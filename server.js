@@ -171,7 +171,9 @@ app.get('/invoices-page', (req, res) => {
 app.get('/suppliers-page', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'suppliers.html'));
 });
-
+app.get('/manifest.json', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'manifest.json'));
+});
 // ===== Admin auth pages =====
 app.get('/admin-login', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'admin-login.html'));
