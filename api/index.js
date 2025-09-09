@@ -1,3 +1,9 @@
-// api/index.js
-const app = require('../server');        // דורש את ה-app שמייצא server.js
-module.exports = (req, res) => app(req, res);   // מעביר את הבקשה ל־Express
+const app = require('../server');
+
+module.exports = (req, res) => {
+  // מסיר את /api מהנתיב כדי שראוטים כמו "/invoices" יתאימו
+  if (req.url.startsWith('/api')) {
+    req.url = req.url.replace(/^\/api/, '');
+  }
+  return app(req, res);
+};
