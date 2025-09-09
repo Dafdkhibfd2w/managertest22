@@ -802,3 +802,35 @@ app.delete('/dispersals/:id', async (req, res) => {
 // app.listen(PORT, () => console.log(`🚀 Server listening on :${PORT}`));ss
 module.exports = app;
 
+// === DEBUG MIDDLEWARE (מדפיס כל בקשה שמגיעה ל-Express) ===
+app.use((req, res, next) => {
+  console.log(`[EXPRESS] ${process.env.VERCEL ? 'VERCEL' : 'LOCAL'} ${req.method} ${req.url}`);
+  next();
+});
+
+// === DEBUG: /ping מחזיר JSON ===
+app.get('/ping', (req, res) => {
+  res.json({ ok: true, where: 'server', url: req.url, vercel: !!process.env.VERCEL });
+});
+
+// === DEBUG: רשימת ראוטים שיש לאפליקציה (כולל שיטות) ===
+app.get('/debug-routes', (req, res) => {
+  const routes = [];
+  const stack = app._router?.stack || [];
+  for (const layer of stack) {
+    if (layer.route) {
+      const path = layer.route.path;
+      const methods = Object.keys(layer.route.methods).filter(Boolean);
+      routes.push({ path, methods });
+    } else if (layer.name === 'router' && layer.handle?.stack) {
+      for (const l2 of layer.handle.stack) {
+        if (l2.route) {
+          const path = l2.route.path;
+          const methods = Object.keys(l2.route.methods).filter(Boolean);
+          routes.push({ path, methods });
+        }
+      }
+    }
+  }
+  res.json({ vercel: !!process.env.VERCEL, routes });
+});
