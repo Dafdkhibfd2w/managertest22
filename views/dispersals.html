@@ -177,7 +177,7 @@
       const fd = new FormData(addForm);
       const body = Object.fromEntries(fd.entries());
       try {
-        const res = await fetch('/dispersals', {
+        const res = await fetch('/api/dispersals', {
           method:'POST',
           headers:{'Content-Type':'application/json'},
           body: JSON.stringify(body)
@@ -229,7 +229,7 @@
     // ===== Data loading & Rendering =====
     async function loadAll(){
       // אפשר להעביר date לשאילתה כדי לצמצם, אבל כאן נביא הכל פעם אחת
-      const res = await fetch('/dispersals');
+      const res = await fetch('/api/dispersals');
       allItems = await res.json();
     }
 
@@ -283,7 +283,7 @@
 
     async function delDisp(id){
       if (!confirm('למחוק את הרשומה?')) return;
-      await fetch('/dispersals/' + encodeURIComponent(id), { method:'DELETE' });
+      await fetch('/api/dispersals/' + encodeURIComponent(id), { method:'DELETE' });
       await loadAll();
       applyFiltersAndRender();
     }

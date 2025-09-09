@@ -202,11 +202,11 @@
         msg.textContent = 'שומר...';
         let res;
         if (editingId) {
-          res = await fetch('/suppliers/' + editingId, {
+          res = await fetch('/api/suppliers/' + editingId, {
             method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
           });
         } else {
-          res = await fetch('/suppliers', {
+          res = await fetch('/api/suppliers', {
             method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
           });
         }
@@ -225,7 +225,7 @@
     });
 
     async function loadSuppliers(activeOnly=false){
-      const res = await fetch('/suppliers' + (activeOnly ? '?active=true' : ''));
+      const res = await fetch('/api/suppliers' + (activeOnly ? '?active=true' : ''));
       const data = await res.json();
       currentList = data.suppliers || [];
       renderTable();
@@ -267,14 +267,14 @@
 
     async function delSupplier(id){
       if (!confirm('למחוק ספק?')) return;
-      await fetch('/suppliers/' + id, { method:'DELETE' });
+      await fetch('/api/suppliers/' + id, { method:'DELETE' });
       await loadSuppliers();
     }
 
     async function toggleActive(id){
       const s = currentList.find(x => x._id === id);
       if (!s) return;
-      await fetch('/suppliers/' + id + '/active', {
+      await fetch('/api/suppliers/' + id + '/active', {
         method:'PATCH',
         headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ active: !s.active })

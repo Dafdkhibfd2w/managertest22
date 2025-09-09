@@ -131,7 +131,7 @@
       uploadMsg.textContent = 'מעלה...';
       const fd = new FormData(uploadForm);
       try {
-        const res = await fetch('/upload-invoice', { method:'POST', body: fd });
+        const res = await fetch('/api/upload-invoice', { method:'POST', body: fd });
         const data = await res.json();
         uploadMsg.textContent = data.message || (data.ok ? 'הועלה' : 'שגיאה');
         if (data.ok) {
@@ -179,7 +179,7 @@
       params.set('skip', state.skip);
       params.set('limit', state.limit);
 
-      const res = await fetch('/invoices?' + params.toString());
+      const res = await fetch('/api/invoices?' + params.toString());
       const data = await res.json();
       state.total = data.total || 0;
 
@@ -204,7 +204,7 @@
 
     async function delInvoice(id) {
       if (!confirm('למחוק את החשבונית?')) return;
-      const res = await fetch('/invoice/' + encodeURIComponent(id), { method:'DELETE' });
+      const res = await fetch('/api/invoice/' + encodeURIComponent(id), { method:'DELETE' });
       const data = await res.json();
       alert(data.message || (data.ok ? 'נמחק' : 'שגיאה'));
       if (data.ok) load();

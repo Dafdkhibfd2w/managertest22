@@ -78,7 +78,7 @@
       const date = dateInput.value;
       if (!date) return;
       msg.textContent = 'טוען...';
-      const res = await fetch('/orders?date=' + encodeURIComponent(date));
+      const res = await fetch('/api/orders?date=' + encodeURIComponent(date));
       const data = await res.json();
       if (data.ok) {
         current = data.order;
@@ -114,7 +114,7 @@ document.getElementById('dateInput').addEventListener('change', updateWeekdayHin
       if (!current) return;
       collectFromUI();
       msg.textContent = 'שומר...';
-      const res = await fetch('/orders', {
+      const res = await fetch('/api/orders', {
         method:'POST',
         headers:{ 'Content-Type':'application/json' },
         body: JSON.stringify({ date: current.date, blocks: current.blocks, notes: current.notes || '' })
