@@ -1,0 +1,804 @@
+// server.js
+require('dotenv').config();
+
+const express       = require('express');
+const path          = require('path');
+const cookieParser  = require('cookie-parser');
+const bodyParser    = require('body-parser');
+const mongoose      = require('mongoose');
+const multer        = require('multer');
+const { v2: cloudinary } = require('cloudinary');
+
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 8 * 1024 * 1024 } });
+const CLOUD_FOLDER = process.env.CLOUDINARY_FOLDER || 'invoices';
+
+// ===== Models =====
+const Dispersal  = require('./models/Dispersal');
+const Supplier   = require('./models/Supplier');
+const DailyOrder = require('./models/DailyOrder');
+const Invoice    = require('./models/Invoice'); // ודא נתיב נכון אצלך
+
+// ===== Utils =====
+function isAllowedMime(m) {
+  return ['image/jpeg','image/png','image/webp','application/pdf'].includes(m);
+}
+
+// ===== App =====
+const app  = express();
+const PORT = process.env.PORT || 3000;
+
+// ===== Middlewares =====
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static('public'));
+app.use(cookieParser());
+
+// ===== Cloudinary =====
+;['CLOUDINARY_CLOUD_NAME','CLOUDINARY_API_KEY','CLOUDINARY_API_SECRET'].forEach(k => {
+  if (!process.env[k]) console.error(`❌ Missing ${k} in .env`);
+});
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// ===== MongoDB Connect =====
+// מומלץ לשים ב-.env: MONGO_URI=mongodb+srv://user:pass@cluster/dbName
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://aviel:aviel998898@cluster0.3po9ias.mongodb.net/';
+mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 10000 })
+  .then(() => console.log('✅ MongoDB connected'))
+  .catch(err => { console.error('❌ Mongo connection error:', err.message); process.exit(1); });
+
+// ===== Schemas for Shifts (כמו אצלך) =====
+const ExecutionSchema = new mongoose.Schema({
+  task:   { type: String, required: true },
+  worker: { type: String, default: '' },
+  time:   { type: String, default: '' },
+}, { _id: false });
+
+const RuntimeNoteSchema = new mongoose.Schema({
+  id:     { type: String, required: true },
+  text:   { type: String, required: true },
+  author: { type: String, default: 'אחמ״ש' },
+  time:   { type: Date,   default: Date.now }
+}, { _id: false });
+
+const ShiftSchema = new mongoose.Schema({
+  date:   { type: String, required: true, unique: true }, // YYYY-MM-DD
+  manager:{ type: String, default: '' },
+  team:   { type: [String], default: [] },
+
+  tasks: {
+    daily:   { type: [String], default: [] },
+    weekly:  { type: [String], default: [] },
+    monthly: { type: [String], default: [] },
+  },
+
+  executions: {
+    daily:   { type: [ExecutionSchema], default: [] },
+    weekly:  { type: [ExecutionSchema], default: [] },
+    monthly: { type: [ExecutionSchema], default: [] },
+  },
+
+  notes:         { type: String, default: '' },
+  runtimeNotes:  { type: [RuntimeNoteSchema], default: [] },
+  closed:        { type: Boolean, default: false },
+  closedAt:      { type: Date, default: null },
+}, { timestamps: true });
+
+const Shift = mongoose.model('Shift', ShiftSchema);
+
+// ===== Helpers =====
+const ADMIN_PIN = process.env.ADMIN_PIN || '1111';
+
+function requireAdmin(req, res, next) {
+  if (req.cookies && req.cookies.adminAuth === 'yes') return next();
+  return res.redirect('/admin-login');
+}
+function normalizeTeam(team) {
+  if (Array.isArray(team)) return team.map(n => String(n).trim()).filter(Boolean);
+  if (typeof team === 'string') return team.split(',').map(n => n.trim()).filter(Boolean);
+  return [];
+}
+function upsertExecutions(targetExec, incomingExec) {
+  const cats = ['daily', 'weekly', 'monthly'];
+  cats.forEach(cat => {
+    const t = Array.isArray(targetExec?.[cat]) ? targetExec[cat] : (targetExec[cat] = []);
+    const inc = Array.isArray(incomingExec?.[cat]) ? incomingExec[cat] : [];
+    inc.forEach(e => {
+      if (!e || !e.task) return;
+      const hit = t.find(x => x.task === e.task);
+      if (hit) {
+        if (e.worker !== undefined) hit.worker = e.worker;
+        if (e.time   !== undefined) hit.time   = e.time;
+      } else {
+        t.push({ task: e.task, worker: e.worker || '', time: e.time || '' });
+      }
+    });
+  });
+}
+function alignExecutionsByTasks(shift, executions) {
+  const out = { daily: [], weekly: [], monthly: [] };
+  ['daily', 'weekly', 'monthly'].forEach(cat => {
+    const tasks = Array.isArray(shift?.tasks?.[cat]) ? shift.tasks[cat] : [];
+    const inReq = Array.isArray(executions?.[cat]) ? executions[cat] : [];
+    const byTask = new Map(inReq.map(e => [e.task, { worker: e.worker || '', time: e.time || '' }]));
+    out[cat] = tasks.map(t => {
+      const hit = byTask.get(t);
+      return { task: t, worker: hit?.worker || '', time: hit?.time || '' };
+    });
+  });
+  return out;
+}
+// 0=א',1=ב',2=ג',3=ד',4=ה'  (מתאריך YYYY-MM-DD)
+function weekdayIndexFromDateStr(yyyy_mm_dd) {
+  const [y,m,d] = yyyy_mm_dd.split('-').map(Number);
+  const wd = new Date(Date.UTC(y, m-1, d)).getUTCDay(); // 0=Sunday..6=Saturday
+  return (wd === 0) ? 0 : wd; // כאן יוצא 0=ראשון, 1=שני, ...
+}
+
+// ===== Views =====
+app.get('/create', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'index.html'));
+});
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'home.html'));
+});
+app.get('/manage', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'manage.html'));
+});
+app.get('/dispersals-page', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'dispersals.html'));
+});
+app.get('/orders-page', (req, res) => {               // << דף ההזמנות
+  res.sendFile(path.join(__dirname, 'views', 'orders.html'));
+});
+app.get('/invoices-page', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'invoices.html'));
+});
+app.get('/suppliers-page', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'suppliers.html'));
+});
+
+// ===== Admin auth pages =====
+app.get('/admin-login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'admin-login.html'));
+});
+app.post('/admin-login', (req, res) => {
+  const { pin } = req.body || {};
+  if (pin === ADMIN_PIN) {
+    res.cookie('adminAuth', 'yes', {
+      httpOnly: true, sameSite: 'lax', maxAge: 1000 * 60 * 60 * 8
+    });
+    return res.redirect('/admin');
+  }
+  return res.status(401).send(`
+    <meta charset="utf-8">
+    <div style="font-family:system-ui;direction:rtl;padding:20px">
+      <h3>קוד שגוי</h3>
+      <p>נסה שוב.</p>
+      <a href="/admin-login">חזרה</a>
+    </div>
+  `);
+});
+app.post('/admin-logout', (req, res) => {
+  res.clearCookie('adminAuth', { sameSite: 'lax' });
+  res.redirect('/admin-login');
+});
+app.get('/admin', requireAdmin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'admin.html'));
+});
+
+// ===== Cloudinary helper =====
+function uploadToCloudinary(buffer, opts = {}) {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(opts, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+    stream.end(buffer);
+  });
+}
+
+// ===== API: חשבוניות =====
+app.post('/upload-invoice', upload.single('file'), async (req, res) => {
+  try {
+    const date = (req.body?.date || '').trim();
+    const supplier = (req.body?.supplier || '').trim();
+    const f = req.file;
+
+    if (!date || !supplier || !f) {
+      return res.status(400).json({ ok:false, message:'חסר date / supplier / קובץ' });
+    }
+    if (!isAllowedMime(f.mimetype)) {
+      return res.status(400).json({ ok:false, message:'סוג קובץ לא נתמך' });
+    }
+
+    const folder = `${CLOUD_FOLDER}/shifts/${date}/${encodeURIComponent(supplier)}`;
+    const result = await uploadToCloudinary(f.buffer, {
+      folder,
+      resource_type: 'auto',
+      filename_override: f.originalname,
+      use_filename: true,
+      unique_filename: true
+    });
+
+    const row = await Invoice.create({
+      shiftDate:   date,
+      supplier,
+      url:         result.secure_url,
+      publicId:    result.public_id,
+      resourceType:result.resource_type,
+      format:      result.format,
+      bytes:       result.bytes,
+      width:       result.width,
+      height:      result.height,
+      originalName:f.originalname,
+      uploadedBy:  'אחמ״ש'
+    });
+
+    res.json({ ok:true, message:'החשבונית הועלתה בהצלחה', invoice: row });
+  } catch (e) {
+    console.error('upload-invoice error:', e);
+    res.status(500).json({ ok:false, message:'שגיאה בהעלאת חשבונית' });
+  }
+});
+
+// GET /invoices?date=YYYY-MM-DD&supplier=שם&skip=0&limit=20
+app.get('/invoices', async (req, res) => {
+  try {
+    const { date, supplier, skip = 0, limit = 20 } = req.query;
+    const q = {};
+    if (date) q.shiftDate = String(date);
+    if (supplier) q.supplier = new RegExp(String(supplier).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+
+    const s = Math.max(0, parseInt(skip));
+    const l = Math.min(100, Math.max(1, parseInt(limit)));
+
+    const [items, total] = await Promise.all([
+      Invoice.find(q).sort({ createdAt: -1 }).skip(s).limit(l).lean(),
+      Invoice.countDocuments(q)
+    ]);
+
+    res.json({ items, total, skip: s, limit: l });
+  } catch (e) {
+    console.error('invoices error:', e);
+    res.status(500).json({ items: [], total: 0, skip: 0, limit: 20 });
+  }
+});
+
+app.delete('/invoice/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const row = await Invoice.findById(id);
+    if (!row) return res.status(404).json({ ok:false, message:'לא נמצאה חשבונית' });
+
+    await cloudinary.uploader.destroy(row.publicId, { resource_type: row.resourceType || 'image' });
+    await row.deleteOne();
+
+    res.json({ ok:true, message:'נמחק' });
+  } catch (e) {
+    console.error('delete-invoice error:', e);
+    res.status(500).json({ ok:false, message:'שגיאה במחיקה' });
+  }
+});
+
+// ===== API: משמרות =====
+app.get('/get-all-shifts', async (req, res) => {
+  try {
+    const all = await Shift.find().sort({ date: -1 });
+    res.json(all);
+  } catch (e) {
+    console.error('get-all-shifts error:', e);
+    res.status(500).json([]);
+  }
+});
+app.get('/get-shift', async (req, res) => {
+  try {
+    const { date } = req.query;
+    if (!date) return res.json(null);
+    const shift = await Shift.findOne({ date });
+    res.json(shift || null);
+  } catch (e) {
+    console.error('get-shift error:', e);
+    res.status(500).json(null);
+  }
+});
+app.post('/save-shift', async (req, res) => {
+  try {
+    const payload = { ...req.body };
+    payload.team = normalizeTeam(payload.team);
+
+    await Shift.findOneAndUpdate(
+      { date: payload.date },
+      { $set: payload, $setOnInsert: { executions: { daily: [], weekly: [], monthly: [] } } },
+      { upsert: true, new: true }
+    );
+    res.json({ status: 'ok', message: 'המשמרת נשמרה בהצלחה!' });
+  } catch (e) {
+    console.error('save-shift error:', e);
+    res.status(500).json({ status: 'error', message: 'שגיאה בשמירה' });
+  }
+});
+app.post('/update-shift', async (req, res) => {
+  try {
+    const { date, executions } = req.body || {};
+    if (!date) return res.status(400).json({ message: 'date חובה' });
+
+    const shift = await Shift.findOne({ date });
+    if (!shift) return res.status(404).json({ message: 'Shift not found' });
+
+    const aligned = alignExecutionsByTasks(shift, executions);
+    shift.executions = aligned;
+    await shift.save();
+
+    res.json({ message: 'עודכן בהצלחה' });
+  } catch (e) {
+    console.error('update-shift error:', e);
+    res.status(500).json({ message: 'שגיאת שרת' });
+  }
+});
+app.post('/update-single-task', async (req, res) => {
+  try {
+    const { date, category, task, worker, time } = req.body || {};
+    if (!date || !category || !task) {
+      return res.status(400).json({ message: 'חובה date, category, task' });
+    }
+    const shift = await Shift.findOne({ date });
+    if (!shift) return res.status(404).json({ message: 'Shift not found' });
+
+    if (!shift.executions) shift.executions = { daily: [], weekly: [], monthly: [] };
+    const list = Array.isArray(shift.executions[category]) ? shift.executions[category] : (shift.executions[category] = []);
+    const existing = list.find(e => e.task === task);
+
+    if (existing) {
+      if (worker !== undefined) existing.worker = worker;
+      if (time   !== undefined) existing.time   = time;
+    } else {
+      list.push({ task, worker: worker || '', time: time || '' });
+    }
+
+    await shift.save();
+    res.json({ message: 'נשמר ✔' });
+  } catch (e) {
+    console.error('update-single-task error:', e);
+    res.status(500).json({ message: 'שגיאת שרת' });
+  }
+});
+app.post('/admin-update-shift', async (req, res) => {
+  try {
+    const { date, manager, team, notes } = req.body || {};
+    if (!date) return res.status(400).json({ ok: false, message: 'date חובה.' });
+
+    const update = {};
+    if (typeof manager === 'string') update.manager = manager.trim();
+    if (team !== undefined) update.team = normalizeTeam(team);
+    if (typeof notes === 'string') update.notes = notes.trim();
+
+    const shift = await Shift.findOneAndUpdate(
+      { date },
+      { $set: update },
+      { new: true }
+    );
+    if (!shift) return res.status(404).json({ ok: false, message: 'Shift not found' });
+
+    return res.json({ ok: true, message: 'הפרטים נשמרו בהצלחה' });
+  } catch (e) {
+    console.error('admin-update-shift error:', e);
+    return res.status(500).json({ ok: false, message: 'שגיאת שרת' });
+  }
+});
+app.post('/finalize-shift', async (req, res) => {
+  try {
+    const { date, manager, team, executions } = req.body || {};
+    if (!date) return res.status(400).json({ ok: false, message: 'date חובה.' });
+
+    let shift = await Shift.findOne({ date });
+    if (!shift) {
+      shift = new Shift({
+        date,
+        manager: manager || '',
+        team: normalizeTeam(team),
+        tasks: { daily: [], weekly: [], monthly: [] },
+        executions: { daily: [], weekly: [], monthly: [] }
+      });
+    } else {
+      if (manager !== undefined) shift.manager = manager;
+      if (team !== undefined)    shift.team    = normalizeTeam(team);
+    }
+
+    if (!shift.executions) shift.executions = { daily: [], weekly: [], monthly: [] };
+    if (executions) upsertExecutions(shift.executions, executions);
+
+    shift.closed  = true;
+    shift.closedAt = new Date();
+
+    await shift.save();
+    return res.json({ ok: true, message: 'המשמרת נסגרה בהצלחה.', shift });
+  } catch (err) {
+    console.error('finalize-shift error:', err);
+    return res.status(500).json({ ok: false, message: 'שגיאה בסגירת המשמרת.' });
+  }
+});
+
+// ===== API: הזמנות יומיות =====
+// GET /orders?date=YYYY-MM-DD  → מחזיר/יוצר טופס לפי ספקים פעילים ליום הזה
+// ✅ להשאיר – בונה מחדש אם אין מסמך או אם ה־blocks ריק
+// GET /orders?date=YYYY-MM-DD&mode=merge|replace
+// משדרג תמיד את המסמך לסט הספקים הכי עדכני לאותו יום.
+// ברירת מחדל: merge (שומר כמויות/הערות). mode=replace ידרוס הכל.
+app.get('/orders', async (req, res) => {
+  try {
+    const { date, mode = 'merge' } = req.query;
+    if (!date) return res.status(400).json({ ok:false, message:'חסר date' });
+
+    // ה־blocks ה"תקניים" לפי הספקים העדכניים
+    const freshBlocks = await buildBlocksFromSuppliers(date);
+
+    // אם אין בכלל ספקים ליום הזה – ניצור/נחזיר מסמך ריק עם blocks=[]
+    if (!freshBlocks.length) {
+      let emptyDoc = await DailyOrder.findOne({ date });
+      if (!emptyDoc) emptyDoc = await DailyOrder.create({ date, blocks: [], notes: '' });
+      return res.json({ ok:true, order: emptyDoc });
+    }
+
+    let doc = await DailyOrder.findOne({ date });
+    if (!doc) {
+      // אין מסמך — ניצור חדש ישר מהספקים
+      doc = await DailyOrder.create({ date, blocks: freshBlocks, notes: '' });
+      return res.json({ ok:true, order: doc });
+    }
+
+    // יש מסמך — נעדכן אותו לפי מצב הספקים הנוכחי
+    if (mode === 'replace') {
+      doc.blocks = freshBlocks; // דריסה מלאה
+    } else {
+      // merge: שומר כמויות/הערות קיימות על מוצרים שנשארו
+      doc.blocks = mergeBlocksKeepQuantities(doc.blocks, freshBlocks);
+    }
+    await doc.save();
+
+    res.json({ ok:true, order: doc });
+  } catch (e) {
+    console.error('GET /orders error', e);
+    res.status(500).json({ ok:false, message:'שגיאת שרת' });
+  }
+});
+
+
+
+// POST /orders  body: { date, blocks, notes }
+app.post('/orders', async (req, res) => {
+  try {
+    const { date, blocks, notes } = req.body || {};
+    if (!date || !Array.isArray(blocks)) {
+      return res.status(400).json({ ok:false, message:'חסר date/blocks' });
+    }
+
+    const cleanBlocks = blocks.map(b => ({
+      supplierId: b.supplierId,
+      supplier:   b.supplier,
+      items: (b.items || []).map(it => ({
+        name: it.name,
+        unit: it.unit || '',
+        currentQty: Number(it.currentQty || 0),
+        toOrderQty: Number(it.toOrderQty || 0),
+        notes: String(it.notes || '')
+      }))
+    }));
+
+    const saved = await DailyOrder.findOneAndUpdate(
+      { date },
+      { $set: { blocks: cleanBlocks, notes: notes || '' } },
+      { new: true, upsert: true }
+    );
+
+    res.json({ ok:true, order: saved });
+  } catch (e) {
+    console.error('POST /orders error', e);
+    res.status(500).json({ ok:false, message:'שגיאה בשמירה' });
+  }
+});
+// בונה blocks לפי ספקים פעילים של היום (א׳=0 ... ש׳=6)
+async function buildBlocksFromSuppliers(dateStr) {
+  const [y,m,d] = dateStr.split('-').map(Number);
+  const wd = new Date(Date.UTC(y, m-1, d)).getUTCDay(); // 0..6
+
+  const suppliers = await Supplier.find({
+    active: true,
+    $or: [{ days: wd }, { days: String(wd) }] // תמיכה גם במחרוזות ישנות
+  }).lean();
+
+  return suppliers.map(s => ({
+    supplierId: s._id,
+    supplier:   s.name,
+    items: (s.items || []).map(it => ({
+      name: it.name,
+      unit: it.unit || '',
+      currentQty: 0,
+      toOrderQty: 0,
+      notes: ''
+    }))
+  }));
+}
+
+// ממזג blocks חדשים עם קיימים – שומר כמויות/הערות לפי שם מוצר+יחידה
+function mergeBlocksKeepQuantities(oldBlocks = [], freshBlocks = []) {
+  const oldBySupplier = new Map(
+    oldBlocks.map(b => [String(b.supplier), b])
+  );
+
+  return freshBlocks.map(fb => {
+    const ob = oldBySupplier.get(String(fb.supplier));
+    if (!ob) return fb; // ספק חדש לגמרי
+
+    // מיפוי פריטים ישנים לפי שם+יחידה
+    const oldItemMap = new Map(
+      (ob.items || []).map(it => [ `${it.name}__${it.unit||''}`, it ])
+    );
+
+    const mergedItems = (fb.items || []).map(nit => {
+      const key = `${nit.name}__${nit.unit||''}`;
+      const hit = oldItemMap.get(key);
+      return hit ? {
+        ...nit,
+        currentQty: Number(hit.currentQty || 0),
+        toOrderQty: Number(hit.toOrderQty || 0),
+        notes: String(hit.notes || '')
+      } : nit;
+    });
+
+    return {
+      ...fb,
+      items: mergedItems
+    };
+  });
+}
+
+app.get('/orders-list', async (req, res) => {
+  try {
+    const limit = Math.min(200, Math.max(1, parseInt(req.query.limit || '30')));
+    const rows = await DailyOrder.find({}, { date:1, createdAt:1, updatedAt:1 })
+      .sort({ date: -1 }).limit(limit).lean();
+    res.json({ ok:true, days: rows });
+  } catch (e) {
+    console.error('GET /orders-list error', e);
+    res.status(500).json({ ok:false, days: [] });
+  }
+});
+// // GET /orders-list?limit=30
+// app.get('/orders', async (req, res) => {
+//   try {
+//     const { date } = req.query;
+//     if (!date) return res.status(400).json({ ok:false, message:'חסר date' });
+
+//     let doc = await DailyOrder.findOne({ date });
+//     const wd = weekdayIndexFromDateStr(date); // 0=א'..6=ש'
+
+//     // בונה ספקים ליום הזה
+//     const suppliers = await Supplier.find({
+//       active: true,
+//       $or: [{ days: wd }, { days: String(wd) }] // תומך גם במחרוזות ישנות
+//     }).lean();
+
+//     // אם אין blocks או שהמסמך לא קיים → נבנה חדשים
+//     if (!doc || !doc.blocks || !doc.blocks.length) {
+//       const blocks = suppliers.map(s => ({
+//         supplierId: s._id,
+//         supplier: s.name,
+//         items: (s.items || []).map(it => ({
+//           name: it.name, unit: it.unit || '', currentQty: 0, toOrderQty: 0, notes: ''
+//         }))
+//       }));
+
+//       if (!doc) {
+//         doc = await DailyOrder.create({ date, blocks, notes: '' });
+//       } else {
+//         doc.blocks = blocks;
+//         await doc.save();
+//       }
+//     }
+
+//     res.json({ ok:true, order: doc });
+//   } catch (e) {
+//     console.error('GET /orders error', e);
+//     res.status(500).json({ ok:false, message:'שגיאת שרת' });
+//   }
+// });
+
+// ===== API: ספקים (ניהול מלא) =====
+app.get('/suppliers', async (req, res) => {
+  try {
+    const { active } = req.query;
+    const q = {};
+    if (active === 'true') q.active = true;
+    if (active === 'false') q.active = false;
+    const rows = await Supplier.find(q).sort({ name: 1 }).lean();
+    res.json({ ok:true, suppliers: rows });
+  } catch (e) {
+    console.error('GET /suppliers error', e);
+    res.status(500).json({ ok:false, suppliers: [] });
+  }
+});
+
+app.post('/suppliers', async (req, res) => {
+  try {
+    const { name, phone, days, items, active } = req.body || {};
+    const doc = await Supplier.create({
+      name: String(name).trim(),
+      phone: String(phone||'').trim(),
+      days: Array.isArray(days) ? days.map(Number) : [], // <<< חשוב
+      items: Array.isArray(items) ? items.map(it => ({ name: it.name, unit: it.unit||'' })) : [],
+      active: active !== undefined ? !!active : true
+    });
+    res.json({ ok:true, supplier: doc });
+  } catch (e) {
+    console.error('POST /suppliers error', e);
+    res.status(500).json({ ok:false, message: 'שגיאה ביצירה' });
+  }
+});
+// POST /orders/rebuild  { date: 'YYYY-MM-DD' }
+app.post('/orders/rebuild', async (req, res) => {
+  try {
+    const { date } = req.body || {};
+    if (!date) return res.status(400).json({ ok:false, message:'חסר date' });
+
+    let doc = await DailyOrder.findOne({ date });
+    const wd = weekdayIndexFromDateStr(date);
+
+    const suppliers = await Supplier.find({
+      active: true,
+      $or: [{ days: wd }, { days: String(wd) }]
+    }).lean();
+
+    const blocks = suppliers.map(s => ({
+      supplierId: s._id,
+      supplier: s.name,
+      items: (s.items || []).map(it => ({
+        name: it.name, unit: it.unit || '', currentQty: 0, toOrderQty: 0, notes: ''
+      }))
+    }));
+
+    if (!doc) {
+      doc = await DailyOrder.create({ date, blocks, notes: '' });
+    } else {
+      doc.blocks = blocks;
+      await doc.save();
+    }
+    res.json({ ok:true, order: doc });
+  } catch (e) {
+    console.error('rebuild-order error', e);
+    res.status(500).json({ ok:false, message:'שגיאה בעדכון' });
+  }
+});
+app.delete('/orders/:date', async (req, res) => {
+  try {
+    const { date } = req.params;
+    const r = await DailyOrder.deleteOne({ date });
+    res.json({ ok:true, deleted: r.deletedCount });
+  } catch (e) {
+    console.error('DELETE /orders/:date error', e);
+    res.status(500).json({ ok:false, message:'שגיאה במחיקה' });
+  }
+});
+app.put('/suppliers/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, phone, days, items, active } = req.body || {};
+    const doc = await Supplier.findByIdAndUpdate(
+      id,
+      {
+        $set: {
+          ...(name !== undefined ? { name: String(name).trim() } : {}),
+          ...(phone !== undefined ? { phone: String(phone).trim() } : {}),
+          ...(days !== undefined ? { days: (Array.isArray(days) ? days.map(Number) : []) } : {}), // <<< חשוב
+          ...(items !== undefined ? { items: (Array.isArray(items) ? items.map(it => ({ name: it.name, unit: it.unit||'' })) : []) } : {}),
+          ...(active !== undefined ? { active: !!active } : {})
+        }
+      },
+      { new: true }
+    );
+    res.json({ ok:true, supplier: doc });
+  } catch (e) {
+    console.error('PUT /suppliers/:id error', e);
+    res.status(500).json({ ok:false, message: 'שגיאה בעדכון' });
+  }
+});
+
+app.delete('/suppliers/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Supplier.findByIdAndDelete(id);
+    res.json({ ok:true });
+  } catch (e) {
+    console.error('DELETE /suppliers/:id error', e);
+    res.status(500).json({ ok:false, message: 'שגיאה במחיקה' });
+  }
+});
+
+app.patch('/suppliers/:id/active', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { active } = req.body || {};
+    const doc = await Supplier.findByIdAndUpdate(id, { $set: { active: !!active } }, { new: true });
+    res.json({ ok:true, supplier: doc });
+  } catch (e) {
+    console.error('PATCH /suppliers/:id/active error', e);
+    res.status(500).json({ ok:false, message: 'שגיאה' });
+  }
+});
+
+// 🔧 מיגרציה חד־פעמית: להפוך days ממחרוזות למספרים לכל הספקים (תריץ פעם אחת ואז תסיר/תנעל)
+app.post('/suppliers/migrate-days-to-numbers', async (req, res) => {
+  try {
+    const all = await Supplier.find({}).lean();
+    const ops = [];
+    for (const s of all) {
+      if (Array.isArray(s.days) && s.days.some(v => typeof v === 'string')) {
+        ops.push({
+          updateOne: {
+            filter: { _id: s._id },
+            update: { $set: { days: s.days.map(n => Number(n)) } }
+          }
+        });
+      }
+    }
+    if (ops.length) await Supplier.bulkWrite(ops);
+    res.json({ ok:true, updated: ops.length });
+  } catch (e) {
+    console.error('migrate-days error', e);
+    res.status(500).json({ ok:false, message:'migration failed' });
+  }
+});
+
+// ===== API: פיזורים =====
+app.post('/dispersals', async (req, res) => {
+  try {
+    const { date, price, taxi, people, payer, notes } = req.body;
+    if (!date || !price) return res.status(400).json({ ok:false, message:'חובה תאריך ומחיר' });
+
+    const doc = await Dispersal.create({
+      shiftDate: date,
+      price,
+      taxi: taxi || '',
+      people: Array.isArray(people) ? people : String(people||'').split(',').map(x => x.trim()).filter(Boolean),
+      payer: payer || '',
+      notes: notes || ''
+    });
+
+    res.json({ ok:true, dispersal: doc });
+  } catch (e) {
+    console.error('create dispersal error', e);
+    res.status(500).json({ ok:false, message:'שגיאה ביצירה' });
+  }
+});
+
+app.get('/dispersals', async (req, res) => {
+  try {
+    const { date } = req.query;
+    const q = {};
+    if (date) q.shiftDate = date;
+    const items = await Dispersal.find(q).sort({ createdAt: -1 }).lean();
+    res.json(items);
+  } catch (e) {
+    console.error('list dispersals error', e);
+    res.status(500).json([]);
+  }
+});
+
+app.delete('/dispersals/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Dispersal.findByIdAndDelete(id);
+    res.json({ ok:true });
+  } catch (e) {
+    console.error('delete dispersal error', e);
+    res.status(500).json({ ok:false });
+  }
+});
+
+// ===== Start server =====
+// app.listen(PORT, () => console.log(`🚀 Server listening on :${PORT}`));
+module.exports = app;
+

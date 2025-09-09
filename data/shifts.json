@@ -1,0 +1,58 @@
+[
+  {
+    "date": "1111-11-11",
+    "team": [
+      "1"
+    ],
+    "manager": "1",
+    "tasks": {
+      "daily": [
+        "ניקיון עמדות"
+      ],
+      "weekly": [],
+      "monthly": []
+    },
+    "notes": "112121",
+    "runtimeNotes": [
+      {
+        "id": "mfalk3uxijxxj",
+        "text": "12",
+        "author": "אחמ״ש",
+        "time": "2025-09-08T04:03:36.969Z"
+      },
+      {
+        "id": "mfaltzvtme8r4",
+        "text": "1212",
+        "author": "אחמ״ש",
+        "time": "2025-09-08T04:11:18.377Z"
+      }
+    ],
+    "executions": {
+      "daily": [
+        {
+          "task": "ניקיון עמדות",
+          "worker": "1",
+          "time": ""
+        }
+      ],
+      "weekly": [],
+      "monthly": []
+    }
+  },
+  {
+    "date": "1212-12-12",
+    "team": [
+      "121221"
+    ],
+    "manager": "12212",
+    "tasks": {
+      "daily": [
+        "ניקיון עמדות"
+      ],
+      "weekly": [],
+      "monthly": []
+    },
+    "notes": "",
+    "runtimeNotes": []
+  }
+]

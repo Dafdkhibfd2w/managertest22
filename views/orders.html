@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>NEW DELI • הזמנות יומיות</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    :root { --green:#2b5329; --bg:#fbfff6; --border:#e2eadc; --ink:#0a0a0a; }
+    body { font-family: system-ui, Arial; background: var(--bg); color: var(--ink); padding: clamp(12px,2vw,24px); }
+    .wrap { max-width: 1080px; margin: 0 auto; }
+    h1 { color: var(--green); margin-bottom: 12px; }
+    .card { background:#fff; border:1px solid var(--border); border-radius:14px; padding:16px; box-shadow:0 2px 10px rgba(0,0,0,.05); margin-bottom:16px; }
+    .row { display:grid; grid-template-columns: 1fr 1fr auto; gap:12px; align-items:end; }
+    label { font-size:14px; display:block; margin-bottom:6px; }
+    input, textarea { width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; }
+    textarea { min-height: 46px; }
+    button { padding:10px 14px; border:0; border-radius:10px; background:var(--green); color:#fff; cursor:pointer; }
+    .supplier { border:1px dashed var(--border); border-radius:12px; padding:12px; margin-bottom:12px; }
+    .supplier h3 { margin:0 0 10px; color:#234; font-size:16px; }
+    table { width:100%; border-collapse: collapse; }
+    th, td { border-bottom:1px solid var(--border); padding:8px; text-align:right; }
+    th { background:#f5f9f1; }
+    .qty { width:90px; text-align:center; }
+    .unit { color:#666; font-size:12px; white-space:nowrap; }
+    .muted { color:#666; font-size:12px; }
+    @media (max-width: 820px){ .row { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>הזמנות יומיות</h1>
+
+    <!-- בר עליון: בחירת תאריך + כפתורי טעינה/שמירה -->
+    <div class="card">
+      <form id="loadForm" class="row">
+        <div>
+<label>תאריך</label>
+<input type="date" name="date" id="dateInput" required>
+<small id="weekdayHint" class="muted" style="margin-inline-start:8px"></small>
+        </div>
+        <div>
+          <label>&nbsp;</label>
+          <button type="submit">טען / צור טופס</button>
+        </div>
+        <div>
+          <label>&nbsp;</label>
+          <button type="button" id="saveBtn">שמור</button>
+        </div>
+      </form>
+      <p class="muted" id="msg"></p>
+    </div>
+
+    <!-- טפסי ספקים -->
+    <div id="suppliersWrap"></div>
+
+    <!-- הערות כלליות ליום -->
+    <!-- <div class="card" id="notesCard" style="display:none">
+      <label>הערות כלליות ליום</label>
+      <textarea id="dayNotes"></textarea>
+    </div> -->
+  </div>
+
+  <script>
+    const dateInput = document.getElementById('dateInput');
+    const loadForm  = document.getElementById('loadForm');
+    const saveBtn   = document.getElementById('saveBtn');
+    const msg       = document.getElementById('msg');
+    const wrap      = document.getElementById('suppliersWrap');
+    // const notesCard = document.getElementById('notesCard');
+    const dayNotes  = document.getElementById('dayNotes');
+
+    let current = null; // { date, blocks:[{supplierId,supplier,items:[{name,unit,currentQty,toOrderQty,notes}]}], notes }
+
+    // טען/צור טופס ליום
+    loadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const date = dateInput.value;
+      if (!date) return;
+      msg.textContent = 'טוען...';
+      const res = await fetch('/orders?date=' + encodeURIComponent(date));
+      const data = await res.json();
+      if (data.ok) {
+        current = data.order;
+        render();
+        msg.textContent = 'נטען ✔';
+      } else {
+        msg.textContent = data.message || 'שגיאה';
+      }
+      setTimeout(()=> msg.textContent='', 1500);
+    });
+function weekdayFromYMD(ymd) {
+  if (!ymd) return '';
+  // נפרק ידנית כדי להימנע מבעיות אזור זמן
+  const [y, m, d] = ymd.split('-').map(Number);
+  const dt = new Date(y, m - 1, d); // תאריך מקומי
+  return dt.toLocaleDateString('he-IL', { weekday: 'long' }); // לדוגמה: "שלישי"
+}
+
+function updateWeekdayHint() {
+  const ymd = document.getElementById('dateInput').value;
+  document.getElementById('weekdayHint').textContent =
+    ymd ? `(${weekdayFromYMD(ymd)})` : '';
+}
+
+// בעת טעינת הדף:
+updateWeekdayHint();
+
+// בכל שינוי תאריך:
+document.getElementById('dateInput').addEventListener('change', updateWeekdayHint);
+
+    // שמירה
+    saveBtn.addEventListener('click', async () => {
+      if (!current) return;
+      collectFromUI();
+      msg.textContent = 'שומר...';
+      const res = await fetch('/orders', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify({ date: current.date, blocks: current.blocks, notes: current.notes || '' })
+      });
+      const data = await res.json();
+      msg.textContent = data.ok ? 'נשמר ✔' : (data.message || 'שגיאה בשמירה');
+      setTimeout(()=> msg.textContent='', 1500);
+    });
+
+    function render(){
+      wrap.innerHTML = '';
+      if (!current.blocks || !current.blocks.length) {
+  const empty = document.createElement('div');
+  empty.className = 'card';
+  empty.innerHTML = `<p style="text-align:center;color:#666">אין ספקים ליום זה</p>`;
+  wrap.appendChild(empty);
+//   notesCard.style.display = 'block';
+  dayNotes.value = current.notes || '';
+  return;
+}
+
+    //   notesCard.style.display = 'block';
+    //   dayNotes.value = current.notes || '';
+
+      (current.blocks || []).forEach((b, bi) => {
+        const card = document.createElement('div');
+        card.className = 'card supplier';
+        card.innerHTML = `
+          <h3>${escapeHtml(b.supplier)}</h3>
+          <div style="overflow:auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>מוצר</th>
+                  <th>כמה יש</th>
+                  <th>להזמין</th>
+                  <th>הערות</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${b.items.map((it, ii) => `
+                  <tr>
+                    <td>
+                      <div>${escapeHtml(it.name)} <span class="unit">${escapeHtml(it.unit||'')}</span></div>
+                    </td>
+                    <td><input type="number" class="qty" min="0" step="1" value="${num(it.currentQty)}" data-bi="${bi}" data-ii="${ii}" data-field="currentQty"></td>
+                    <td><input type="number" class="qty" min="0" step="1" value="${num(it.toOrderQty)}" data-bi="${bi}" data-ii="${ii}" data-field="toOrderQty"></td>
+                    <td><input type="text" value="${escapeAttr(it.notes||'')}" data-bi="${bi}" data-ii="${ii}" data-field="notes" style="width:100%"></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+        wrap.appendChild(card);
+      });
+
+      // מאזינים לכל האינפוטים
+      wrap.querySelectorAll('input').forEach(inp => {
+        inp.addEventListener('input', onFieldChange);
+      });
+    //   dayNotes.addEventListener('input', () => current.notes = dayNotes.value);
+    }
+
+    function onFieldChange(e){
+      const bi = +e.target.dataset.bi;
+      const ii = +e.target.dataset.ii;
+      const field = e.target.dataset.field;
+      const v = e.target.type === 'number' ? Number(e.target.value || 0) : String(e.target.value || '');
+      if (current?.blocks?.[bi]?.items?.[ii]) {
+        current.blocks[bi].items[ii][field] = v;
+      }
+    }
+
+    function collectFromUI(){
+      // כבר מעדכנים oninput; כאן רק דואגים להערות יום
+    //   current.notes = dayNotes.value || '';
+    }
+
+    // utils
+    function num(n){ return Number(n||0); }
+    function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
+    function escapeAttr(s){ return escapeHtml(s).replace(/"/g,'&quot;'); }
+
+    // ברירת מחדל: טען היום
+    const today = new Date().toISOString().slice(0,10);
+    dateInput.value = today;
+  </script>
+</body>
+</html>

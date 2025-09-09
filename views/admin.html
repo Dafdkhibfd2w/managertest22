@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>NEW DELI • דף מנהל</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#2b5329">
+
+<style>
+  :root{
+    --green:#2b5329; --green-50:#eef7ea; --green-100:#dff0d7;
+    --amber:#e6b800; --red:#c73d3d; --bg:#fbfff6; --border:#dfe8d9;
+    --text:#0a0a0a;
+  }
+
+  /* מודאל */
+  .modal{
+    position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+    background:rgba(0,0,0,.28); padding:16px;
+  }
+  .modal-content{
+    background:#fff; width:min(96vw,980px); max-height:90dvh; overflow:auto;
+    border-radius:18px; padding:18px; box-shadow:0 12px 40px rgba(0,0,0,.22);
+  }
+  .modal-actions{ display:flex; gap:10px; margin-top:10px }
+  .modal-actions .save,.modal-actions .cancel{
+    background:var(--green); color:#fff; border:0; padding:10px 14px;
+    border-radius:12px; cursor:pointer;
+  }
+  .modal-actions .cancel{ background:#b89f00 }
+
+  /* טופס בפרטי משמרת */
+  #editForm{
+    display:grid; grid-template-columns:1fr 1fr; gap:16px;
+  }
+  #editForm > label,#editForm > textarea{ grid-column:1 / -1 }
+  #editForm > input[readonly]{ background:#f7fbf3 }
+
+  /* כל שדות הטופס – לא לגלוש */
+  #editForm input, #editForm select, #editForm textarea{
+    width:100%; max-width:100%; min-width:0; box-sizing:border-box;
+    padding:10px 14px; font-size:15px;
+    border:1px solid var(--border,#ccc); border-radius:10px;
+  }
+
+  /* גריד של שורות המשימות */
+  #editRows{
+    display:grid; grid-template-columns:1fr 1fr; gap:14px; grid-column:1 / -1;
+  }
+  /* תיקון טייפו שהיה: grid-template-coFlumns -> grid-template-columns */
+  @media (max-width:820px){
+    #editForm{ grid-template-columns:1fr; }
+    #editRows{ grid-template-columns:1fr; }
+  }
+
+  /* כרטיס משימה */
+  .task-card{
+    background:#fff; border:1px solid var(--border); border-radius:14px;
+    padding:12px; display:flex; gap:10px; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; min-width:0;
+  }
+  .task-card.ok{ background:#f4fbf1; border-color:#cfe6c6 }
+  .task-card.missing{ background:#fff6f6; border-color:#f3c7c7 }
+  .task-card .state{
+    width:30px; height:30px; display:grid; place-items:center;
+    border-radius:8px; border:1px solid var(--border);
+  }
+  .task-card.ok .state{ background:#e6f7e0 }
+  .task-card.missing .state{ background:#ffe7e7; color:var(--red); border-color:#f1b7b7 }
+
+  .task-card .name{
+    font-weight:700; color:#1a2c18; word-break:break-word;
+    flex:1 1 100%; text-align:right; display:flex; flex-direction:column; gap:.5rem; padding: .25rem 0;
+    min-width:0;
+  }
+  .task-card select{
+    flex:1 1 260px; max-width:100%; min-width:0;
+  }
+
+  /* במסכים צרים—הכרטיסים נערמים אנכית כדי למנוע גלישה */
+  @media (max-width:560px){
+    .task-card{ flex-direction:column; align-items:stretch; }
+    .task-card .name{ flex-basis:auto; }
+    .task-card select{ width:100%; }
+  }
+
+  .cat-title{ grid-column:1 / -1; margin:4px 0 0; color:var(--green) }
+
+  textarea{
+    width:100%; padding:10px 14px; font-size:15px;
+    border:1px solid var(--border,#ccc); border-radius:10px;
+    resize:vertical; min-height:80px; box-sizing:border-box;
+  }
+
+  /* כל מיכל כללי בעמוד – ריווח פנימי כדי שלא "ייזלוג" לשוליים בנייד */
+  .container{ padding-inline:12px; }
+</style>
+</head>
+<body>
+  <header class="brandbar">
+    <div class="inner">
+      <div class="brand-logo"><div class="mark">ND</div><div class="txt">NEW DELI</div></div>
+      <div class="brand-tag">ניהול משמרות</div>
+    </div>
+  </header>
+  <br>
+  <br>
+
+  <div class="container">
+    <h1>דף מנהל – משמרות</h1>
+
+    <div class="admin-controls">
+      <input type="date" id="filterDate" />
+      <input type="text" id="searchName" placeholder="חפש לפי שם עובד" />
+      <button type="button" onclick="filterShifts()">סנן תאריך</button>
+      <button type="button" onclick="searchByName()">חפש עובד</button>
+      <button type="button" onclick="resetFilters()">נקה סינון</button>
+      <button id="go-back" class="btn btn--primary">חזור אחורה</button>
+    </div>
+
+    <div id="shiftsContainer"></div>
+  </div>
+
+  <!-- מודאל: הצגה / עריכה -->
+  <div id="editModal" class="modal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <h2>פרטי משמרת</h2>
+
+      <form id="editForm">
+        <label>תאריך (לקריאה):</label>
+        <input type="text" id="editDate" readonly>
+
+        <label>אחמ״ש הערב (אופציונלי):</label>
+        <input type="text" id="editManager" placeholder="שם האחמ״ש">
+
+        <label>צוות (מופרד בפסיקים):</label>
+        <input type="text" id="editTeam" placeholder="יוסי, דנה, רועי">
+
+        <!-- תיבת הערות -->
+        <label for="editNotes">הערות כלליות:</label>
+        <textarea id="editNotes" name="notes" placeholder="הערות או משימות מותאמות אישית..."></textarea>
+
+        <section class="card" style="margin-top:12px">
+          <h3>הערות במהלך המשמרת</h3>
+          <ul id="runtimeNotesListAdmin" class="exec-list"></ul>
+        </section>
+
+        <div id="editRows" class="modal-grid"></div>
+
+        <div class="modal-actions" style="margin-top:10px">
+          <button type="button" class="save" onclick="saveEdit()">שמור</button>
+          <button type="button" class="cancel" onclick="closeEdit()">סגור</button>
+        </div>
+        <p id="editStatus" class="edit-status"></p>
+      </form>
+    </div>
+  </div>
+  <script>
+    let allShifts = [];
+
+    const CATS = [
+      { key: "daily",   title: "משימות יומיות" },
+      { key: "weekly",  title: "משימות שבועיות" },
+      { key: "monthly", title: "משימות חודשיות" },
+    ];
+
+    function normalizeTeam(team){
+      if(Array.isArray(team)) return team;
+      if(typeof team==='string') return team.split(',').map(s=>s.trim()).filter(Boolean);
+      return [];
+    }
+    function getDayName(dateStr){
+      const days=["ראשון","שני","שלישי","רביעי","חמישי","שישי","שבת"];
+      const d = new Date(dateStr);
+      return isNaN(d) ? "" : days[d.getDay()];
+    }
+    function chip(text){ return `<div class="chip"><span class="dot"></span>${text}</div>`; }
+
+    function buildTeamSelect(name, teamArr, selected){
+      const opts = ['<option value="">בחר עובד</option>']
+        .concat(teamArr.map(n=>`<option value="${n}" ${selected===n?'selected':''}>${n}</option>`));
+      return `<select name="${name}">${opts.join('')}</select>`;
+    }
+    function rowState(workerValue){
+      return (workerValue) ? "ok" : "missing";
+    }
+    function attachRowListeners(card){
+      const sel = card.querySelector('select');
+      const update = ()=>{
+        card.classList.remove('ok','missing');
+        card.classList.add(rowState(sel.value.trim()));
+      };
+      sel.addEventListener('change', update);
+      update();
+    }
+    function renderAdminEditRows(shift){
+      const wrap = document.getElementById('editRows');
+      wrap.innerHTML = "";
+
+      const teamArr = normalizeTeam(shift.team);
+      const tasks = shift.tasks || { daily:[], weekly:[], monthly:[] };
+      const execs = shift.executions || { daily:[], weekly:[], monthly:[] };
+
+      const CATS = [
+        { key: "daily",   title: "משימות יומיות" },
+        { key: "weekly",  title: "משימות שבועיות" },
+        { key: "monthly", title: "משימות חודשיות" },
+      ];
+
+      CATS.forEach(cat=>{
+        const list = Array.isArray(tasks[cat.key]) ? tasks[cat.key] : [];
+        if(!list.length) return;
+
+        // כותרת קטגוריה
+        const title = document.createElement('h3');
+        title.className = 'cat-title';
+        title.textContent = cat.title;
+        wrap.appendChild(title);
+
+        list.forEach((task,i)=>{
+          const ex = (execs[cat.key] || []).find(e=>e.task===task) || {};
+          const card = document.createElement('div');
+          card.className = 'task-card';
+
+          // תבנית כרטיס
+          card.innerHTML = `
+            <div class="name">${task}</div>
+            <div>
+              <select name="worker-${cat.key}-${i}">
+                <option value="">בחר עובד</option>
+                ${teamArr.map(n => `<option value="${n}" ${ex.worker===n?'selected':''}>${n}</option>`).join('')}
+              </select>
+            </div>
+            <input type="hidden" name="task-${cat.key}-${i}" value="${task}">
+          `;
+          wrap.appendChild(card);
+          attachRowListeners(card); // חיווי ok/missing
+        });
+      });
+    }
+
+    async function loadShifts(){
+      const res = await fetch('/get-all-shifts');
+      allShifts = await res.json();
+      console.log('Loaded shifts:', allShifts);
+      renderShifts(allShifts);
+    }
+
+    function renderShifts(shifts) {
+      const container = document.getElementById('shiftsContainer');
+      container.innerHTML = '';
+
+      shifts.forEach(shift => {
+        const dayName = getDayName(shift.date);
+        const teamArr = normalizeTeam(shift.team);
+        const leadName = shift.manager ?? (teamArr[0] || '');
+        const closed = shift.closed ? 'סגור' : 'פתוח';
+
+        const card = document.createElement('div');
+        card.className = 'highlight';
+
+        card.innerHTML = `
+          <div class="meta">
+            ${chip(`${shift.date}${dayName ? ` (${dayName})` : ''}`)}
+            ${chip(`צוות: ${teamArr.length ? teamArr.join(', ') : '—'}`)}
+            ${chip(`אחמ״ש: ${leadName || '—'}`)}
+            ${chip(`סטטוס: ${closed}`)}
+            ${shift.closedAt ? chip(`נסגר: ${new Date(shift.closedAt).toLocaleString('he-IL')}`) : ''}
+          </div>
+          <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="edit-btn" type="button" onclick="openEdit('${shift.date}')">
+              הצג / ערוך
+            </button>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    function filterShifts(){
+      const date = document.getElementById('filterDate').value;
+      if(!date) return renderShifts(allShifts);
+      renderShifts(allShifts.filter(s=>s.date===date));
+    }
+    function searchByName(){
+      const name = document.getElementById('searchName').value.trim();
+      if(!name) return renderShifts(allShifts);
+      const filtered = allShifts.filter(s=>normalizeTeam(s.team).some(m=>m.includes(name)));
+      renderShifts(filtered);
+    }
+    function resetFilters(){
+      document.getElementById('filterDate').value='';
+      document.getElementById('searchName').value='';
+      renderShifts(allShifts);
+    }
+
+    // --- NEW: עזר קטן לאבטחה בצד לקוח (לרינדור טקסטים) ---
+    function escapeHtml(s){ 
+      return String(s).replace(/[&<>"']/g, m=>({ 
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' 
+      }[m])); 
+    } // NEW
+
+    // --- NEW: רנדר הערות במהלך המשמרת במודאל ---
+    function renderAdminRuntimeNotes(shift) { // NEW
+      const listEl = document.getElementById('runtimeNotesListAdmin');
+      if (!listEl) return;
+
+      const arr = Array.isArray(shift?.runtimeNotes) ? shift.runtimeNotes : [];
+      listEl.innerHTML = arr.length
+        ? arr.map(n => `
+            <li class="exec-row">
+              <span class="task-name">${escapeHtml(n.text)}</span>
+              <span class="who-time">
+              </span>
+            </li>
+          `).join('')
+        : '<li class="exec-row"><span class="task-name">אין הערות</span></li>';
+    } // NEW
+
+    async function openEdit(date){
+      const res = await fetch(`/get-shift?date=${date}`);
+      const shift = await res.json();
+      if(!shift) return;
+
+      const teamArr = normalizeTeam(shift.team);
+      const leadName = shift.manager ?? (teamArr[0] || '');
+      const dayName = getDayName(shift.date);
+
+      document.getElementById('editDate').value = shift.date;
+      document.getElementById('editManager').value = leadName || '';
+      document.getElementById('editTeam').value = teamArr.join(', ');
+
+      renderAdminEditRows(shift);
+      document.getElementById('editNotes').value = shift.notes || '';
+
+      // --- NEW: ודא שתמיד יש מערך, ואז רנדר את ההערות בזמן המשמרת ---
+      if (!Array.isArray(shift.runtimeNotes)) shift.runtimeNotes = []; // NEW
+      renderAdminRuntimeNotes(shift); // NEW
+
+      const modal = document.getElementById('editModal');
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden', 'false');
+
+      modal.onclick = (e)=>{ if(e.target===modal) closeEdit(); };
+      document.addEventListener('keydown', escCloseOnce);
+    }
+
+    function escCloseOnce(e){
+      if(e.key==='Escape'){ closeEdit(); document.removeEventListener('keydown', escCloseOnce); }
+    }
+
+    function closeEdit(){
+      const modal = document.getElementById('editModal');
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    async function saveEdit() {
+      const date    = document.getElementById('editDate').value;
+      const manager = document.getElementById('editManager').value.trim();
+      const teamStr = document.getElementById('editTeam').value.trim();
+      const notes = document.getElementById('editNotes').value.trim();
+
+      // 1) שמירת צוות/אחמ״ש + הערות כלליות
+      await fetch('/admin-update-shift', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ date, manager, team: teamStr, notes })
+      });
+
+      // 2) איסוף ושמירת ביצועים
+      const form = document.getElementById('editForm');
+      const data = new FormData(form);
+      const executions = { daily: [], weekly: [], monthly: [] };
+      const byIdx = {};
+
+      for (const [k, v] of data.entries()) {
+        const m = k.match(/(task|worker)-(daily|weekly|monthly)-(\d+)/);
+        if (!m) continue;
+        const [, field, cat, i] = m;
+        byIdx[cat] = byIdx[cat] || {};
+        byIdx[cat][i] = byIdx[cat][i] || { task: "", worker: "" };
+        if (field === 'task')   byIdx[cat][i].task = v;
+        if (field === 'worker') byIdx[cat][i].worker = v;
+      }
+      ["daily","weekly","monthly"].forEach(cat => {
+        if (!byIdx[cat]) return;
+        executions[cat] = Object.values(byIdx[cat]).map(e => ({
+          task: e.task,
+          worker: (e.worker || "").trim(),
+        }));
+      });
+
+      const res = await fetch('/update-shift', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ date, executions })
+      });
+      const result = await res.json();
+
+      const status = document.getElementById('editStatus');
+      if (res.ok) {
+        status.textContent = result?.message || 'נשמר בהצלחה ✅';
+        await loadShifts(); // לרענן את הכרטיסים
+      } else {
+        status.textContent = result?.message || 'שגיאה בשמירה';
+        status.style.color = 'crimson';
+      }
+    }
+
+    window.filterShifts = filterShifts;
+    window.searchByName = searchByName;
+    window.resetFilters = resetFilters;
+    window.openEdit = openEdit;
+    window.closeEdit = closeEdit;
+    window.saveEdit = saveEdit;
+
+    window.onload = loadShifts;
+  </script>
+  <script src="/js/global.js"></script>
+
+</body>
+</html>

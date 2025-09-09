@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>NEW DELI • פיזורים</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#2b5329">
+  <style>
+    :root {
+      --green: #2b5329; --amber:#ffcb05; --bg:#fbfff6; --border:#e2eadc; --ink:#0a0a0a;
+    }
+    body { font-family: system-ui, Arial; background: var(--bg); color: var(--ink); padding: clamp(12px,2vw,24px); }
+    .wrap { max-width: 1080px; margin: 0 auto; }
+    h1 { font-size: clamp(20px, 4vw, 28px); margin-bottom: 16px; color: var(--green); }
+
+    .card { background:#fff; border:1px solid var(--border); border-radius:14px; padding:16px;
+            box-shadow:0 2px 10px rgba(0,0,0,.05); margin-bottom:16px; }
+    .row { display:grid; grid-template-columns: 1fr 1fr 1fr auto; gap:12px; align-items:end; }
+    .row label { font-size:14px; color:#333; display:block; margin-bottom:6px; }
+    input[type="date"], input[type="text"], input[type="number"], textarea, select {
+      width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; background:#fff;
+    }
+    textarea { min-height: 42px; resize: vertical; }
+    button { padding:10px 14px; border:0; border-radius:10px; cursor:pointer; background:var(--green); color:#fff; }
+    button.secondary { background:#eef1eb; color:#222; }
+    button.danger { background:#d9534f; }
+    .muted { color:#666; font-size:12px; }
+
+    .summary { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    .chip { background:#f5f9f1; border:1px solid var(--border); border-radius:999px; padding:6px 10px; font-size:13px; }
+
+    table { width:100%; border-collapse: collapse; font-size:14px; }
+    th, td { padding:10px; border-bottom:1px solid var(--border); vertical-align: top; }
+    th { background:#f5f9f1; text-align:right; }
+    td .pill { display:inline-block; background:#f0f5ed; border:1px solid var(--border); border-radius:999px; padding:4px 8px; margin:2px 4px 0 0; font-size:12px; }
+
+    .pager { display:flex; gap:8px; align-items:center; justify-content:flex-end; margin-top:8px; }
+    .right { text-align: right; }
+    .nowrap { white-space: nowrap; }
+
+    @media (max-width: 820px) {
+      .row { grid-template-columns: 1fr; }
+      table { font-size:13px; }
+      th:nth-child(6), td:nth-child(6) { white-space: nowrap; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>פיזורים 🚕</h1>
+
+    <!-- סיכום עלויות ותצוגה מהירה -->
+    <div class="card summary">
+      <span class="chip">סה״כ מוצג: <b id="sumShown">0</b> ₪</span>
+      <span class="chip">כמות רשומות: <b id="countShown">0</b></span>
+      <span class="muted">טיפ: אפשר לסנן לפי תאריך, נהג או שם של מישהו שנסע.</span>
+    </div>
+
+    <!-- טופס הוספה -->
+    <div class="card">
+      <form id="addForm">
+        <div class="row">
+          <div>
+            <label>תאריך משמרת</label>
+            <input type="date" name="date" required />
+          </div>
+          <div>
+            <label>מחיר מונית (₪)</label>
+            <input type="number" name="price" min="0" step="1" placeholder="לדוגמה: 55" required />
+          </div>
+          <div>
+            <label>נהג / חברה</label>
+            <input type="text" name="taxi" placeholder="לדוגמה: אבי / Gett" />
+          </div>
+
+        </div>
+
+        <div class="row" style="grid-template-columns: 1fr 1fr;">
+          <div>
+            <label>עם מי נסעו (מופרד בפסיקים)</label>
+            <input type="text" name="people" placeholder="לדוגמה: עומר, מאיה, איתי" />
+          </div>
+          <div>
+            <label>מי שילם</label>
+            <input type="text" name="payer" placeholder="לדוגמה: הקופה / עומר" />
+          </div>
+        </div>
+
+        <div class="row" style="grid-template-columns: 1fr;">
+          <div>
+            <label>הערות</label>
+            <textarea name="notes" placeholder="לדוגמה: מסלול מיוחד, המתנה, וכו׳"></textarea>
+          </div>
+        </div>
+        <p class="muted" id="addMsg"></p>
+              <div>
+            <button type="submit">שמור פיזור</button>
+          </div>  
+    </form>
+    </div>
+
+    <!-- סינון -->
+    <div class="card">
+      <form id="filterForm">
+        <div class="row">
+          <div>
+            <label>סינון לפי תאריך</label>
+            <input type="date" name="date" />
+          </div>
+          <div>
+            <label>חיפוש לפי נהג / אדם</label>
+            <input type="text" name="q" placeholder="הקלד שם נהג או אחד הנוסעים" />
+          </div>
+          <div>
+            <button type="submit" class="secondary">סנן</button>
+          </div>
+          <div>
+            <button type="button" id="clearFilters" class="secondary">נקה</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- טבלה -->
+    <div class="card">
+      <div style="overflow:auto">
+        <table id="tbl">
+          <thead>
+            <tr>
+              <th class="nowrap">תאריך</th>
+              <th class="nowrap">מחיר</th>
+              <th>נהג / חברה</th>
+              <th>נוסעים</th>
+              <th>שילם</th>
+              <th>הערות</th>
+              <th style="width:140px" class="nowrap">פעולות</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="pager">
+        <button id="prevBtn" class="secondary">‹ הקודם</button>
+        <span class="muted" id="pageInfo"></span>
+        <button id="nextBtn" class="secondary">הבא ›</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== Helpers =====
+    const addForm     = document.getElementById('addForm');
+    const addMsg      = document.getElementById('addMsg');
+    const filterForm  = document.getElementById('filterForm');
+    const clearBtn    = document.getElementById('clearFilters');
+    const tbody       = document.querySelector('#tbl tbody');
+    const prevBtn     = document.getElementById('prevBtn');
+    const nextBtn     = document.getElementById('nextBtn');
+    const pageInfo    = document.getElementById('pageInfo');
+    const sumShownEl  = document.getElementById('sumShown');
+    const countShownEl= document.getElementById('countShown');
+
+    let allItems = []; // מאגר מקומי לאחר הבאה מהשרת
+    let state = { date:'', q:'', skip:0, limit:20 };
+
+    function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
+    function toArr(val){ return Array.isArray(val) ? val : String(val||'').split(',').map(x=>x.trim()).filter(Boolean); }
+    function formatPrice(n){ return (Number(n)||0).toLocaleString('he-IL'); }
+
+    // ===== Create =====
+    addForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      addMsg.textContent = 'שומר...';
+      const fd = new FormData(addForm);
+      const body = Object.fromEntries(fd.entries());
+      try {
+        const res = await fetch('/dispersals', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (data.ok) {
+          addMsg.textContent = 'נשמר ✔';
+          addForm.reset();
+          await loadAll(); // רענון נתונים
+          applyFiltersAndRender();
+        } else {
+          addMsg.textContent = data.message || 'שגיאה בשמירה';
+        }
+      } catch(err){
+        addMsg.textContent = 'שגיאה בשמירה';
+      } finally {
+        setTimeout(()=> addMsg.textContent='', 1500);
+      }
+    });
+
+    // ===== Filters =====
+    filterForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const fd = new FormData(filterForm);
+      state.date = fd.get('date') || '';
+      state.q    = fd.get('q') || '';
+      state.skip = 0;
+      applyFiltersAndRender();
+    });
+
+    clearBtn.addEventListener('click', () => {
+      filterForm.reset();
+      state = { ...state, date:'', q:'', skip:0 };
+      applyFiltersAndRender();
+    });
+
+    // ===== Pagination =====
+    prevBtn.addEventListener('click', () => {
+      if (state.skip <= 0) return;
+      state.skip = Math.max(0, state.skip - state.limit);
+      render(currentFiltered);
+    });
+    nextBtn.addEventListener('click', () => {
+      if (state.skip + state.limit >= currentFiltered.length) return;
+      state.skip += state.limit;
+      render(currentFiltered);
+    });
+
+    // ===== Data loading & Rendering =====
+    async function loadAll(){
+      // אפשר להעביר date לשאילתה כדי לצמצם, אבל כאן נביא הכל פעם אחת
+      const res = await fetch('/dispersals');
+      allItems = await res.json();
+    }
+
+    let currentFiltered = [];
+    function applyFiltersAndRender(){
+      // סינון בצד לקוח
+      currentFiltered = allItems.filter(item => {
+        const byDate = state.date ? (item.shiftDate === state.date) : true;
+        const q = state.q.trim();
+        const byQ = !q ? true : (
+          (item.taxi && item.taxi.toLowerCase().includes(q.toLowerCase())) ||
+          (Array.isArray(item.people) && item.people.some(p => (p||'').toLowerCase().includes(q.toLowerCase())))
+        );
+        return byDate && byQ;
+      });
+      state.skip = 0;
+      render(currentFiltered);
+    }
+
+    function render(list){
+      const start = state.skip;
+      const end   = Math.min(list.length, start + state.limit);
+      const page  = list.slice(start, end);
+
+      // סיכום
+      const sum = page.reduce((acc, x) => acc + Number(x.price||0), 0);
+      sumShownEl.textContent   = formatPrice(sum);
+      countShownEl.textContent = page.length;
+
+      tbody.innerHTML = page.map(d => `
+        <tr>
+          <td class="nowrap">${escapeHtml(d.shiftDate)}</td>
+          <td class="nowrap">${formatPrice(d.price)} ₪</td>
+          <td>${escapeHtml(d.taxi || '')}</td>
+          <td>${(d.people || []).map(p => `<span class="pill">${escapeHtml(p)}</span>`).join('')}</td>
+          <td>${escapeHtml(d.payer || '')}</td>
+          <td>${escapeHtml(d.notes || '')}</td>
+          <td class="nowrap">
+            <button class="secondary" onclick="delDisp('${d._id}')">מחק</button>
+          </td>
+        </tr>
+      `).join('');
+
+      const pageIdx  = Math.floor(state.skip / state.limit) + 1;
+      const pages    = Math.max(1, Math.ceil(list.length / state.limit));
+      pageInfo.textContent = `עמוד ${pageIdx} מתוך ${pages} (סה״כ ${list.length})`;
+
+      prevBtn.disabled = state.skip <= 0;
+      nextBtn.disabled = state.skip + state.limit >= list.length;
+    }
+
+    async function delDisp(id){
+      if (!confirm('למחוק את הרשומה?')) return;
+      await fetch('/dispersals/' + encodeURIComponent(id), { method:'DELETE' });
+      await loadAll();
+      applyFiltersAndRender();
+    }
+
+    // Init
+    (async () => {
+      await loadAll();
+      applyFiltersAndRender();
+    })();
+  </script>
+  <script src="/js/global.js"></script>
+
+</body>
+</html>
