@@ -49,9 +49,25 @@ app.use((req, res, next) => {
 // ===== MongoDB Connect =====
 // מומלץ לשים ב-.env: MONGO_URI=mongodb+srv://user:pass@cluster/dbName
 const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://aviel:aviel998898@cluster0.3po9ias.mongodb.net/';
+let mongoReady = false;
+
 mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 10000 })
-  .then(() => console.log('✅ MongoDB connected'))
-  .catch(err => { console.error('❌ Mongo connection error:', err.message); process.exit(1); });
+  .then(() => {
+    mongoReady = true;
+    console.log('✅ MongoDB connected');
+  })
+  .catch(err => {
+    console.error('❌ Mongo connection error:', err);
+    // אל תעשה process.exit(1) ב-Vercel
+  });
+
+// מחסום נחמד: אם DB לא מוכן מחזירים 503 במקום לקרוס
+app.use((req, res, next) => {
+  if (!mongoReady) {
+    return res.status(503).json({ ok:false, message: 'Database not ready' });
+  }
+  next();
+});
 
 // ===== Schemas for Shifts (כמו אצלך) =====
 const ExecutionSchema = new mongoose.Schema({
