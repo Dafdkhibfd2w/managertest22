@@ -13,7 +13,7 @@ let shifts = [];
 loadForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const date = new FormData(loadForm).get("date");
-  const res = await fetch(`/get-shift?date=${encodeURIComponent(date)}`);
+  const res = await fetch(`/api/get-shift?date=${encodeURIComponent(date)}`);
   const shift = await res.json();
 
   // אם לא נמצאה משמרת – הצג הודעה ונקה רשימת הערות
@@ -97,7 +97,7 @@ saveBtn.addEventListener("click", async () => {
   }
 
   const cleaned = Object.values(updates);
-  const res = await fetch("/update-shift", {
+  const res = await fetch("/api/update-shift", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ date, updates: cleaned })
@@ -109,7 +109,7 @@ saveBtn.addEventListener("click", async () => {
 
 // ---------- טעינת כל המשמרות לרשימה ----------
 async function fetchAllShifts() {
-  const res = await fetch("/all-shifts");
+  const res = await fetch("/api/all-shifts");
   shifts = await res.json();
   renderShifts(shifts);
 }

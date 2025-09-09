@@ -53,7 +53,7 @@ loadForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const date = new FormData(loadForm).get("date");
 
-  const res = await fetch(`/get-shift?date=${date}`);
+  const res = await fetch(`/api/get-shift?date=${date}`);
   const shift = await res.json();
 
   if (!shift) {
@@ -191,7 +191,7 @@ async function saveSingleTask(btn) {
   btn.textContent = "שומר...";
 
   try {
-    const res = await fetch("/update-single-task", {
+    const res = await fetch("/api/update-single-task", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ date, category, task, worker })
@@ -231,7 +231,7 @@ saveBtn.addEventListener("click", async () => {
     return;
   }
 
-  const res = await fetch("/update-shift", {
+  const res = await fetch("/api/update-shift", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ date, executions })
@@ -278,7 +278,7 @@ confirmFinalize?.addEventListener("click", async () => {
   btn.disabled = true; btn.textContent = "סוגר...";
 
   try {
-    const res = await fetch("/finalize-shift", {
+    const res = await fetch("/api/finalize-shift", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
@@ -363,7 +363,7 @@ function buildFinalizeSummaryHTML(shift) {
   }
 
   async function fetchShiftByDate(date) {
-    const res = await fetch(`/get-shift?date=${encodeURIComponent(date)}`);
+    const res = await fetch(`/api/get-shift?date=${encodeURIComponent(date)}`);
     if (!res.ok) return null;
     return res.json();
   }
@@ -387,7 +387,7 @@ function buildFinalizeSummaryHTML(shift) {
       const text = (noteText?.value || '').trim();
       if (!text) { noteText?.focus(); return; }
 
-      const res = await fetch('/add-runtime-note', {
+      const res = await fetch('/api/add-runtime-note', {
         method: 'POST',
         headers: { 'Content-Type':'application/json' },
         body: JSON.stringify({
@@ -418,7 +418,7 @@ function buildFinalizeSummaryHTML(shift) {
 
       if (!confirm('למחוק את ההערה?')) return;
 
-      const res = await fetch('/delete-runtime-note', {
+      const res = await fetch('/api/delete-runtime-note', {
         method: 'POST',
         headers: { 'Content-Type':'application/json' },
         body: JSON.stringify({

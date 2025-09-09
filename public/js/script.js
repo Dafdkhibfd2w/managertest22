@@ -94,7 +94,7 @@ tasks: {
 notes: formData.get("notes") || "",
   };
 
-  const res = await fetch("/save-shift", {
+  const res = await fetch("/api/save-shift", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
