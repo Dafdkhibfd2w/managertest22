@@ -400,6 +400,117 @@ app.post('/admin-update-shift', async (req, res) => {
     return res.status(500).json({ ok: false, message: 'שגיאת שרת' });
   }
 });
+
+// ========= Runtime Notes: Add =========
+app.post('/add-runtime-note', async (req, res) => {
+  try {
+    const { date, text, author } = req.body || {};
+    if (!date || !text) {
+      return res.status(400).json({ ok: false, message: 'חובה תאריך וטקסט הערה' });
+    }
+
+    // אוספים
+    const mongoose = require('mongoose');
+    const col = mongoose.connection.collection('shifts');
+
+    // כמו הישן: לא יוצרים משמרת אם לא קיימת – מחזירים 404
+    const shift = await col.findOne({ date });
+    if (!shift) {
+      return res.status(404).json({ ok: false, message: 'לא נמצאה משמרת' });
+    }
+
+    // מזהה ייחודי כמו קודם (זמן + רנדום)
+    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+    const note = {
+      id,
+      text: String(text).trim(),
+      author: author || shift.manager || 'אחמ״ש',
+      time: new Date().toISOString(),
+    };
+
+    // נעדכן ונחזיר את המסמך אחרי העדכון (כדי להחזיר runtimeNotes עדכני)
+    const result = await col.findOneAndUpdate(
+      { date },
+      { $push: { runtimeNotes: note } },
+      { returnDocument: 'after', projection: { _id: 0, runtimeNotes: 1 } }
+    );
+
+    return res.json({
+      ok: true,
+      message: 'הערה נוספה',
+      runtimeNotes: (result.value && result.value.runtimeNotes) || []
+    });
+  } catch (e) {
+    console.error('add-runtime-note error', e);
+    return res.status(500).json({ ok: false, message: 'שגיאה בשרת' });
+  }
+});
+
+
+// ========= Runtime Notes: Delete =========
+app.post('/delete-runtime-note', async (req, res) => {
+  try {
+    const { date, noteId, index } = req.body || {};
+    if (!date || (!noteId && (index === undefined || index === null))) {
+      return res.status(400).json({ ok: false, message: 'חובה להעביר date וגם noteId או index' });
+    }
+
+    const mongoose = require('mongoose');
+    const col = mongoose.connection.collection('shifts');
+
+    // קודם נוודא שהמשמרת קיימת
+    const shift = await col.findOne({ date }, { projection: { _id: 0, runtimeNotes: 1 } });
+    if (!shift) return res.status(404).json({ ok: false, message: 'לא נמצאה משמרת' });
+
+    const notes = Array.isArray(shift.runtimeNotes) ? shift.runtimeNotes : [];
+
+    let removed = false;
+
+    // 1) מחיקה לפי id (העדפה ראשונה – כמו בקוד הישן)
+    if (noteId) {
+      const pullRes = await col.updateOne(
+        { date },
+        { $pull: { runtimeNotes: { id: noteId } } }
+      );
+      removed = pullRes.modifiedCount > 0;
+    }
+
+    // 2) אם לא הוסר לפי id ויש index – מחיקה לפי אינדקס
+    if (!removed && (index !== undefined && index !== null)) {
+      const idx = Number(index);
+      if (!Number.isNaN(idx) && idx >= 0 && idx < notes.length) {
+        // נבנה מערך חדש בלי אותו אינדקס
+        const newNotes = notes.slice(0, idx).concat(notes.slice(idx + 1));
+        const setRes = await col.updateOne(
+          { date },
+          { $set: { runtimeNotes: newNotes } }
+        );
+        removed = setRes.modifiedCount > 0;
+      }
+    }
+
+    if (!removed) {
+      return res.status(404).json({ ok: false, message: 'הערה לא נמצאה' });
+    }
+
+    // נחזיר את המצב העדכני של ההערות
+    const updated = await col.findOne(
+      { date },
+      { projection: { _id: 0, runtimeNotes: 1 } }
+    );
+
+    return res.json({
+      ok: true,
+      message: 'הערה נמחקה',
+      runtimeNotes: (updated && updated.runtimeNotes) || []
+    });
+  } catch (e) {
+    console.error('delete-runtime-note error', e);
+    return res.status(500).json({ ok: false, message: 'שגיאה בשרת' });
+  }
+});
+
 app.post('/finalize-shift', async (req, res) => {
   try {
     const { date, manager, team, executions } = req.body || {};
