@@ -1,5 +1,5 @@
 const CACHE = 'newdeli-v1';
-const ASSETS = ['/', '/css/style.css', '/invoices-page', '/dispersals-page', '/manage', '/create', '/admin'];
+const ASSETS = ['/', '/css/style.css', '/api/invoices-page', '/api/dispersals-page', '/api/manage', '/api/create', '/api/admin'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)));
