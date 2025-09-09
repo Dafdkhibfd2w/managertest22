@@ -42,7 +42,10 @@ cloudinary.config({
   api_key:    process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-
+app.use((req, res, next) => {
+  console.log(`[EXPRESS] ${req.method} ${req.url}`);
+  next();
+});
 // ===== MongoDB Connect =====
 // מומלץ לשים ב-.env: MONGO_URI=mongodb+srv://user:pass@cluster/dbName
 const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://aviel:aviel998898@cluster0.3po9ias.mongodb.net/';
@@ -800,7 +803,11 @@ app.delete('/dispersals/:id', async (req, res) => {
 
 // ===== Start server =====
 // app.listen(PORT, () => console.log(`🚀 Server listening on :${PORT}`));ss
-module.exports = app;
+if (process.env.VERCEL) {
+  module.exports = app; // אין app.listen ב-Vercel
+} else {
+  app.listen(PORT, () => console.log(`🚀 Server listening on :${PORT}`));
+}
 
 // === DEBUG MIDDLEWARE (מדפיס כל בקשה שמגיעה ל-Express) ===
 app.use((req, res, next) => {
