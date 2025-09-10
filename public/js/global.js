@@ -19,7 +19,6 @@ document.getElementById("go-back").addEventListener("click", () => {
   closeNav.addEventListener("click", () => {
     mobileNav.classList.remove("active");
   });
-
   // סגירה בלחיצה מחוץ לתפריט
   window.addEventListener("click", (e) => {
     if (!mobileNav.contains(e.target) && e.target !== burger) {
