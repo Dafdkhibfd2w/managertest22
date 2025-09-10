@@ -2,51 +2,49 @@
    CSS Variables (NEW DELI)
    ========================= */
 :root {
-  /* בסיס */
-  --bg-grad-1: #f7fddc;
-  --bg-grad-2: #d4f4c2;
-  --bg-grad-3: #e8ffd1;  /* משמש בהגsדרה השנייה של body (שנשמרת כ-overwrite) */
-  --bg-grad-4: #fffabe;
+  /* בסיס - משודרג */
+  --bg-grad-1: #fafff2;
+  --bg-grad-2: #e3f7cc;
+  --bg-grad-3: #e9ffdd;
+  --bg-grad-4: #fffcc7;
 
-  --ink: #2b5329;            /* טקסט ראשי */
-  --ink-muted: #666;
+  --ink: #1e3520;
+  --ink-muted: #5a5a5a;
 
-  /* מותג / דגשים */
-  --brand-1: #2f6d37;        /* ירוק מותג (בר עליון) */
-  --brand-2: #3c7f43;        /* ירוק Hover/גרדיאנט */
-  --accent:  #ffcb05;        /* צהוב מותג */
-  --accent-2:#dfffac;        /* ירקרק hover לטאבים */
-  --bg-light: #f7fdf0;
-  --bg-dark: #e2f7d9;
+  --brand-1: #33673b;
+  --brand-2: #447c4e;
 
-  /* גבולות/פאנלים */
+  --accent:  #fdd835;
+  --accent-2:#e5fbb5;
+
+  --bg-light: #f7fbf2;
+  --bg-dark: #dbeec9;
+
   --panel: #ffffff;
-  --panel-ghost: #ffffffcc;
+  --panel-ghost: #ffffffd0;
 
-  --green-very-light: #f3fdf1;
-  --green-light: #e6ffda;
-  --green-mid:   #c2eaba;
-  --green-dash:  #aadf9e;
-  --green-chip:  #e6ffda;
-  --green-chip-border: #c2eaba;
-  --green-chip-dot: #2b5329;
+  --green-very-light: #f2fdf2;
+  --green-light: #d8f8c9;
+  --green-mid:   #b0e7a1;
+  --green-dash:  #8cd48c;
 
-  --stroke-1: #d4f4c2;
-  --stroke-2: #d9f3c9;
-  --stroke-3: #e6ebea;       /* admin controls / pickers */
+  --green-chip:  #dbf5c6;
+  --green-chip-border: #b3df9e;
+  --green-chip-dot: #225c22;
 
-  /* צללים ואנימציות */
-  --shadow-1: 0 4px 12px rgba(0,0,0,0.1);
-  --shadow-2: 0 0 15px rgba(0,0,0,0.08);
-  --shadow-3: 0 8px 18px rgba(0,0,0,.06);
-  --shadow-4: 0 12px 30px rgba(0,0,0,.2);
+  --stroke-1: #cfecc2;
+  --stroke-2: #d8f2c8;
+  --stroke-3: #e1ece1;
 
-  /* כפתורים */
-  --btn-bg: #2b5329;
-  --btn-bg-hover: #3f6d3a;
+  --shadow-1: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-2: 0 0 15px rgba(0, 0, 0, 0.08);
+  --shadow-3: 0 8px 20px rgba(0, 0, 0, .08);
+  --shadow-4: 0 14px 30px rgba(0, 0, 0, .20);
+
+  --btn-bg: #1e4f1e;
+  --btn-bg-hover: #2f6e2f;
   --btn-text: #ffffff;
 
-  /* מודאל / טקסט משני */
   --muted: #666;
 }
 
@@ -268,64 +266,204 @@ button:hover {
   gap: 10px;
   flex-wrap: wrap;
 }
-
+.manager-note-box {
+  background: #f0f0e8;
+  border-right: 4px solid #2f6d37;
+  padding: 16px;
+  margin: 16px 0;
+  border-radius: 10px;
+}
+#managerNote {
+  white-space: pre-wrap;
+  color: #222;
+}
 /* ===== Brandbar (מסודר למשתנים) ===== */
 /* ===== Brandbar – full width polish ===== */
 /* === Brandbar חדש === */
-.brandbar{
-  position: fixed;      /* תמיד נשאר למעלה וצמוד */
-  top: 0;
-  left: 0;
-  right: 0;
-  width: 100vw;         /* תופס את כל הרוחב */
-  margin: 0;
-  border-radius: 0;
-  z-index: 1000;
-  background: linear-gradient(90deg, var(--brand-1) 0%, var(--brand-2) 50%, var(--brand-1) 100%);
-  box-shadow: 0 6px 16px rgba(0,0,0,.18);
-}
-
-.brandbar .inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 14px 22px;
+/* בר עליון */
+.brandbar {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
+  padding: 14px 24px;
+  background:  #0e452b;/* רקע כהה יוקרתי */
+  /* background: linear-gradient(135deg, #1c1c1c, #2a2a2a); רקע כהה יוקרתי */
+  color: #fdfdfd;
+  font-family: "Segoe UI", "Heebo", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 1px;
+
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+
+  box-shadow: 0 4px 14px rgba(0,0,0,.35);
 }
 
-/* צד ימין: לוגו */
-.brand-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 900;
-  letter-spacing: .4px;
-  color: #fff;
+
+.brandbar .left {
+  text-align: left;
 }
-.brand-logo .mark {
+
+.brandbar .right {
+  font-size: 26px;
+  cursor: pointer;
+}
+.burger {
+  font-size: 28px;
+  cursor: pointer;
+  transition: transform 0.25s ease, color 0.25s ease;
+}
+.burger:hover {
+  transform: rotate(90deg) scale(1.1);
+  color: #ffcb05;
+}
+
+.brand-logo {
+  margin-inline-start: auto;
+}
+@media (max-width: 600px) {
+  .brandbar {
+    flex-direction: row !important;   /* להכריח שורה */
+    justify-content: space-between;
+    align-items: center;
+    gap: 0;
+    padding: 12px 14px;
+  }
+
+  .brandbar .brand-title {
+    font-size: 1.2rem; /* טיפה קטן למסך קטן */
+  }
+
+  .brandbar .burger {
+    font-size: 24px;
+  }
+}
+
+.brand-title {
+  font-size: 1.4rem;
+  background-color: #2b9966;
+  /* background: linear-gradient(90deg, #ffcb05, #fff176); */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-transform: uppercase;
+}
+/* תפריט צדדי מימין */
+.mobile-nav {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 280px;
+  height: 100%;
+  background: #ffffff;
+  color: #1a1a1a;
+  z-index: 1500;
+  transition: right 0.35s cubic-bezier(.25,.8,.25,1);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -10px 0 30px rgba(0,0,0,.12);
+  border-radius: 20px 0 0 20px;
+}
+
+.mobile-nav.active {
+  right: 0;
+}
+
+/* כפתור סגירה */
+.close-btn {
+  background: #f3f3f3;
+  border: none;
+  font-size: 20px;
+  color: #333;
+  border-radius: 50%;
   width: 36px;
   height: 36px;
-  border-radius: 8px;
-  background: var(--accent);
-  color: #1d1d1d;
-  display: grid;
-  place-items: center;
-  font-weight: 900;
-  box-shadow: 0 3px 10px rgba(0,0,0,.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-left: auto;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  transition: transform 0.2s ease, background 0.2s ease;
 }
-.brand-logo .txt {
-  font-size: 20px;
-  line-height: 1;
+.close-btn:hover {
+  transform: rotate(90deg);
+  background: #ffcb05;
+  color: #000;
 }
 
-/* צד שמאל: שם עמוד */
-.brand-tag {
-  font-weight: 700;
-  font-size: 17px;
-  color: #fff;
-  letter-spacing: .3px;
+/* רשימת קישורים */
+.mobile-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
+
+.mobile-nav li a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+  background: #f9fafb;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  transition: background 0.25s, transform 0.2s, box-shadow 0.2s;
+}
+
+.mobile-nav li a:hover {
+  background: #e8f5e9;
+  transform: translateX(-5px);
+  box-shadow: 0 4px 10px rgba(0,0,0,.08);
+}
+
+/* אייקונים */
+.mobile-nav li a .icon {
+  font-size: 18px;
+  color: #2f6d37;
+}
+
+/* אנימציה לינקים בכניסה */
+.mobile-nav li {
+  opacity: 0;
+  transform: translateX(20px);
+  animation: fadeSlideIn 0.4s forwards;
+}
+.mobile-nav.active li {
+  animation-delay: calc(var(--i, 0) * 0.08s);
+}
+@keyframes fadeSlideIn {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+
+/* מובייל בלבד */
+@media (max-width: 768px) {
+  .burger {
+    display: block;
+  }
+
+  .desktop-nav {
+    display: none;
+  }
+
+  body {
+    padding-top: 56px;
+  }
+}
+
 
 
 .task-tab {
@@ -398,20 +536,56 @@ button:hover {
   margin-top: 10px;
 }
 
-.lead-chip {
-  background: var(--green-chip);
-  border: 2px solid var(--green-chip-border);
-  color: #1f3b1f;
+/* בסיס */
+/* .lead-chip {
   padding: 8px 12px;
   border-radius: 999px;
   font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+} */
+
+/* ברירת מחדל */
+.lead-chip.default {
+  background: #f1f1f1;
+  border: 2px solid #ccc;
+  color: #333;
 }
 
+/* פתוח */
+.lead-chip.open {
+background: #f0ffe5;
+  color: #2b5329;
+  border: 2px solid #aee3a2;
+}
+
+/* סגור */
+.lead-chip.closed {
+  background: #fcd6d6;       /* ורדרד */
+  border: 2px solid #8b0000; 
+  color: #8b0000;
+}
+
+/* עיגול קטן */
 .lead-chip .dot {
-  display:inline-block;width:8px;height:8px;border-radius:50%;
-  background: var(--green-chip-dot); margin-left:8px;
+  display:inline-block;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background: currentColor; /* צבע נקודה לפי הצבע של הסטטוס */
+}
+.lead-chip.open .dot {
+  background: #2b5329; /* ירוק כהה */
 }
 
+.lead-chip.closed .dot {
+  background: #8b0000; /* אדום כהה */
+}
+
+.lead-chip.default .dot {
+  background: #666; /* אפור */
+}
 /* (ההגדרה הבאה הייתה אצלך מאוחר יותר — שומר עליה כדי לא לשנות את ה-UI בפועל) */
 .container { max-width: 1000px; margin: auto; padding: 24px; }
 h1 { color: var(--ink); text-align:center; margin-bottom:18px; }
@@ -625,7 +799,6 @@ h1 { color: var(--ink); text-align:center; margin-bottom:18px; }
 }
 
 select {
-
   width: 200px;
   cursor: pointer;
   background-color: #40593d27;
@@ -721,12 +894,7 @@ button:hover, .btn:hover, input[type="submit"]:hover {
 .task-card .state { border-radius: 10px; }
 
 /* ---------- Brand bar (only if exists) ---------- */
-.brandbar {
-  background: linear-gradient(90deg, var(--nd-green), var(--nd-green-2));
-  color: #fff;
-  box-shadow: var(--nd-shadow-1);
-}
-.brandbar .inner { max-width: 1060px; margin: 0 auto; }
+
 
 /* ---------- Tabs (if you use .task-tabs/.task-tab) ---------- */
 .task-tabs {
@@ -908,4 +1076,43 @@ input, select, textarea {
 }
 .note-del-btn:hover{
   background: rgba(0,0,0,.06);
+}
+@media (max-width: 700px) {
+  .responsive-table thead {
+    display: none; /* לא מציגים את שורת הכותרת במובייל */
+  }
+
+  .responsive-table, .responsive-table tbody, .responsive-table tr, .responsive-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .responsive-table tr {
+    background: #fff;
+    border: 1px solid var(--stroke-1, #dfe8d9);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    padding: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  }
+
+  .responsive-table td {
+    padding: 8px 12px;
+    text-align: right;
+    position: relative;
+  }
+
+  .responsive-table td::before {
+    content: attr(data-label);
+    font-weight: bold;
+    color: var(--ink-muted, #666);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .responsive-table td.actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
 }

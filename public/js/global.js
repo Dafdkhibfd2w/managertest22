@@ -8,8 +8,21 @@ document.getElementById("go-back").addEventListener("click", () => {
 
 
 
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(console.error);
+  const burger = document.getElementById("burger");
+  const mobileNav = document.getElementById("mobileNav");
+  const closeNav = document.getElementById("closeNav");
+
+  burger.addEventListener("click", () => {
+    mobileNav.classList.add("active");
   });
-}
+
+  closeNav.addEventListener("click", () => {
+    mobileNav.classList.remove("active");
+  });
+
+  // סגירה בלחיצה מחוץ לתפריט
+  window.addEventListener("click", (e) => {
+    if (!mobileNav.contains(e.target) && e.target !== burger) {
+      mobileNav.classList.remove("active");
+    }
+  });
