@@ -4,9 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>NEW DELI • ניהול משמרת</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/style.css?v=2">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <link rel="icon" href="/icons/icon-512.png" type="image/png">
-<link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#2b5329">
 </head>
 <style>
@@ -87,14 +88,28 @@
   }
 </style>
 <body>
-  <header class="brandbar">
-    <div class="inner">
-      <div class="brand-logo"><div class="mark">ND</div><div class="txt">NEW DELI</div></div>
-      <div class="brand-tag">ניהול משמרת קיימת</div>
-    </div>
-  </header>
+<header class="brandbar">
+  <span class="brand-title">NEW DELI</span>
+  <span class="burger" id="burger">&#9776;</span>
+</header>
 
-  <div class="container">
+<nav class="mobile-nav" id="mobileNav">
+  <button id="closeNav" class="close-btn">✖</button>
+  <ul>
+    <li><a href="/"><span class="icon">🏠</span> דף הבית</a></li>
+    <li><a href="/create"><span class="icon">🗓️</span> יצירת משמרת</a></li>
+    <li><a href="/manage"><span class="icon">✅</span> ניהול משמרת</a></li>
+    <li><a href="/admin-login"><span class="icon">📚</span> ארכיון / דשבורד מנהל</a></li>
+    <li><a href="/invoices-page"><span class="icon">🧾</span> חשבוניות</a></li>
+    <li><a href="/suppliers-page"><span class="icon">🏷️</span> ספקים</a></li>
+    <li><a href="/orders-page"><span class="icon">📦</span> הזמנות</a></li>
+    <li><a href="/dispersals-page"><span class="icon">🚕</span> פיזורים</a></li>
+  </ul>
+</nav>
+
+
+
+  <div class="container" style="padding-top: 80px;">
     <h1>ניהול משימות המשמרת</h1>
 
     <form id="loadForm">
@@ -103,6 +118,7 @@
       <button type="submit" class="btn btn--primary">טען משמרת</button>
       <button id="go-back" class="btn btn--primary">חזור אחורה</button>
       <span id="leadChip" class="lead-chip" style="display:none;"><span class="dot"></span>אחמ״ש: —</span>
+      <span id="status" class="lead-chip" style="display:none;"><span class="dot"></span>סטטוס: —</span>
     </form>
 
     <div id="shiftSection" style="display:none;">
@@ -110,6 +126,7 @@
       <form id="updateForm"></form>
 
       <section id="runtimeNotesSection">
+        
   <h3>הערות בזמן המשמרת</h3>
   <ul id="runtimeNotesList"></ul>
   <br>
@@ -117,6 +134,12 @@
     <input type="text" id="runtimeNoteText" placeholder="לדוגמה: נגמר החומר של הפלטה">
     <button type="button" id="addRuntimeNoteBtn" style="color: black;">➕</button>
   </div>
+
+
+  <section id="managerNoteSection" class="manager-note-box">
+    <h3>הערות למשמרת</h3>
+    <p id="managerNote"></p>
+  </section>
 </section>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
         <button id="saveUpdates" class="btn btn--accent" style="display:none;">שמור ביצועים</button>
@@ -134,6 +157,18 @@
     <div class="modal-content">
       <h2>סיכום משמרת לאישור אחמ״ש</h2>
       <div id="finalizeSummary" class="section" style="margin-top:8px"></div>
+
+      
+<!-- <section id="managerNoteSection" class="manager-note-box">
+  <h3>הערות למשמרת</h3>
+  <div id="managerNotes"></div>
+</section> -->
+<li style="display:flex; align-items:center; background:#fbfff6;border:1px dashed #d7efd0;border-radius:10px;padding:8px 10px;margin:6px 0">
+  <span style="font-weight: bold; margin-left: 6px;">הערות למשמרת:</span>
+  <span id="managerNotes" style="font-size:14px;color:#2b5329"></span>
+</li>
+
+
 
       <div class="modal-actions">
         <button type="button" class="btn btn--primary" id="confirmFinalize">אישור וסגירת יום</button>

@@ -1,17 +1,18 @@
 // ===== refs
-const loadForm = document.getElementById("loadForm");
-const updateForm = document.getElementById("updateForm");
-const shiftSection = document.getElementById("shiftSection");
-const saveBtn = document.getElementById("saveUpdates");
-const finalizeBtn = document.getElementById("finalizeBtn");
-const saveStatus = document.getElementById("saveStatus");
-const leadChip = document.getElementById("leadChip");
+const loadForm      = document.getElementById("loadForm");
+const updateForm    = document.getElementById("updateForm");
+const shiftSection  = document.getElementById("shiftSection");
+const saveBtn       = document.getElementById("saveUpdates");
+const finalizeBtn   = document.getElementById("finalizeBtn");
+const saveStatus    = document.getElementById("saveStatus");
+const leadChip      = document.getElementById("leadChip");
+const statusEl      = document.getElementById("status");
 
 // finalize modal refs
-const finalizeModal = document.getElementById("finalizeModal");
+const finalizeModal   = document.getElementById("finalizeModal");
 const finalizeSummary = document.getElementById("finalizeSummary");
 const confirmFinalize = document.getElementById("confirmFinalize");
-const cancelFinalize = document.getElementById("cancelFinalize");
+const cancelFinalize  = document.getElementById("cancelFinalize");
 
 // ===== consts
 const categories = [
@@ -47,6 +48,29 @@ function getExecForTask(shift, category, task) {
 }
 
 /* =========================
+   עדכון סטטוס
+   ========================= */
+function updateStatus(shift) {
+  statusEl.classList.remove("default", "open", "closed");
+
+  if (!shift) {
+    statusEl.innerHTML = `<span class="dot"></span>סטטוס: —`;
+    statusEl.classList.add("default");
+    statusEl.style.display = "inline-flex";
+    return;
+  }
+
+  if (shift.closed) {
+    statusEl.innerHTML = `<span class="dot"></span>סטטוס: סגור`;
+    statusEl.classList.add("closed");
+  } else {
+    statusEl.innerHTML = `<span class="dot"></span>סטטוס: פתוח`;
+    statusEl.classList.add("open");
+  }
+  statusEl.style.display = "inline-flex";
+}
+
+/* =========================
    טעינת משמרת
    ========================= */
 loadForm.addEventListener("submit", async (e) => {
@@ -61,8 +85,8 @@ loadForm.addEventListener("submit", async (e) => {
     shiftSection.style.display = "block";
     saveBtn.style.display = "none";
     finalizeBtn.style.display = "none";
-    // אחמ״ש
     leadChip.textContent = "אחמ״ש: —";
+    updateStatus(null);
     leadChip.style.display = "inline-flex";
     return;
   }
@@ -72,18 +96,27 @@ loadForm.addEventListener("submit", async (e) => {
     shift.team = shift.team.split(",").map((name) => name.trim()).filter(Boolean);
   }
 
-  // אחמ״ש ליד הכפתור
+  // אחמ״ש
   let leadName = shift.manager;
   if (!leadName) {
     if (Array.isArray(shift.team) && shift.team.length) leadName = shift.team[0];
     else if (typeof shift.team === "string") leadName = shift.team.split(",")[0]?.trim();
   }
-  if (leadName) {
-    leadChip.innerHTML = `<span class="dot"></span>אחמ״ש: ${leadName}`;
-    leadChip.style.display = "inline-flex";
+  leadChip.innerHTML = `<span class="dot"></span>אחמ״ש: ${leadName || "—"}`;
+  leadChip.style.display = "inline-flex";
+
+  // סטטוס
+  updateStatus(shift);
+
+  // הערות אחמ״ש
+  const noteBox = document.getElementById("managerNoteSection");
+  const noteText = document.getElementById("managerNote");
+  if (shift.notes && shift.notes.trim()) {
+    noteText.textContent = shift.notes;
+    noteBox.style.display = "block";
   } else {
-    leadChip.textContent = "אחמ״ש: —";
-    leadChip.style.display = "inline-flex";
+    noteText.textContent = "אין הערת אחמ\"ש";
+    noteBox.style.display = "block";
   }
 
   // שמור נתונים לרינדור
@@ -151,19 +184,13 @@ window.renderCategory = function(categoryKey) {
       </div>
     `;
 
-    // מאזינים לשינויים כדי לעדכן זיכרון מקומי (כדי שלא ייעלם בין טאבים)
+    // האזנה לשינויים
     const bodyEl = document.getElementById(`task-${taskId}`).querySelector('.task-body');
     const sel = bodyEl.querySelector('.fld-worker');
-
-    const markDirty = () => bodyEl.classList.add('dirty');
     sel.addEventListener('change', () => {
       upsertLocalExecution(categoryKey, task, sel.value.trim());
-      markDirty();
+      bodyEl.classList.add('dirty');
     });
-    // tm.addEventListener('change', () => {
-    //   upsertLocalExecution(categoryKey, task, sel.value.trim(), tm.value.trim());
-    //   markDirty();
-    // });
   });
 };
 
@@ -180,10 +207,8 @@ async function saveSingleTask(btn) {
   const category = body.dataset.category;
   const task = body.dataset.task;
   const worker = body.querySelector(".fld-worker").value.trim();
-  // const time   = body.querySelector(".fld-time").value.trim();
   const date   = updateForm.dataset.date;
 
-  // עדכון מקומי
   upsertLocalExecution(category, task, worker);
 
   btn.disabled = true;
@@ -221,7 +246,6 @@ saveBtn.addEventListener("click", async () => {
     const cat  = body.dataset.category;
     const task = body.dataset.task;
     const worker = body.querySelector(".fld-worker")?.value?.trim() || "";
-    // const time   = body.querySelector(".fld-time")?.value?.trim() || "";
     if (worker) executions[cat].push({ task, worker });
   });
 
@@ -253,8 +277,7 @@ saveBtn.addEventListener("click", async () => {
    ========================= */
 finalizeBtn?.addEventListener("click", () => {
   if (!shiftData) return;
-  const html = buildFinalizeSummaryHTML(shiftData);
-  finalizeSummary.innerHTML = html;
+  finalizeSummary.innerHTML = buildFinalizeSummaryHTML(shiftData);
   finalizeModal.style.display = "flex";
 });
 
@@ -287,9 +310,9 @@ confirmFinalize?.addEventListener("click", async () => {
     if (!res.ok) throw new Error(result.message || "שגיאת שרת");
 
     document.getElementById("finalizeStatus").textContent = result.message || "המשמרת נסגרה בהצלחה.";
-    // אפשר לנעול את ה־UI לעריכה
     updateForm.querySelectorAll("select,input[type='time'],button.save-single").forEach(el => el.disabled = true);
     saveBtn.disabled = true;
+    updateStatus({ closed: true }); // עדכון סטטוס לסגור
   } catch (err) {
     document.getElementById("finalizeStatus").textContent = err.message || "סגירה נכשלה.";
   } finally {
@@ -297,8 +320,17 @@ confirmFinalize?.addEventListener("click", async () => {
   }
 });
 
-// בונה סיכום יפה לפי המשימות והביצועים
+// בונה סיכום יפה
 function buildFinalizeSummaryHTML(shift) {
+  const managerNote = document.getElementById('managerNotes');
+  if (managerNote) {
+    if (shift.notes && shift.notes.trim()) {
+      managerNote.innerHTML = `<div>${shift.notes.trim()}</div>`;
+    } else {
+      managerNote.textContent = 'אין הערות.';
+    }
+  }
+
   const date = updateForm.dataset.date || shift.date || "";
   const manager = shift.manager || "—";
   const team = Array.isArray(shift.team) ? shift.team.join(", ") :
@@ -315,7 +347,6 @@ function buildFinalizeSummaryHTML(shift) {
     tasks.forEach(task => {
       const ex = getExecForTask(shift, cat.key, task);
       const worker = ex?.worker || "—";
-      // const time = ex?.time || "—";
       const ok = worker !== "—";
       rows.push(`
         <li style="background:#fbfff6;border:1px dashed #d7efd0;border-radius:10px;padding:8px 10px;margin:6px 0">
@@ -336,10 +367,14 @@ function buildFinalizeSummaryHTML(shift) {
     </div>
     <div class="section">
       ${rows.join("") || "<em>אין משימות מוגדרות.</em>"}
-      <small class="muted">סימן ✅ מציין משימה שמולאה עם עובד ושעה; ❗ מציין שחסר פרטים.</small>
+      <small class="muted">סימן ✅ מציין משימה שמולאה עם עובד; ❗ מציין שחסר פרטים.</small>
     </div>
   `;
 }
+
+/* =========================
+   הערות בזמן אמת
+   ========================= */
 (function () {
   function escapeHtml(s){
     return String(s).replace(/[&<>"']/g, m => ({
@@ -356,7 +391,7 @@ function buildFinalizeSummaryHTML(shift) {
             <span class="who-time">
               <small>${new Date(n.time).toLocaleString('he-IL')}</small>
             </span>
-            <button class="note-del-btn" style='color: black' title="חיקה">🗑️</button>
+            <button class="note-del-btn" style='color: black' title="מחיקה">🗑️</button>
           </li>
         `).join('')
       : '<li class="exec-row"><span class="task-name">אין הערות</span></li>';
@@ -383,9 +418,9 @@ function buildFinalizeSummaryHTML(shift) {
 
     // הוספת הערה
     addBtn?.addEventListener('click', async () => {
-      if (!dateInput?.value) { alert('בחר תאריך משמרת קודם'); return; }
+      if (!dateInput?.value) return alert('בחר תאריך משמרת קודם');
       const text = (noteText?.value || '').trim();
-      if (!text) { noteText?.focus(); return; }
+      if (!text) return noteText.focus();
 
       const res = await fetch('/api/add-runtime-note', {
         method: 'POST',
@@ -396,15 +431,26 @@ function buildFinalizeSummaryHTML(shift) {
           author: managerInput?.value || 'אחמ״ש'
         })
       });
+
       const data = await res.json();
-      if (!data.ok) { alert(data.message || 'שגיאה'); return; }
+      if (!data.ok) return alert(data.message || 'שגיאה');
+
+      // הוספה ל־DOM
+      const li = document.createElement('li');
+      li.className = 'exec-row';
+      li.innerHTML = `
+        <span class="task-name">${text}</span>
+        <span class="who-time"><small>${new Date().toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}</small></span>
+        <button class="note-del-btn" style="color:black" title="מחיקה">🗑️</button>
+      `;
+      li.querySelector('.note-del-btn').addEventListener('click', () => li.remove());
+      runtimeList.appendChild(li);
 
       noteText.value = '';
-      renderRuntimeNotes(runtimeList, data.runtimeNotes);
       noteText.focus();
     });
 
-    // מחיקת הערה (האצלת אירועים על ה-UL)
+    // מחיקת הערה
     runtimeList?.addEventListener('click', async (e) => {
       const btn = e.target.closest('.note-del-btn');
       if (!btn) return;
@@ -424,7 +470,7 @@ function buildFinalizeSummaryHTML(shift) {
         body: JSON.stringify({
           date,
           noteId: noteId || undefined,
-          index: noteId ? undefined : Number(index) // fallback אם אין id
+          index: noteId ? undefined : Number(index)
         })
       });
 
