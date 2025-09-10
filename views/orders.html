@@ -6,7 +6,7 @@
   <title>NEW DELI • הזמנות יומיות</title>
   <link rel="icon" href="/icons/icon-512.png" type="image/png">
 
-  <link rel="stylesheet" href="/css/style.css?v=2" />
+  <link rel="stylesheet" href="/css/style.css?v=3" />
   <style>
     :root { --green:#2b5329; --bg:#fbfff6; --border:#e2eadc; --ink:#0a0a0a; }
     body { font-family: system-ui, Arial; background: var(--bg); color: var(--ink); padding: clamp(12px,2vw,24px); }
@@ -98,7 +98,7 @@
       const date = dateInput.value;
       if (!date) return;
       msg.textContent = 'טוען...';
-      const res = await fetch('/orders?date=' + encodeURIComponent(date));
+      const res = await fetch('/api/orders?date=' + encodeURIComponent(date));
       const data = await res.json();
       if (data.ok) {
         current = data.order;
@@ -134,7 +134,7 @@ document.getElementById('dateInput').addEventListener('change', updateWeekdayHin
       if (!current) return;
       collectFromUI();
       msg.textContent = 'שומר...';
-      const res = await fetch('/orders', {
+      const res = await fetch('/api/orders', {
         method:'POST',
         headers:{ 'Content-Type':'application/json' },
         body: JSON.stringify({ date: current.date, blocks: current.blocks, notes: current.notes || '' })
