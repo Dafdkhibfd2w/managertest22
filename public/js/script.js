@@ -38,6 +38,34 @@ function getChecked(listId) {
   const boxes = document.querySelectorAll(`input[name="${listId}"]:checked`);
   return Array.from(boxes).map((b) => b.value.trim()).filter(Boolean);
 }
+const managerNoteText = document.getElementById('managerNoteText');
+const addManagerBtn = document.getElementById('addManagerNoteBtn');
+const managerInput = document.getElementById('managerInput'); // אם יש
+const updateForm = document.getElementById('updateForm');
+
+addManagerBtn?.addEventListener('click', async () => {
+  const date = updateForm.dataset.date;
+  if (!date) return alert('לא נטענה משמרת');
+
+  const text = (managerNoteText?.value || '').trim();
+  if (!text) return managerNoteText.focus();
+
+  const res = await fetch('/api/add-manager-note', {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json' },
+    body: JSON.stringify({
+      date,
+      text,
+      author: managerInput?.value || 'מנהל'
+    })
+  });
+
+  const data = await res.json();
+  if (!data.ok) return alert(data.message || 'שגיאה');
+
+  managerNoteText.value = '';
+  alert('ההערה נוספה ✔');
+});
 
 // ================== Toggle Panels (Accordion) ==================
 function setupPickerToggles() {
