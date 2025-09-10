@@ -6,7 +6,7 @@
   <title>NEW DELI • הזמנות יומיות</title>
   <link rel="icon" href="/icons/icon-512.png" type="image/png">
 
-  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/style.css?v=2" />
   <style>
     :root { --green:#2b5329; --bg:#fbfff6; --border:#e2eadc; --ink:#0a0a0a; }
     body { font-family: system-ui, Arial; background: var(--bg); color: var(--ink); padding: clamp(12px,2vw,24px); }
@@ -30,6 +30,24 @@
   </style>
 </head>
 <body>
+  <header class="brandbar">
+  <span class="brand-title">NEW DELI</span>
+  <span class="burger" id="burger">&#9776;</span>
+</header>
+
+<nav class="mobile-nav" id="mobileNav">
+  <button id="closeNav" class="close-btn">✖</button>
+  <ul>
+    <li><a href="/"><span class="icon">🏠</span> דף הבית</a></li>
+    <li><a href="/create"><span class="icon">🗓️</span> יצירת משמרת</a></li>
+    <li><a href="/manage"><span class="icon">✅</span> ניהול משמרת</a></li>
+    <li><a href="/admin-login"><span class="icon">📚</span> ארכיון / דשבורד מנהל</a></li>
+    <li><a href="/invoices-page"><span class="icon">🧾</span> חשבוניות</a></li>
+    <li><a href="/suppliers-page"><span class="icon">🏷️</span> ספקים</a></li>
+    <li><a href="/orders-page"><span class="icon">📦</span> הזמנות</a></li>
+    <li><a href="/dispersals-page"><span class="icon">🚕</span> פיזורים</a></li>
+  </ul>
+</nav>
   <div class="wrap">
     <h1>הזמנות יומיות</h1>
 
@@ -80,7 +98,7 @@
       const date = dateInput.value;
       if (!date) return;
       msg.textContent = 'טוען...';
-      const res = await fetch('/api/orders?date=' + encodeURIComponent(date));
+      const res = await fetch('/orders?date=' + encodeURIComponent(date));
       const data = await res.json();
       if (data.ok) {
         current = data.order;
@@ -116,7 +134,7 @@ document.getElementById('dateInput').addEventListener('change', updateWeekdayHin
       if (!current) return;
       collectFromUI();
       msg.textContent = 'שומר...';
-      const res = await fetch('/api/orders', {
+      const res = await fetch('/orders', {
         method:'POST',
         headers:{ 'Content-Type':'application/json' },
         body: JSON.stringify({ date: current.date, blocks: current.blocks, notes: current.notes || '' })
@@ -205,5 +223,7 @@ document.getElementById('dateInput').addEventListener('change', updateWeekdayHin
     const today = new Date().toISOString().slice(0,10);
     dateInput.value = today;
   </script>
+  <script src="/js/global.js"></script>
+
 </body>
 </html>

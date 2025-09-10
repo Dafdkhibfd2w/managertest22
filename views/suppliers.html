@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>NEW DELI • ניהול ספקים</title>
-  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/style.css?v=2" />
   <link rel="icon" href="/icons/icon-512.png" type="image/png">
 
   <style>
@@ -30,86 +30,92 @@
   </style>
 </head>
 <body>
+  <header class="brandbar">
+  <span class="brand-title">NEW DELI</span>
+  <span class="burger" id="burger">&#9776;</span>
+</header>
+
+<nav class="mobile-nav" id="mobileNav">
+  <button id="closeNav" class="close-btn">✖</button>
+  <ul>
+    <li><a href="/"><span class="icon">🏠</span> דף הבית</a></li>
+    <li><a href="/create"><span class="icon">🗓️</span> יצירת משמרת</a></li>
+    <li><a href="/manage"><span class="icon">✅</span> ניהול משמרת</a></li>
+    <li><a href="/admin-login"><span class="icon">📚</span> ארכיון / דשבורד מנהל</a></li>
+    <li><a href="/invoices-page"><span class="icon">🧾</span> חשבוניות</a></li>
+    <li><a href="/suppliers-page"><span class="icon">🏷️</span> ספקים</a></li>
+    <li><a href="/orders-page"><span class="icon">📦</span> הזמנות</a></li>
+    <li><a href="/dispersals-page"><span class="icon">🚕</span> פיזורים</a></li>
+  </ul>
+</nav>
   <div class="wrap">
     <h1>ניהול ספקים</h1>
 
     <!-- טופס הוספה/עריכה -->
-    <div class="card">
-      <h3 id="formTitle" style="margin-top:0">הוסף ספק</h3>
-      <form id="supplierForm">
-        <div class="row">
-          <div>
-            <label>שם ספק</label>
-            <input type="text" name="name" id="name" required />
-          </div>
-          <div>
-            <label>טלפון (לא חובה)</label>
-            <input type="text" name="phone" id="phone" placeholder="050-0000000" />
-          </div>
-          <div>
-            <label>סטטוס</label>
-            <select id="active">
-              <option value="true" selected>פעיל</option>
-              <option value="false">לא פעיל</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="row" style="grid-template-columns:1fr;">
-          <div>
-            <label>ימי פעילות</label>
-            <div class="days">
-              <label><input type="checkbox" class="day" value="0"> א'</label>
-              <label><input type="checkbox" class="day" value="1"> ב'</label>
-              <label><input type="checkbox" class="day" value="2"> ג'</label>
-              <label><input type="checkbox" class="day" value="3"> ד'</label>
-              <label><input type="checkbox" class="day" value="4"> ה'</label>
-            </div>
-          </div>
-        </div>
-
-        <div class="row" style="grid-template-columns:1fr;">
-          <div>
-            <label>מוצרים</label>
-            <div class="items-grid" id="itemsGrid">
-              <!-- שורות יתווספו דינמית -->
-            </div>
-            <button type="button" id="addItem" class="secondary" style="margin-top:8px;">הוסף מוצר</button>
-          </div>
-        </div>
-
-        <div class="row" style="grid-template-columns:auto auto;">
-          <div>
-            <button type="submit">שמור</button>
-          </div>
-          <div>
-            <button type="button" id="resetForm" class="secondary">נקה טופס</button>
-          </div>
-        </div>
-        <p class="muted" id="msg"></p>
-      </form>
+<div class="section">
+  <h3 id="formTitle">הוסף ספק</h3>
+  <form id="supplierForm">
+    <div class="modal-grid">
+      <div>
+        <label for="name">שם ספק</label>
+        <input type="text" id="name" name="name" required />
+      </div>
+      <div>
+        <label for="phone">טלפון (לא חובה)</label>
+        <input type="text" id="phone" name="phone" placeholder="050-0000000" />
+      </div>
+      <!-- <div>
+        <label for="active">סטטוס</label>
+        <select id="active" name="active">
+          <option value="true" selected>פעיל</option>
+          <option value="false">לא פעיל</option>
+        </select>
+      </div> -->
     </div>
+
+    <div class="section">
+      <label>ימי פעילות</label>
+      <div class="task-tabs">
+        <label class="task-tab"><input type="checkbox" class="day" value="0"> א'</label>
+        <label class="task-tab"><input type="checkbox" class="day" value="1"> ב'</label>
+        <label class="task-tab"><input type="checkbox" class="day" value="2"> ג'</label>
+        <label class="task-tab"><input type="checkbox" class="day" value="3"> ד'</label>
+        <label class="task-tab"><input type="checkbox" class="day" value="4"> ה'</label>
+      </div>
+    </div>
+
+    <div class="section">
+      <label>מוצרים</label>
+      <div class="items-grid" id="itemsGrid" style="display: grid; gap: 12px;">
+        <!-- יתווספו פריטים דינמית -->
+      </div>
+      <button type="button" id="addItem" class="btn btn-secondary" style="margin-top: 10px;">הוסף מוצר</button>
+    </div>
+
+    <div class="modal-actions" style="margin-top: 20px;">
+      <button type="submit" class="btn save">שמור</button>
+      <button type="button" id="resetForm" class="btn cancel">נקה טופס</button>
+    </div>
+    <p class="muted" id="msg"></p>
+  </form>
+</div>
+
 
     <!-- טבלת ספקים -->
     <div class="card">
       <div style="display:flex; gap:8px; align-items:center; justify-content:space-between;">
         <h3 style="margin:0">ספקים</h3>
-        <div>
-          <button class="secondary" id="filterActive">הצג פעילים בלבד</button>
-          <button class="secondary" id="filterAll">הצג את כולם</button>
-        </div>
       </div>
       <div style="overflow:auto; margin-top:10px;">
-        <table id="tbl">
-          <thead>
-            <tr>
-              <th>שם</th>
-              <th>ימים</th>
-              <th>מוצרים</th>
-              <th>סטטוס</th>
-              <th style="width:160px">פעולות</th>
-            </tr>
-          </thead>
+<table id="tbl" class="responsive-table">
+<thead>
+  <tr>
+    <th>שם</th>
+    <th>ימים</th>
+    <th>מוצרים</th>
+    <th style="width:160px">פעולות</th>
+  </tr>
+</thead>
           <tbody></tbody>
         </table>
       </div>
@@ -128,11 +134,9 @@
 
     const nameEl = document.getElementById('name');
     const phoneEl = document.getElementById('phone');
-    const activeEl = document.getElementById('active');
+    // const activeEl = document.getElementById('active');
     const dayEls = Array.from(document.querySelectorAll('.day'));
 
-    const filterActiveBtn = document.getElementById('filterActive');
-    const filterAllBtn = document.getElementById('filterAll');
 
     let editingId = null;
     let currentList = [];
@@ -147,18 +151,22 @@
       if (!items || !items.length) addItemRow('','');
     }
 
-    function addItemRow(name='', unit=''){
-      const row = document.createElement('div');
-      row.className = 'item-row';
-      row.innerHTML = `
-        <input type="text" placeholder="שם מוצר" value="${escapeAttr(name)}">
-        <input type="text" placeholder="יחידה (למשל: קרטון/ארגז)" value="${escapeAttr(unit)}">
-        <button type="button" class="secondary">מחק</button>
-      `;
-      const delBtn = row.querySelector('button');
-      delBtn.onclick = () => row.remove();
-      itemsGrid.appendChild(row);
-    }
+function addItemRow(name = '', unit = '') {
+  const row = document.createElement('div');
+  row.className = 'item-row'; // חשוב מאוד!
+
+  row.innerHTML = `
+    <input type="text" placeholder="שם מוצר" value="${escapeAttr(name)}">
+    <input type="text" placeholder="יחידה (למשל: קרטון)" value="${escapeAttr(unit)}">
+    <button type="button" class="secondary">מחק</button>
+  `;
+
+  const delBtn = row.querySelector('button');
+  delBtn.onclick = () => row.remove();
+
+  itemsGrid.appendChild(row);
+}
+
 
     addItemBtn.onclick = () => addItemRow('','');
 
@@ -183,7 +191,7 @@
       formTitle.textContent = 'הוסף ספק';
       nameEl.value = '';
       phoneEl.value = '';
-      activeEl.value = 'true';
+      // activeEl.value = 'true';
       setDays([]);
       renderItems([]);
       msg.textContent = '';
@@ -193,13 +201,12 @@
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const payload = {
-        name: nameEl.value.trim(),
-        phone: phoneEl.value.trim(),
-        days: collectDays(),
-        items: collectItems(),
-        active: activeEl.value === 'true'
-      };
+const payload = {
+  name: nameEl.value.trim(),
+  phone: phoneEl.value.trim(),
+  days: collectDays(),
+  items: collectItems()
+};
       try {
         msg.textContent = 'שומר...';
         let res;
@@ -226,33 +233,29 @@
       }
     });
 
-    async function loadSuppliers(activeOnly=false){
-      const res = await fetch('/api/suppliers' + (activeOnly ? '?active=true' : ''));
-      const data = await res.json();
-      currentList = data.suppliers || [];
-      renderTable();
-    }
+async function loadSuppliers(){
+  const res = await fetch('/api/suppliers');
+  const data = await res.json();
+  currentList = data.suppliers || [];
+  renderTable();
+}
 
-    function renderTable(){
-      tblBody.innerHTML = currentList.map(s => `
-        <tr>
-          <td>${escapeHtml(s.name)}</td>
-          <td>${(s.days||[]).map(dayLabel).join(', ')}</td>
-          <td>${(s.items||[]).map(it => escapeHtml(it.name)).join(', ')}</td>
-          <td>${s.active ? 'פעיל' : 'לא פעיל'}</td>
-          <td class="actions">
-            <button class="secondary" data-edit="${s._id}">ערוך</button>
-            <button class="secondary" data-toggle="${s._id}">${s.active ? 'השבת' : 'הפעל'}</button>
-            <button class="danger" data-del="${s._id}">מחק</button>
-          </td>
-        </tr>
-      `).join('');
 
-      // חיבור אירועים
-      tblBody.querySelectorAll('[data-edit]').forEach(btn => btn.onclick = () => editSupplier(btn.dataset.edit));
-      tblBody.querySelectorAll('[data-del]').forEach(btn => btn.onclick = () => delSupplier(btn.dataset.del));
-      tblBody.querySelectorAll('[data-toggle]').forEach(btn => btn.onclick = () => toggleActive(btn.dataset.toggle));
-    }
+function renderTable(){
+  tblBody.innerHTML = currentList.map(s => `
+    <tr>
+      <td data-label="שם">${escapeHtml(s.name)}</td>
+      <td data-label="מס טלפון">${escapeHtml(s.phone) || 'לא הוזן'}</td>
+      <td data-label="ימים">${(s.days||[]).map(dayLabel).join(', ')}</td>
+      <td data-label="מוצרים">${(s.items||[]).map(it => escapeHtml(it.name)).join(', ')}</td>
+      <td data-label="פעולות" class="actions">
+        <button class="secondary" data-edit="${s._id}">ערוך</button>
+        <button class="danger" data-del="${s._id}">מחק</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
 
     async function editSupplier(id){
       const s = currentList.find(x => x._id === id);
@@ -261,7 +264,7 @@
       formTitle.textContent = 'עריכת ספק';
       nameEl.value = s.name || '';
       phoneEl.value = s.phone || '';
-      activeEl.value = s.active ? 'true' : 'false';
+      // activeEl.value = s.active ? 'true' : 'false';
       setDays(s.days || []);
       renderItems(s.items || []);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -273,20 +276,18 @@
       await loadSuppliers();
     }
 
-    async function toggleActive(id){
-      const s = currentList.find(x => x._id === id);
-      if (!s) return;
-      await fetch('/api/suppliers/' + id + '/active', {
-        method:'PATCH',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ active: !s.active })
-      });
-      await loadSuppliers();
-    }
+    // async function toggleActive(id){
+    //   const s = currentList.find(x => x._id === id);
+    //   if (!s) return;
+    //   await fetch('/api/suppliers/' + id + '/active', {
+    //     method:'PATCH',
+    //     headers:{'Content-Type':'application/json'},
+    //     body: JSON.stringify({ active: !s.active })
+    //   });
+    //   await loadSuppliers();
+    // }
 
-    // סינון תצוגה
-    filterActiveBtn.onclick = () => loadSuppliers(true);
-    filterAllBtn.onclick    = () => loadSuppliers(false);
+
 
     // Utils
     function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
@@ -296,5 +297,7 @@
     resetForm();
     loadSuppliers();
   </script>
+  <script src="/js/global.js"></script>
+  
 </body>
 </html>
