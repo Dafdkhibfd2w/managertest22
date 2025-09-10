@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>NEW DELI • פיזורים</title>
-  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/style.css?v=2" />
   <link rel="icon" href="/icons/icon-512.png" type="image/png">
 
 
@@ -15,7 +15,12 @@
       --green: #2b5329; --amber:#ffcb05; --bg:#fbfff6; --border:#e2eadc; --ink:#0a0a0a;
     }
     body { font-family: system-ui, Arial; background: var(--bg); color: var(--ink); padding: clamp(12px,2vw,24px); }
-    .wrap { max-width: 1080px; margin: 0 auto; }
+.wrap {
+  max-width: 1080px;
+  width: 100%;       /* ← חשוב מאוד */
+  margin: 0 auto;
+  padding: 16px;
+}
     h1 { font-size: clamp(20px, 4vw, 28px); margin-bottom: 16px; color: var(--green); }
 
     .card { background:#fff; border:1px solid var(--border); border-radius:14px; padding:16px;
@@ -51,6 +56,24 @@
   </style>
 </head>
 <body>
+  <header class="brandbar">
+  <span class="brand-title">NEW DELI</span>
+  <span class="burger" id="burger">&#9776;</span>
+</header>
+
+<nav class="mobile-nav" id="mobileNav">
+  <button id="closeNav" class="close-btn">✖</button>
+  <ul>
+    <li><a href="/"><span class="icon">🏠</span> דף הבית</a></li>
+    <li><a href="/create"><span class="icon">🗓️</span> יצירת משמרת</a></li>
+    <li><a href="/manage"><span class="icon">✅</span> ניהול משמרת</a></li>
+    <li><a href="/admin-login"><span class="icon">📚</span> ארכיון / דשבורד מנהל</a></li>
+    <li><a href="/invoices-page"><span class="icon">🧾</span> חשבוניות</a></li>
+    <li><a href="/suppliers-page"><span class="icon">🏷️</span> ספקים</a></li>
+    <li><a href="/orders-page"><span class="icon">📦</span> הזמנות</a></li>
+    <li><a href="/dispersals-page"><span class="icon">🚕</span> פיזורים</a></li>
+  </ul>
+</nav>
   <div class="wrap">
     <h1>פיזורים 🚕</h1>
 
@@ -81,22 +104,22 @@
         </div>
 
         <div class="row" style="grid-template-columns: 1fr 1fr;">
-          <div>
+          <!-- <div>
             <label>עם מי נסעו (מופרד בפסיקים)</label>
             <input type="text" name="people" placeholder="לדוגמה: עומר, מאיה, איתי" />
-          </div>
+          </div> -->
           <div>
             <label>מי שילם</label>
             <input type="text" name="payer" placeholder="לדוגמה: הקופה / עומר" />
           </div>
         </div>
 
-        <div class="row" style="grid-template-columns: 1fr;">
+        <!-- <div class="row" style="grid-template-columns: 1fr;">
           <div>
             <label>הערות</label>
             <textarea name="notes" placeholder="לדוגמה: מסלול מיוחד, המתנה, וכו׳"></textarea>
           </div>
-        </div>
+        </div> -->
         <p class="muted" id="addMsg"></p>
               <div>
             <button type="submit">שמור פיזור</button>
@@ -113,8 +136,8 @@
             <input type="date" name="date" />
           </div>
           <div>
-            <label>חיפוש לפי נהג / אדם</label>
-            <input type="text" name="q" placeholder="הקלד שם נהג או אחד הנוסעים" />
+            <label>חיפוש לפי נהג</label>
+            <input type="text" name="q" placeholder="הקלד שם נהג" />
           </div>
           <div>
             <button type="submit" class="secondary">סנן</button>
@@ -135,9 +158,9 @@
               <th class="nowrap">תאריך</th>
               <th class="nowrap">מחיר</th>
               <th>נהג / חברה</th>
-              <th>נוסעים</th>
+              <!-- <th>נוסעים</th> -->
               <th>שילם</th>
-              <th>הערות</th>
+              <!-- <th>הערות</th> -->
               <th style="width:140px" class="nowrap">פעולות</th>
             </tr>
           </thead>
@@ -180,7 +203,7 @@
       const fd = new FormData(addForm);
       const body = Object.fromEntries(fd.entries());
       try {
-        const res = await fetch('/api/dispersals', {
+        const res = await fetch('/dispersals', {
           method:'POST',
           headers:{'Content-Type':'application/json'},
           body: JSON.stringify(body)
@@ -232,7 +255,7 @@
     // ===== Data loading & Rendering =====
     async function loadAll(){
       // אפשר להעביר date לשאילתה כדי לצמצם, אבל כאן נביא הכל פעם אחת
-      const res = await fetch('/api/dispersals');
+      const res = await fetch('/dispersals');
       allItems = await res.json();
     }
 
@@ -243,8 +266,8 @@
         const byDate = state.date ? (item.shiftDate === state.date) : true;
         const q = state.q.trim();
         const byQ = !q ? true : (
-          (item.taxi && item.taxi.toLowerCase().includes(q.toLowerCase())) ||
-          (Array.isArray(item.people) && item.people.some(p => (p||'').toLowerCase().includes(q.toLowerCase())))
+          (item.taxi && item.taxi.toLowerCase().includes(q.toLowerCase()))
+          // (Array.isArray(item.people) && item.people.some(p => (p||'').toLowerCase().includes(q.toLowerCase())))
         );
         return byDate && byQ;
       });
@@ -266,15 +289,15 @@
         <tr>
           <td class="nowrap">${escapeHtml(d.shiftDate)}</td>
           <td class="nowrap">${formatPrice(d.price)} ₪</td>
-          <td>${escapeHtml(d.taxi || '')}</td>
-          <td>${(d.people || []).map(p => `<span class="pill">${escapeHtml(p)}</span>`).join('')}</td>
-          <td>${escapeHtml(d.payer || '')}</td>
-          <td>${escapeHtml(d.notes || '')}</td>
+          <td>${escapeHtml(d.taxi || 'לא הוזן')}</td>
+          <td>${escapeHtml(d.payer || 'לא הוזן')}</td>
           <td class="nowrap">
             <button class="secondary" onclick="delDisp('${d._id}')">מחק</button>
           </td>
         </tr>
       `).join('');
+          // <td>${escapeHtml(d.notes || '')}</td>
+          // <td>${(d.people || []).map(p => `<span class="pill">${escapeHtml(p)}</span>`).join('')}</td>
 
       const pageIdx  = Math.floor(state.skip / state.limit) + 1;
       const pages    = Math.max(1, Math.ceil(list.length / state.limit));
@@ -286,7 +309,7 @@
 
     async function delDisp(id){
       if (!confirm('למחוק את הרשומה?')) return;
-      await fetch('/api/dispersals/' + encodeURIComponent(id), { method:'DELETE' });
+      await fetch('/dispersals/' + encodeURIComponent(id), { method:'DELETE' });
       await loadAll();
       applyFiltersAndRender();
     }
