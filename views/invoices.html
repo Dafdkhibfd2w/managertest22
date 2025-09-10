@@ -4,8 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>NEW DELI • חשבוניות</title>
-  <link rel="stylesheet" href="/css/style.css" />
-  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="/css/style.css?v=2" />
 <meta name="theme-color" content="#2b5329">
   <link rel="icon" href="/icons/icon-512.png" type="image/png">
 
@@ -38,6 +37,24 @@
   </style>
 </head>
 <body>
+  <header class="brandbar">
+  <span class="brand-title">NEW DELI</span>
+  <span class="burger" id="burger">&#9776;</span>
+</header>
+
+<nav class="mobile-nav" id="mobileNav">
+  <button id="closeNav" class="close-btn">✖</button>
+  <ul>
+    <li><a href="/"><span class="icon">🏠</span> דף הבית</a></li>
+    <li><a href="/create"><span class="icon">🗓️</span> יצירת משמרת</a></li>
+    <li><a href="/manage"><span class="icon">✅</span> ניהול משמרת</a></li>
+    <li><a href="/admin-login"><span class="icon">📚</span> ארכיון / דשבורד מנהל</a></li>
+    <li><a href="/invoices-page"><span class="icon">🧾</span> חשבוניות</a></li>
+    <li><a href="/suppliers-page"><span class="icon">🏷️</span> ספקים</a></li>
+    <li><a href="/orders-page"><span class="icon">📦</span> הזמנות</a></li>
+    <li><a href="/dispersals-page"><span class="icon">🚕</span> פיזורים</a></li>
+  </ul>
+</nav>
   <div class="wrap">
     <h1>חשבוניות</h1>
 
@@ -133,7 +150,7 @@
       uploadMsg.textContent = 'מעלה...';
       const fd = new FormData(uploadForm);
       try {
-        const res = await fetch('/api/upload-invoice', { method:'POST', body: fd });
+        const res = await fetch('/upload-invoice', { method:'POST', body: fd });
         const data = await res.json();
         uploadMsg.textContent = data.message || (data.ok ? 'הועלה' : 'שגיאה');
         if (data.ok) {
@@ -181,7 +198,7 @@
       params.set('skip', state.skip);
       params.set('limit', state.limit);
 
-      const res = await fetch('/api/invoices?' + params.toString());
+      const res = await fetch('/invoices?' + params.toString());
       const data = await res.json();
       state.total = data.total || 0;
 
@@ -206,7 +223,7 @@
 
     async function delInvoice(id) {
       if (!confirm('למחוק את החשבונית?')) return;
-      const res = await fetch('/api/invoice/' + encodeURIComponent(id), { method:'DELETE' });
+      const res = await fetch('/invoice/' + encodeURIComponent(id), { method:'DELETE' });
       const data = await res.json();
       alert(data.message || (data.ok ? 'נמחק' : 'שגיאה'));
       if (data.ok) load();
