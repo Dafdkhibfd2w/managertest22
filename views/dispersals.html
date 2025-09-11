@@ -425,12 +425,12 @@
 
       tbody.innerHTML = page.map(d => `
         <tr>
-          <div id="tablee">
+        <div id="tablee" style="background-color: red;">
           <td class="nowrap">${escapeHtml(d.shiftDate)}</td>
           <td class="nowrap">${formatPrice(d.price)} ₪</td>
           <td>${escapeHtml(d.taxi || 'לא הוזן')}</td>
           <td>${escapeHtml(d.payer || 'לא הוזן')}</td>
-          </div>
+        </div>
 
           <td class="nowrap">
             <button class="secondary ss" onclick="delDisp('${d._id}')">מחק</button>
