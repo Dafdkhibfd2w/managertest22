@@ -35,7 +35,9 @@
       margin: 0 auto;
       padding: 16px;
     }
-
+.ss {
+    width: 70%;
+}
     h1 {
       font-size: clamp(20px, 4vw, 28px);
       margin-bottom: 16px;
@@ -423,12 +425,15 @@
 
       tbody.innerHTML = page.map(d => `
         <tr>
+          <div id="tablee">
           <td class="nowrap">${escapeHtml(d.shiftDate)}</td>
           <td class="nowrap">${formatPrice(d.price)} ₪</td>
           <td>${escapeHtml(d.taxi || 'לא הוזן')}</td>
           <td>${escapeHtml(d.payer || 'לא הוזן')}</td>
+          </div>
+
           <td class="nowrap">
-            <button class="secondary" onclick="delDisp('${d._id}')">מחק</button>
+            <button class="secondary ss" onclick="delDisp('${d._id}')">מחק</button>
           </td>
         </tr>
       `).join('');
