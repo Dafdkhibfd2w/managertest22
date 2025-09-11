@@ -220,7 +220,7 @@
 
   // טעינת משימות מהשרת
   async function loadTasks() {
-    const res = await fetch("/tasks");
+    const res = await fetch("/api/tasks");
     const data = await res.json();
     renderTasks(data); // שימוש בפונקציה הקיימת
   }
@@ -229,7 +229,7 @@
   addForm.addEventListener("submit", async e => {
     e.preventDefault();
     const fd = new FormData(addForm);
-    await fetch("/tasks", {
+    await fetch("/api/tasks", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(Object.fromEntries(fd))
@@ -241,7 +241,7 @@
   // מחיקת משימה
   async function delTask(id) {
     if (!confirm("למחוק משימה?")) return;
-    await fetch("/tasks/" + id, { method: "DELETE" });
+    await fetch("/api/tasks/" + id, { method: "DELETE" });
     loadTasks();
   }
 
@@ -277,7 +277,7 @@ async function editTask(id, oldName, oldCategory) {
     return;
   }
 
-  await fetch("/tasks/" + id, {
+  await fetch("/api/tasks/" + id, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name: newName.trim(), category: newCategory })
