@@ -1079,8 +1079,8 @@ button:hover, .btn:hover, input[type="submit"]:hover {
 }
 
 /* Task state tints (if you already use .ok/.missing they’ll just look nicer) */
-.task-card.ok { background: #f4fbf1; }
-.task-card.missing { background: #fff6f6; }
+/* .task-card.ok { background: #f4fbf1; }
+.task-card.missing { background: #fff6f6; } */
 .task-card .state { border-radius: 10px; }
 
 /* ---------- Brand bar (only if exists) ---------- */
