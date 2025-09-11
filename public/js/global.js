@@ -75,8 +75,10 @@ async function initPush() {
     statusEl.textContent = "❌ שגיאה: " + err.message;
   }
 }
-
+document.addEventListener("DOMContentLoaded", () => {
+  lucide.createIcons(); // יחליף את <i data-lucide="bell"> לאייקון אמיתי
+});
 // כפתור הפעלה
-document
-  .getElementById("enableNotifications")
-  ?.addEventListener("click", initPush);
+document.getElementById("enableNotifications")?.addEventListener("click", () => {
+  initPush(); // הפונקציה שלך להרשמה ל־Push
+});
