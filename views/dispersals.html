@@ -57,8 +57,9 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 16px;
-  align-items: start;
+  align-items: end;
 }
+
 
     .row label {
       font-size: 14px;
@@ -177,14 +178,17 @@
         box-sizing: border-box;
       }
 
-      .row.buttons {
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 10px;
-      }
+/* ספציפית לשורה של הכפתורים */
+.row.buttons {
+  display: flex;
+  justify-content: flex-start; /* או flex-end אם אתה רוצה בצד ימין */
+  gap: 12px;
+}
 
-      .row.buttons button { flex: 1; }
-
+.row.buttons button {
+  width: auto;   /* שלא יתפרסו על כל הרוחב */
+  min-width: 120px;
+}
       tbody tr {
         background: #2a2f45;
         border-radius: 12px;
@@ -238,7 +242,7 @@
   </nav>
 
   <div class="wrap">
-    <h1>פיזורים 🚕</h1>
+    <h1 style="margin-top: 50px;">פיזורים 🚕</h1>
 
     <div class="card summary">
       <span class="chip">סה״כ מוצג: <b id="sumShown">0</b> ₪</span>
