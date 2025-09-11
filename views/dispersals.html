@@ -424,18 +424,15 @@
       countShownEl.textContent = page.length;
 
       tbody.innerHTML = page.map(d => `
-        <tr>
-        <div id="tablee" style="background-color: red;">
-          <td class="nowrap">${escapeHtml(d.shiftDate)}</td>
-          <td class="nowrap">${formatPrice(d.price)} ₪</td>
-          <td>${escapeHtml(d.taxi || 'לא הוזן')}</td>
-          <td>${escapeHtml(d.payer || 'לא הוזן')}</td>
-        </div>
-
-          <td class="nowrap">
-            <button class="secondary ss" onclick="delDisp('${d._id}')">מחק</button>
-          </td>
-        </tr>
+<tr>
+  <td class="nowrap">${escapeHtml(d.shiftDate)}</td>
+  <td class="nowrap">${formatPrice(d.price)} ₪</td>
+  <td>${escapeHtml(d.taxi || 'לא הוזן')}</td>
+  <td>${escapeHtml(d.payer || 'לא הוזן')}</td>
+  <td class="nowrap">
+    <button class="secondary ss" onclick="delDisp('${d._id}')">מחק</button>
+  </td>
+</tr>
       `).join('');
           // <td>${escapeHtml(d.notes || '')}</td>
           // <td>${(d.people || []).map(p => `<span class="pill">${escapeHtml(p)}</span>`).join('')}</td>
