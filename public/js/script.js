@@ -1,4 +1,4 @@
-// ================== ברירות מחדל למשימות ==================
+// ================== ברירות מחדל למשימות (Fallback) ==================
 const defaultTasks = {
   daily: [
     "ניקיון עמדות",
@@ -22,29 +22,80 @@ const defaultTasks = {
 function renderCheckboxes(listId, tasks) {
   const container = document.getElementById(listId);
   if (!container) return;
+    if (!tasks || tasks.length === 0) {
+    container.innerHTML = `
+      <div class="no-tasks">A
+        אין משימות בקטגוריה זו.
+      </div>
+    `;
+    return;
+  }
   container.innerHTML = tasks
     .map(
       (t) => `
-      <label class="task-item">
+      <div class="task-item">
         <input type="checkbox" name="${listId}" value="${t}">
-        <span>${t}</span>
-      </label>
+        <span class="task-text">${t}</span>
+      </div>
     `
     )
     .join("");
 }
 
+// ================== Fetch tasks מהשרת ==================
+async function loadTasksForShift() {
+  try {
+    const res = await fetch("/api/tasks");
+    const tasks = await res.json();
+
+    const daily = tasks.filter(t => t.category === "daily").map(t => t.name);
+    const weekly = tasks.filter(t => t.category === "weekly").map(t => t.name);
+    const monthly = tasks.filter(t => t.category === "monthly").map(t => t.name);
+
+    renderCheckboxes("dailyList", daily);
+    renderCheckboxes("weeklyList", weekly);
+    renderCheckboxes("monthlyList", monthly);
+  } catch (err) {
+    console.error("שגיאה בטעינת משימות:", err);
+    // fallback לברירות מחדל אם יש בעיה בשרת
+    renderCheckboxes("dailyList", defaultTasks.daily);
+    renderCheckboxes("weeklyList", defaultTasks.weekly);
+    renderCheckboxes("monthlyList", defaultTasks.monthly);
+  }
+}
+
+// ================== Utility ==================
 function getChecked(listId) {
   const boxes = document.querySelectorAll(`input[name="${listId}"]:checked`);
   return Array.from(boxes).map((b) => b.value.trim()).filter(Boolean);
 }
+
+// ================== Toggle Panels (Accordion) ==================
+function setupPickerToggles() {
+  document.querySelectorAll(".picker-toggle").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const key = btn.dataset.key; // daily/weekly/monthly
+      const panel = document.getElementById(`${key}Panel`);
+      const expanded = btn.getAttribute("aria-expanded") === "true";
+      btn.setAttribute("aria-expanded", String(!expanded));
+      btn.querySelector(".chev").textContent = expanded ? "▾" : "▴";
+      if (expanded) {
+        panel.setAttribute("hidden", "");
+      } else {
+        panel.removeAttribute("hidden");
+      }
+    });
+  });
+}
+
+// ================== הערות אחמ״ש ==================
 const managerNoteText = document.getElementById('managerNoteText');
 const addManagerBtn = document.getElementById('addManagerNoteBtn');
-const managerInput = document.getElementById('managerInput'); // אם יש
+const managerInput = document.getElementById('managerInput');
 const updateForm = document.getElementById('updateForm');
 
 addManagerBtn?.addEventListener('click', async () => {
-  const date = updateForm.dataset.date;
+  const date = updateForm?.dataset.date;
   if (!date) return alert('לא נטענה משמרת');
 
   const text = (managerNoteText?.value || '').trim();
@@ -67,36 +118,10 @@ addManagerBtn?.addEventListener('click', async () => {
   alert('ההערה נוספה ✔');
 });
 
-// ================== Toggle Panels (Accordion) ==================
-function setupPickerToggles() {
-  document.querySelectorAll(".picker-toggle").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const key = btn.dataset.key; // daily/weekly/monthly
-      const panel = document.getElementById(`${key}Panel`);
-      const expanded = btn.getAttribute("aria-expanded") === "true";
-      btn.setAttribute("aria-expanded", String(!expanded));
-      btn.querySelector(".chev").textContent = expanded ? "▾" : "▴";
-      if (expanded) {
-        panel.setAttribute("hidden", "");
-      } else {
-        panel.removeAttribute("hidden");
-      }
-    });
-  });
-}
-
-
-
-
 // ================== Init ==================
 document.addEventListener("DOMContentLoaded", () => {
-  // רנדר צ׳קבוקסים
-  renderCheckboxes("dailyList", defaultTasks.daily);
-  renderCheckboxes("weeklyList", defaultTasks.weekly);
-  renderCheckboxes("monthlyList", defaultTasks.monthly);
-
-  // פתיחה/סגירה של תיבות
-  setupPickerToggles();
+  loadTasksForShift();       // משימות מה־DB
+  setupPickerToggles();      // אקורדיון
 });
 
 // ================== Submit ==================
@@ -112,14 +137,13 @@ document.getElementById("shiftForm").addEventListener("submit", async (e) => {
   const data = {
     date: formData.get("date"),
     team,
-    
     manager: formData.get("manager") || "",
-tasks: {
-  daily: getChecked("dailyList"),
-  weekly: getChecked("weeklyList"),
-  monthly: getChecked("monthlyList"),
-},
-notes: formData.get("notes") || "",
+    tasks: {
+      daily: getChecked("dailyList"),
+      weekly: getChecked("weeklyList"),
+      monthly: getChecked("monthlyList"),
+    },
+    notes: formData.get("notes") || "",
   };
 
   const res = await fetch("/api/save-shift", {
@@ -131,9 +155,7 @@ notes: formData.get("notes") || "",
   const result = await res.json();
   document.getElementById("status").textContent = result.message || "נשמר";
 
-  // איפוס עדין: אחרי reset נחזיר את ברירות המחדל מסומנות
+  // איפוס → נטען שוב מהשרת
   e.target.reset();
-  renderCheckboxes("dailyList", defaultTasks.daily);
-  renderCheckboxes("weeklyList", defaultTasks.weekly);
-  renderCheckboxes("monthlyList", defaultTasks.monthly);
+  loadTasksForShift();
 });
