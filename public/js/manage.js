@@ -351,7 +351,7 @@ function buildFinalizeSummaryHTML(shift) {
       rows.push(`
         <li style="background: linear-gradient(180deg, #1f2937, #111827);border-radius:10px;padding:8px 10px;margin:6px 0">
           <strong>${task}</strong>
-          <div style="font-size:14px;color:#2b5329">בוצע על ידי: <b>${worker}</b> ${ok ? "✅" : "❗"}</div>
+          <div style="font-size:14px;color:white">בוצע על ידי: <b>${worker}</b> ${ok ? "✅" : "❗"}</div>
         </li>
       `);
     });
