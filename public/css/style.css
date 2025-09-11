@@ -214,10 +214,6 @@ input, select, textarea {
   outline: none;
 }
 
-input:focus, textarea:focus, select:focus {
-  border-color: var(--accent);
-  background-color: #fffdf3;
-}
 
 label {
   font-weight: 600;
