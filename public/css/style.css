@@ -1260,6 +1260,13 @@ input, select, textarea {
 .note-del-btn:hover{
   background: rgba(0,0,0,.06);
 }
+
+.icon-btn:focus,
+.icon-btn:active {
+  background: none !important; /* שלא ייצבע */
+  outline: none;               /* בלי outline כחול */
+  box-shadow: none;            /* בלי הצללה */
+}
 @media (max-width: 700px) {
   .responsive-table thead {
     display: none; /* לא מציגים את שורת הכותרת במובייל */
