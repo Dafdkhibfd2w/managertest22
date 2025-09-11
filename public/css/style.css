@@ -321,6 +321,16 @@ button:hover {
   z-index: 1000;
   box-shadow: 0 4px 14px rgba(0,0,0,.35);
 }
+.icon-btn {
+  background: none;       /* בלי צבע */
+  border: none;           /* בלי גבול */
+  padding: 6px;           /* טיפה ריווח פנימי */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;         /* צבע מהטקסט */
+}
 
 .brandbar-left {
   display: flex;
