@@ -83,7 +83,7 @@ body {
   .task-card.missing{ background:linear-gradient(180deg, var(--card), var(--surface)); }
 .task-card .name {
   font-weight: 700;
-  color: #1a2c18;
+  color: white;
   word-break: break-word;
   white-space: normal;
   direction: rtl;
