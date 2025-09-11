@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <title>ניהול משימות</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <link rel="stylesheet" href="/css/style.css?v=2" />
   <link rel="stylesheet" href="/css/premium.css" />
 </head>
@@ -144,49 +146,6 @@
 .delete-btn:hover {
   filter: brightness(1.15);
   transform: scale(1.05);
-}
-/* 📱 התאמה לנייד */
-@media (max-width: 720px) {
-  .wrap {
-    padding: 8px;
-  }
-
-  .card, .task-category {
-    margin: 10px 0;
-    padding: 12px;
-    border-radius: 10px;
-  }
-
-  h1 {
-    font-size: 1.4rem;
-    margin-bottom: 12px;
-  }
-
-  .tasks-table th,
-  .tasks-table td {
-    padding: 8px;
-    font-size: 0.9rem;
-  }
-
-  /* שיהיה שורה שורה במקום רחב מדי */
-  .tasks-table tr {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .tasks-table td.actions {
-    display: flex;
-    gap: 6px;
-    justify-content: flex-end;
-  }
-
-  /* הכפתורים קטנים יותר */
-  .delete-btn,
-  .edit-btn {
-    padding: 5px 10px;
-    font-size: 13px;
-  }
 }
 
 </style>
