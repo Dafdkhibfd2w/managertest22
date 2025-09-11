@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>NEW DELI • ניהול ספקים</title>
-  <link rel="stylesheet" href="/css/style.css?v=3" />
+  <link rel="stylesheet" href="/css/style.css?v=2" />
   <link rel="icon" href="/icons/icon-512.png" type="image/png">
 
   <style>
@@ -28,8 +28,10 @@
     .items-grid { display:grid; grid-template-columns: 2fr 1fr auto; gap:8px; align-items:center; }
     .item-row { display:contents; }
   </style>
+  <link rel="stylesheet" href="/css/premium.css">
+  <script defer src="/js/ui.js"></script>
 </head>
-<body>
+<body class="theme-dark-premium">
   <header class="brandbar">
   <span class="brand-title">NEW DELI</span>
   <span class="burger" id="burger">&#9776;</span>
@@ -53,7 +55,7 @@
 
     <!-- טופס הוספה/עריכה -->
 <div class="section">
-  <h3 id="formTitle">הוסף ספק</h3>
+  <h3 id="formTitle" style="color: var(--muted);">הוסף ספק</h3>
   <form id="supplierForm">
     <div class="modal-grid">
       <div>
@@ -121,7 +123,7 @@
       </div>
     </div>
 
-    <p class="muted">שינויי ספקים ישפיעו על יצירת טופס הזמנות חדש ליום רלוונטי. אם כבר נוצר טופס ליום מסוים, אפשר “לרענן לפי ספקים” .</p>
+    <p class="muted">שינויי ספקים ישפיעו על יצירת טופס הזמנות חדש ליום רלוונטי. אם כבר נוצר טופס ליום מסוים, אפשר “לרענן לפי ספקים”.</p>
   </div>
 
   <script>
@@ -211,11 +213,11 @@ const payload = {
         msg.textContent = 'שומר...';
         let res;
         if (editingId) {
-          res = await fetch('/api/suppliers/' + editingId, {
+          res = await fetch('/suppliers/' + editingId, {
             method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
           });
         } else {
-          res = await fetch('/api/suppliers', {
+          res = await fetch('/suppliers', {
             method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
           });
         }
@@ -234,7 +236,7 @@ const payload = {
     });
 
 async function loadSuppliers(){
-  const res = await fetch('/api/suppliers');
+  const res = await fetch('/suppliers');
   const data = await res.json();
   currentList = data.suppliers || [];
   renderTable();
@@ -272,14 +274,14 @@ function renderTable(){
 
     async function delSupplier(id){
       if (!confirm('למחוק ספק?')) return;
-      await fetch('/api/suppliers/' + id, { method:'DELETE' });
+      await fetch('/suppliers/' + id, { method:'DELETE' });
       await loadSuppliers();
     }
 
     // async function toggleActive(id){
     //   const s = currentList.find(x => x._id === id);
     //   if (!s) return;
-    //   await fetch('/api/suppliers/' + id + '/active', {
+    //   await fetch('/suppliers/' + id + '/active', {
     //     method:'PATCH',
     //     headers:{'Content-Type':'application/json'},
     //     body: JSON.stringify({ active: !s.active })

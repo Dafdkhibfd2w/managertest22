@@ -2,21 +2,110 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>NEW DELI • חשבוניות</title>
-  <link rel="stylesheet" href="/css/style.css?v=3" />
-<meta name="theme-color" content="#2b5329">
+  <link rel="stylesheet" href="/css/style.css?v=2" />
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#2b5329">
   <link rel="icon" href="/icons/icon-512.png" type="image/png">
 
   <style>
     :root {
       --green: #2b5329; --amber: #ffcb05; --bg: #fbfff6; --border:#e2eadc; --ink:#0a0a0a;
     }
-    body { font-family: system-ui, Arial; background: var(--bg); color: var(--ink); padding: clamp(12px,2vw,24px); }
-    .wrap { max-width: 980px; margin: 0 auto; }
-    h1 { font-size: clamp(20px, 4vw, 28px); margin-bottom: 16px; color: var(--green); }
-    .card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 16px; box-shadow: 0 2px 10px rgba(0,0,0,.05); margin-bottom: 16px; }
-    .row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 12px; align-items: end; }
+/* מניעת גלילה אופקית */
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+h1 {
+  color: #ffffff;
+}
+.file-upload {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+@media (max-width: 720px) {
+  .row {
+    display: flex !important;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .row > div,
+  .row button {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .row.buttons {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .row.buttons button {
+    flex: 1;
+  }
+}
+
+.file-upload button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  background: var(--green);
+  color: #fff;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.file-upload span {
+  font-size: 0.9rem;
+  color: #ccc;
+  word-break: break-word;
+  max-width: 200px;
+}
+
+/* ווידוא שכל האלמנטים מתכנסים למסך */
+.wrap, .card, form, .row, table, input, select, button {
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+
+/* הקובץ input[type=file] – שלא יחרוג */
+input[type="file"] {
+  white-space: normal;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* כפתורי סינון – מסתדרים יפה במובייל */
+@media (max-width: 720px) {
+  .row {
+    grid-template-columns: 1fr !important;
+    gap: 10px;
+  }
+
+  .row > div {
+    width: 100%;
+  }
+
+  button, input, select {
+    width: 100% !important;
+  }
+}
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+
     .row label { font-size: 14px; color:#333; display:block; margin-bottom: 6px; }
     input[type="date"], input[type="text"], input[type="file"], select {
       width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background:#fff;
@@ -29,32 +118,114 @@
     .muted { color: #666; font-size: 12px; }
     .actions { display:flex; gap:8px; }
     .pager { display:flex; gap:8px; align-items:center; justify-content: flex-end; margin-top: 8px; }
+
+    /* 📱 מובייל */
     @media (max-width: 720px) {
-      .row { grid-template-columns: 1fr; }
-      table { font-size: 13px; }
-      th:nth-child(4), td:nth-child(4) { white-space: nowrap; }
+      html, body {
+        width: 100%;
+        overflow-x: hidden;
+      }
+
+      .wrap {
+        padding: 0 10px;
+      }
+
+      .card {
+        margin: 10px 0;
+        padding: 14px;
+      }
+
+      .row {
+        grid-template-columns: 1fr !important;
+      }
+
+      .row > div {
+        width: 100%;
+      }
+
+      input, select, textarea, button {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box;
+      }
+
+      /* כפתורי סינון */
+      .row.buttons {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .row.buttons button {
+        flex: 1;
+        font-size: 1rem;
+      }
+
+      /* טבלה רספונסיבית */
+      table,
+      thead,
+      tbody,
+      th,
+      td,
+      tr {
+        display: block;
+        width: 100%;
+      }
+
+      thead {
+        display: none;
+      }
+
+      tbody tr {
+        background: #2a2e38;
+        border-radius: 12px;
+        margin-bottom: 14px;
+        padding: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.15);
+      }
+
+      td {
+        padding: 6px 0;
+      }
+
+      .actions {
+        justify-content: flex-start;
+        gap: 10px;
+      }
+
+      .pager {
+        flex-direction: column;
+        gap: 8px;
+        justify-content: center;
+        align-items: stretch;
+      }
     }
   </style>
-</head>
-<body>
-  <header class="brandbar">
-  <span class="brand-title">NEW DELI</span>
-  <span class="burger" id="burger">&#9776;</span>
-</header>
 
-<nav class="mobile-nav" id="mobileNav">
-  <button id="closeNav" class="close-btn">✖</button>
-  <ul>
-    <li><a href="/"><span class="icon">🏠</span> דף הבית</a></li>
-    <li><a href="/create"><span class="icon">🗓️</span> יצירת משמרת</a></li>
-    <li><a href="/manage"><span class="icon">✅</span> ניהול משמרת</a></li>
-    <li><a href="/admin-login"><span class="icon">📚</span> ארכיון / דשבורד מנהל</a></li>
-    <li><a href="/invoices-page"><span class="icon">🧾</span> חשבוניות</a></li>
-    <li><a href="/suppliers-page"><span class="icon">🏷️</span> ספקים</a></li>
-    <li><a href="/orders-page"><span class="icon">📦</span> הזמנות</a></li>
-    <li><a href="/dispersals-page"><span class="icon">🚕</span> פיזורים</a></li>
-  </ul>
-</nav>
+  <link rel="stylesheet" href="/css/premium.css">
+  <script defer src="/js/ui.js"></script>
+</head>
+<body class="theme-dark-premium">
+  <header class="brandbar">
+    <span class="brand-title">NEW DELI</span>
+    <span class="burger" id="burger">&#9776;</span>
+  </header>
+
+  <nav class="mobile-nav" id="mobileNav">
+    <button id="closeNav" class="close-btn">✖</button>
+    <ul>
+      <li><a href="/"><span class="icon">🏠</span> דף הבית</a></li>
+      <li><a href="/create"><span class="icon">🗓️</span> יצירת משמרת</a></li>
+      <li><a href="/manage"><span class="icon">✅</span> ניהול משמרת</a></li>
+      <li><a href="/admin-login"><span class="icon">📚</span> ארכיון / דשבורד מנהל</a></li>
+      <li><a href="/invoices-page"><span class="icon">🧾</span> חשבוניות</a></li>
+      <li><a href="/suppliers-page"><span class="icon">🏷️</span> ספקים</a></li>
+      <li><a href="/orders-page"><span class="icon">📦</span> הזמנות</a></li>
+      <li><a href="/dispersals-page"><span class="icon">🚕</span> פיזורים</a></li>
+    </ul>
+  </nav>
+
   <div class="wrap">
     <h1>חשבוניות</h1>
 
@@ -70,14 +241,12 @@
             <label>שם ספק</label>
             <input type="text" name="supplier" placeholder="לדוגמה: סופר-דרינק בע״מ" required />
           </div>
-          <div>
-            <label>קובץ חשבונית (תמונה / PDF)</label>
-<input type="file" name="file" accept="image/*,application/pdf" required>
-
-<!-- <label>או צלם חשבונית מהמצלמה</label> -->
-<!-- <input type="file" name="file" accept="image/*" capture="environment"> -->
-
-          </div>
+<label>קובץ חשבונית (תמונה / PDF)</label>
+<div class="file-upload">
+  <input type="file" id="fileInput" name="file" accept="image/*,application/pdf" required hidden>
+  <button type="button" id="fileBtn">בחר קובץ</button>
+  <span id="fileName">לא נבחר קובץ</span>
+</div>
           <div>
             <button type="submit">העלה חשבונית</button>
           </div>
@@ -98,12 +267,11 @@
             <label>חפש לפי ספק</label>
             <input type="text" name="supplier" placeholder="שם ספק" />
           </div>
-          <div>
-            <button type="submit" class="secondary">סנן</button>
-          </div>
-          <div>
-            <button type="button" id="clearFilters" class="secondary">נקה</button>
-          </div>
+        </div>
+
+        <div class="row buttons">
+          <button type="submit" class="secondary">סנן</button>
+          <button type="button" id="clearFilters" class="secondary">נקה</button>
         </div>
       </form>
     </div>
@@ -155,7 +323,6 @@
         uploadMsg.textContent = data.message || (data.ok ? 'הועלה' : 'שגיאה');
         if (data.ok) {
           uploadForm.reset();
-          // רענון הרשימה לפי הסינון הקיים
           load();
         }
       } catch (err) {
@@ -206,7 +373,11 @@
         <tr>
           <td>${escapeHtml(r.shiftDate || '')}</td>
           <td>${escapeHtml(r.supplier || '')}</td>
-          <td><a href="${r.url}" target="_blank">${escapeHtml(r.originalName || 'קובץ')}</a></td>
+          <td>
+            <a href="${r.url}" target="_blank" style="color: #2f9e44;" title="${escapeHtml(r.originalName || '')}">
+              צפייה בקובץ
+            </a>
+          </td>
           <td class="actions">
             <button onclick="delInvoice('${r._id}')" class="secondary">מחק</button>
           </td>
@@ -231,10 +402,20 @@
 
     function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m])); }
 
-    // טעינה ראשונית
     load();
+    const fileInput = document.getElementById('fileInput');
+const fileBtn = document.getElementById('fileBtn');
+const fileName = document.getElementById('fileName');
+
+fileBtn.addEventListener('click', () => fileInput.click());
+
+fileInput.addEventListener('change', () => {
+  fileName.textContent = fileInput.files.length
+    ? fileInput.files[0].name
+    : 'לא נבחר קובץ';
+});
+
   </script>
   <script src="/js/global.js"></script>
-
 </body>
 </html>

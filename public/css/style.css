@@ -8,7 +8,7 @@
   --bg-grad-3: #e9ffdd;
   --bg-grad-4: #fffcc7;
 
-  --ink: #1e3520;
+  --ink: #ffffff;
   --ink-muted: #5a5a5a;
 
   --brand-1: #33673b;
@@ -54,8 +54,7 @@
   margin: 0;
   padding: 0;
   transition: all 0.3s ease;
-      font-family: "Segoe UI", Tahoma, sans-serif;
-
+  font-family: Arial, Helvetica, sans-serif;
 
 }
 .exec-sections { display: grid; gap: 10px; }
@@ -63,7 +62,7 @@
 .exec-list { list-style: none; padding: 0; margin: 0; }
 .exec-row {
   display: flex; justify-content: space-between; align-items: center;
-  border: 1px dashed #d7efd0; background: #fbfff6;
+  border: 1px dashed var(--border); background: rgb(255 255 255 / 3%);;
   border-radius: 10px; padding: 8px 10px; margin: 6px 0;
 }
 .exec-row.missing { border-color: #ffd3bf; background: #fff7f3; }
@@ -173,12 +172,15 @@ h2 {
 form {
   width: 100%;
   max-width: 700px;
-  background: var(--panel);
   border-radius: 14px;
   padding: 30px;
   box-shadow: 0 0 20px rgba(0,0,0,0.05);
   animation: fadeIn 0.8s ease-in-out;
   margin-bottom: 30px;
+
+  background: linear-gradient(180deg, var(--card), var(--surface));
+    /* margin-block: 12px; */
+    transition: transform .2s ease, border-color .2s ease;
 }
 
 input, select, textarea {
@@ -252,8 +254,10 @@ button:hover {
 }
 
 .task-block.accordion {
-  background-color: #fefefe;
-  border: 1px solid var(--green-mid);
+  /* background-color: #fefefe; */
+  background: linear-gradient(180deg, var(--card), var(--surface));
+
+  border: 1px solid var(--border);
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
@@ -261,6 +265,7 @@ button:hover {
 }
 
 .task-tabs {
+  background: linear-gradient(180deg, var(--card), var(--surface));
   display: flex;
   justify-content: center;
   margin-bottom: 20px;
@@ -276,7 +281,7 @@ button:hover {
 }
 #managerNote {
   white-space: pre-wrap;
-  color: #222;
+  color: #ffffff;
 }
 /* ===== Brandbar (מסודר למשתנים) ===== */
 /* ===== Brandbar – full width polish ===== */
@@ -287,9 +292,9 @@ button:hover {
   justify-content: space-between;
   align-items: center;
   padding: 14px 24px;
-  background:  #0e452b;/* רקע כהה יוקרתי */
+  background: linear-gradient(135deg, #1a1f2e, #141824); /* כהה אלגנטי */
   /* background: linear-gradient(135deg, #1c1c1c, #2a2a2a); רקע כהה יוקרתי */
-  color: #fdfdfd;
+  color: #e5eaf0;
   font-family: "Segoe UI", "Heebo", Arial, sans-serif;
   font-weight: 700;
   font-size: 20px;
@@ -332,7 +337,11 @@ button:hover {
     gap: 0;
     padding: 12px 14px;
   }
-
+  .task-tab {
+    flex: 1 1 100%;
+    font-size: 1rem;
+    padding: 12px;
+  }
   .brandbar .brand-title {
     font-size: 1.2rem; /* טיפה קטן למסך קטן */
   }
@@ -466,42 +475,52 @@ button:hover {
 }
 
 
-
 .task-tab {
-  background-color: var(--green-light);
-  border: 2px solid var(--green-mid);
-  padding: 10px 20px;
-  border-radius: 20px;
+  flex: 1 1 auto;                /* שיתפרסו יפה גם במובייל */
+  text-align: center;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--border);
   cursor: pointer;
-  font-weight: bold;
-  color: var(--ink);
-  transition: background-color 0.2s, transform 0.2s;
-}
-
-.task-tab.active {
-  background-color: var(--accent);
-  color: #000;
-  transform: scale(1.05);
+  transition: background .25s ease, transform .2s ease, box-shadow .25s ease;
 }
 
 .task-tab:hover {
-  background-color: var(--accent-2);
+  background: rgba(255,255,255,.08);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-1);
 }
+
+.task-tab.active {
+  background: linear-gradient(135deg,var(--primary),var(--primary-2));
+  color: #fff;
+  border: none;
+  box-shadow: var(--shadow-2);
+}
+
 
 .container { max-width: 980px; margin: auto; padding: 20px; }
 
 .task-header {
-  background-color: var(--green-light);
+  background-color: #202d42bf;
+  /* background: linear-gradient(135deg,var(--primary),var(--primary-2)); */
+
   cursor: pointer;
   padding: 12px 16px;
   font-weight: bold;
-  border-bottom: 1px solid var(--green-mid);
+  border-bottom: 1px solid var(--ink-muted);
 }
 
 .task-body {
   display: none;
   padding: 16px;
-  background-color: #f9fff2;
+  background-color: #202d42bf;
+
+  border-radius: 0px 0px 10px 10px;
   animation: fadeIn 0.4s ease;
 }
 
@@ -518,7 +537,7 @@ button:hover {
 }
 .modal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:12px}
 .modal-content h2{margin:0 0 10px;color:var(--ink)}
-.modal-content h3{margin:10px 0 6px;color:#3c6f39}
+.modal-content h3{margin:10px 0 6px;color:var(--ink)}
 .modal-content label{font-weight:600;margin-top:10px;display:block}
 .modal-content input, .modal-content textarea{
   width:100%; padding:10px; border:2px solid #d2d2d2; border-radius:10px; font-size:15px;
@@ -549,23 +568,27 @@ button:hover {
 
 /* ברירת מחדל */
 .lead-chip.default {
-  background: #f1f1f1;
   border: 2px solid #ccc;
-  color: #333;
+
+  background: rgba(32, 45, 22, 0.252);
+  color: white
+
 }
 
 /* פתוח */
 .lead-chip.open {
-background: #f0ffe5;
-  color: #2b5329;
-  border: 2px solid #aee3a2;
+  background: rgba(32, 45, 22, 0.252);
+  border: 2px solid #aee3a266;
+  color: white
 }
 
 /* סגור */
 .lead-chip.closed {
-  background: #fcd6d6;       /* ורדרד */
-  border: 2px solid #8b0000; 
-  color: #8b0000;
+
+  background: rgba(32, 45, 22, 0.252);
+ border: 2px solid #8b0000;
+  color: white
+
 }
 
 /* עיגול קטן */
@@ -593,7 +616,7 @@ h1 { color: var(--ink); text-align:center; margin-bottom:18px; }
 
 .admin-controls {
   display:flex; flex-wrap:wrap; gap:10px;
-  background: #f6fdf6; padding:15px; border-radius:15px;
+  background: linear-gradient(180deg, var(--card), var(--surface)); padding:15px; border-radius:15px;
   box-shadow:0 4px 8px rgba(0,0,0,0.08);
   margin-bottom:20px;
 }
@@ -607,9 +630,9 @@ h1 { color: var(--ink); text-align:center; margin-bottom:18px; }
 .admin-controls button:hover { transform: scale(1.05); }
 
 .highlight {
-  background: linear-gradient(180deg, #ffffff 0%, #fbffe9 100%);
-  border: 2px solid var(--stroke-2);
-  border-left: 10px solid var(--accent);
+background: linear-gradient(180deg, var(--card), var(--surface));
+  /* border: 2px solid var(--stroke-2); */
+  border-left: 10px solid var(--border);
   border-radius: 16px;
   margin-bottom: 10px;
   padding: 16px 18px;
@@ -626,8 +649,8 @@ h1 { color: var(--ink); text-align:center; margin-bottom:18px; }
   flex-direction: column;
   gap: 10px;
   align-items: stretch;
-  background: #f7ffe8;
-  border: 1.5px solid #dff3cf;
+
+  /* border: 1.5px solid #dff3cf; */
   border-radius: 14px;
   padding: 14px;
   position: relative;
@@ -638,7 +661,7 @@ h1 { color: var(--ink); text-align:center; margin-bottom:18px; }
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(120px 80px at 100% -10%, #fff6b5 0%, transparent 60%);
+  /* background: radial-gradient(120px 80px at 100% -10%, #fff6b5 0%, transparent 60%); */
   opacity: .7;
 }
 .chip {
@@ -646,7 +669,7 @@ h1 { color: var(--ink); text-align:center; margin-bottom:18px; }
   gap: 10px;
   background: #ffffff;
   border: 2px solid var(--stroke-1);
-  color: #1e3a1e;
+  color: white;
   padding: 10px 12px;
   border-radius: 12px;
   font-weight: 700;
@@ -654,7 +677,7 @@ h1 { color: var(--ink); text-align:center; margin-bottom:18px; }
 }
 .chip .dot {
   width: 8px; height: 8px; border-radius: 50%;
-  background: var(--green-chip-dot);
+  background: var(--muted);
 }
 
 .edit-btn {
@@ -684,12 +707,12 @@ h1 { color: var(--ink); text-align:center; margin-bottom:18px; }
 .modal{position:fixed; inset:0; background:rgba(0,0,0,.35); display:none;
   align-items:center; justify-content:center; z-index:1000;}
 .modal-content{
-  background:var(--panel); width:min(980px,95vw); max-height:90vh; overflow:auto;
+  background:#1f2b38; width:min(980px,95vw); max-height:90vh; overflow:auto;
   border-radius:16px; border:2px solid var(--stroke-1); box-shadow: var(--shadow-4);
   padding:22px;
 }
 .modal-content h2{margin:0 0 10px; color: var(--ink);}
-.modal-content h3{margin:10px 0 6px; color:#3c6f39;}
+.modal-content h3{margin:10px 0 6px; color: var(--ink);}
 .modal-content label{font-weight:600; margin-top:10px; display:block;}
 .modal-content input, .modal-content textarea{
   width:100%; padding:10px; border:2px solid #d2d2d2; border-radius:10px; font-size:15px;
@@ -699,8 +722,17 @@ h1 { color: var(--ink); text-align:center; margin-bottom:18px; }
 .modal-actions .save{background:var(--btn-bg); color:#fff; border:none; border-radius:10px; padding:10px 18px; cursor:pointer;}
 .modal-actions .cancel{background:var(--accent); color:#000; border:none; border-radius:10px; padding:10px 18px; cursor:pointer;}
 .edit-status{margin-top:8px; color: var(--ink); font-weight:700;}
+
 .section {
-  background:var(--panel); border:2px solid var(--stroke-1); border-radius:12px; padding:14px; margin-top:10px;
+background: linear-gradient(180deg, var(--card), var(--surface));
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 16px;
+    margin-block: 12px;
+    transition: transform .2s ease, border-color .2s ease;
+
+
 }
 .muted { color:var(--muted); font-size:14px; }
 
@@ -711,71 +743,166 @@ h1 { color: var(--ink); text-align:center; margin-bottom:18px; }
 }
 
 /* Task Picker (Accordion) */
-.task-picker{
-  background: var(--panel);
-  border: 1px solid var(--stroke-3);
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,.05);
+/* ===== Task Picker (Accordion Premium) ===== */
+.task-picker {
+  /* background: linear-gradient(180deg,#1e1e2f,#23233a); כהה פרימיום */
+  /* border: 1px solid #2f3e55; */
+  border-radius: 14px;
+  /* box-shadow: 0 6px 14px rgba(0,0,0,.4); */
   overflow: hidden;
+  margin-bottom: 24px;
 }
 
-.picker-toggle{
+/* כפתור פתיחה/סגירה */
+.picker-toggle {
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* הטקסט מצד ימין, החץ משמאל (RTL) */
+  justify-content: space-between;
   gap: 10px;
-  padding: 14px 16px;
-  background: #f7f9f7;
-  border: 0;
-  border-bottom: 1px solid var(--stroke-3);
+  padding: 14px 18px;
+  border: none;
+  border-radius: 14px 14px 0 0;
   cursor: pointer;
-  text-align: right;
-  color: #1e2a1e;
   font-weight: 800;
   font-size: 16px;
+  color: #fff;
+  background: linear-gradient(135deg,#6d5dfc,#3cb6f6);
+  box-shadow: 0 3px 6px rgba(0,0,0,.35);
+  transition: background .3s ease, transform .2s ease;
 }
-.picker-toggle:hover{ background: #f1f4f2; }
-.picker-toggle .chev{ font-style: normal; color: #6a786a; }
 
-.picker-panel{
-  padding: 12px 16px;
-  background: var(--panel);
-  animation: pickerIn .2s ease;
+.picker-toggle:hover {
+  background: linear-gradient(135deg,#7e6dfc,#4cc6f6);
+  transform: translateY(-1px);
 }
-@keyframes pickerIn { from{opacity:0; transform:translateY(-4px)} to{opacity:1; transform:translateY(0)} }
 
-.task-list{
+/* האייקון של החץ */
+.picker-toggle .chev {
+  font-style: normal;
+  font-size: 1.1rem;
+  color: #fff;
+  opacity: 0.9;
+  transition: transform .3s ease;
+}
+.picker-toggle.open .chev {
+  transform: rotate(180deg);
+}
+
+/* תוכן המשימות */
+.picker-panel {
+  padding: 20px;
+  background: linear-gradient(180deg, #1e2433 0%, #161b28 100%);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  border-bottom-left-radius: 14px;
+  border-bottom-right-radius: 14px;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.05),
+              0 6px 16px rgba(0,0,0,0.35);
+  animation: pickerIn .25s ease;
+}
+
+@keyframes pickerIn {
+  from {opacity:0; transform:translateY(-6px);}
+  to {opacity:1; transform:translateY(0);}
+}
+
+/* רשימת משימות */
+.task-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
 }
+.picker-panel {
+  padding: 20px;
+  background: linear-gradient(180deg, #1e2433 0%, #161b28 100%);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  border-bottom-left-radius: 14px;
+  border-bottom-right-radius: 14px;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.05),
+              0 6px 16px rgba(0,0,0,0.35);
+  animation: pickerIn .25s ease;
+}
+
+/* משימות */
 .task-item {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row-reverse; /* הופך את הסדר: טקסט מימין, checkbox בשמאל */
   align-items: center;
+  justify-content: space-between; /* מבטיח ריווח נכון */
   gap: 10px;
-  background: #f1fdf1;
-  border: 1px solid var(--border);
-  padding: 10px 14px;
-  border-radius: 10px;
-  direction: rtl;
-  text-align: right;
-  word-break: normal;
-  white-space: normal;
+  margin-bottom: 10px;
+  cursor: pointer;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #1c2233, #202738);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
 
-.task-item label {
-  direction: rtl;
-  text-align: right;
-  white-space: normal;
-  font-size: 1rem;
+
+.task-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.45);
+}
+
+
+
+
+.task-item input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #4b5563;
+  border-radius: 6px;
+  background: #111827;
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: all .2s ease;
+}
+
+/* טקסט של המשימה */
+/* .task-item label {
   flex: 1;
+  font-size: 1rem;
+  cursor: pointer;
+} */
+
+/* צ'קבוקס */
+.task-item input[type="checkbox"]:checked {
+  background: linear-gradient(135deg,#3aa35d,#6ed48e);
+  border-color: #3aa35d;
+}
+.task-item input[type="checkbox"]:checked::after {
+  content: "✔";
+  color: #fff;
+  font-size: 14px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+}
+.task-label {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #f0f4f8;
 }
 
-.task-item input[type="checkbox"]{
-  width: 18px; height: 18px; accent-color: var(--accent);
+.task-item input[type="checkbox"]:hover {
+  border-color: #8bda8f;
+  box-shadow: 0 0 0 3px rgba(139,218,143,.25);
 }
+.task-item label {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #d8dee9;
+  cursor: pointer;
+}
+
+/* .task-item input[type="checkbox"]{
+  width: 18px; height: 18px; accent-color: var(--accent);
+} */
 
 #loadForm {
   display: flex;
@@ -786,9 +913,9 @@ h1 { color: var(--ink); text-align:center; margin-bottom:18px; }
 
 /* הצ׳יפ של האחמ״ש */
 .lead-chip {
-  background: #f0ffe5;
-  border: 2px solid #aee3a2;
-  color: #225522;
+  background: rgba(32, 45, 22, 0.252);
+  border: 2px solid #aee3a266;
+  color: white;
   padding: 6px 14px;
   border-radius: 20px;
   font-weight: 600;
@@ -800,9 +927,36 @@ h1 { color: var(--ink); text-align:center; margin-bottom:18px; }
 }
 
 select {
-  width: 200px;
+  background: #1a1f2e;
+  color: #e5eaf0;
+  border: 1px solid #2a3145;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 1rem;
+  appearance: none; /* מסתיר חץ ברירת מחדל */
   cursor: pointer;
-  background-color: #40593d27;
+}
+
+/* חץ מותאם אישית */
+select::-ms-expand {
+  display: none; /* IE */
+}
+select::after {
+  content: "▾";
+  position: absolute;
+  right: 12px;
+  color: #aaa;
+}
+
+/* אופציות */
+option {
+  background: #1a1f2e;
+  color: #e5eaf0;
+  padding: 10px;
+}
+option:hover {
+  background: #2f6d37;
+  color: #fff;
 }
 
 .lead-chip .dot {
@@ -898,17 +1052,17 @@ button:hover, .btn:hover, input[type="submit"]:hover {
 
 
 /* ---------- Tabs (if you use .task-tabs/.task-tab) ---------- */
-.task-tabs {
+/* .task-tabs {
   background: #f0f7ec;
   border: 1px solid var(--nd-border);
   border-radius: 14px;
   padding: 6px;
-}
-.task-tab {
+} */
+/* .task-tab {
   border-radius: 10px;
   font-weight: 700;
   color: var(--nd-green);
-}
+} */
 .task-tab.active {
   background: #ffffff;
   box-shadow: var(--nd-shadow-1);
@@ -984,8 +1138,8 @@ input, select, textarea {
   align-items: center;
   gap: 6px 10px;
   padding: 12px 14px;
-  background: var(--green-50, #f3f9f1);
-  border: 1px solid var(--green-100, #e1efd9);
+  background: var(--card);
+  border: 1px solid var(--border);
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,.05);
 }
@@ -1012,7 +1166,6 @@ input, select, textarea {
   grid-area: del;
   justify-self: start;         /* ב־RTL זה יישב שמאלה של הכרטיס */
   border: 0;
-  background: #fff;
   width: 36px; height: 36px;
   border-radius: 10px;
   box-shadow: 0 1px 4px rgba(0,0,0,.08);
@@ -1087,10 +1240,9 @@ input, select, textarea {
     display: block;
     width: 100%;
   }
-
   .responsive-table tr {
-    background: #fff;
-    border: 1px solid var(--stroke-1, #dfe8d9);
+    /* background: #fff; */
+    border: 1px solid var(--border, #dfe8d9);
     border-radius: 12px;
     margin-bottom: 16px;
     padding: 12px;
@@ -1102,7 +1254,6 @@ input, select, textarea {
     text-align: right;
     position: relative;
   }
-
   .responsive-table td::before {
     content: attr(data-label);
     font-weight: bold;
@@ -1116,4 +1267,16 @@ input, select, textarea {
     justify-content: space-between;
     gap: 10px;
   }
+}
+.task-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e5eaf0;
+}
+
+.task-item input[type="checkbox"] {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  accent-color: #4CAF50; /* ירוק מודרני */
 }

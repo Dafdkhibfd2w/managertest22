@@ -8,7 +8,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <link rel="icon" href="/icons/icon-512.png" type="image/png">
+<link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#2b5329">
+  <link rel="stylesheet" href="/css/premium.css">
+  <script defer src="/js/ui.js"></script>
 </head>
 <style>
     @media (max-width: 600px) {
@@ -21,8 +24,9 @@
       padding: 16px;
       background-color: #ffffff;
       border-radius: 12px;
-      box-shadow: 0 0 10px #ddd;
-    }
+  box-shadow: 
+    0 2px 6px rgba(0,0,0,0.6),      /* צל כהה קרוב */
+    0 0 12px rgba(100, 255, 218, .08); /* זוהר עדין טורקיזי */    }
 
     h1 {
       font-size: 1.5em;
@@ -87,7 +91,7 @@
     }
   }
 </style>
-<body>
+<body class="theme-dark-premium">
 <header class="brandbar">
   <span class="brand-title">NEW DELI</span>
   <span class="burger" id="burger">&#9776;</span>
