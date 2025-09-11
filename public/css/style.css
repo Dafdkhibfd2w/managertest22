@@ -58,11 +58,11 @@ font-family: 'Heebo', Arial, sans-serif;
 
 }
 .exec-sections { display: grid; gap: 10px; }
-.exec-title { margin: 6px 0 4px; color: #2b5329; }
+.exec-title { margin: 6px 0 4px; color: white; }
 .exec-list { list-style: none; padding: 0; margin: 0; }
 .exec-row {
   display: flex; justify-content: space-between; align-items: center;
-  border: 1px dashed var(--border); background: rgb(255 255 255 / 3%);;
+  border: 1px dashed var(--border); background: linear-gradient(180deg, var(--card), var(--surface));
   border-radius: 10px; padding: 8px 10px; margin: 6px 0;
 }
 .exec-row.missing { border-color: #ffd3bf; background: #fff7f3; }
