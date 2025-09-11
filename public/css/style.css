@@ -161,7 +161,7 @@ h2 {
 #shiftDetails {
   background-color: var(--panel);
   border-radius: 14px;
-  border: 2px solid var(--stroke-1);
+  border: 2px solid var(--radius);
   box-shadow: var(--shadow-2);
   padding: 25px;
   margin-top: 30px;
@@ -245,7 +245,7 @@ button:hover {
 .task-category {
   background-color: var(--panel);
   border-radius: 12px;
-  border: 2px solid var(--stroke-1);
+  border: 2px solid var(--radius);
   padding: 20px;
   margin-bottom: 30px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
@@ -562,6 +562,7 @@ button:hover {
 .task-block.open .task-body {
   display: block;
 }
+/* sss */
 
 /* מודאל */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;z-index:1000}
@@ -703,7 +704,7 @@ background: linear-gradient(180deg, var(--card), var(--surface));
   display: flex;
   gap: 10px;
   background: #ffffff;
-  border: 2px solid var(--stroke-1);
+  border: 2px solid var(--radius);
   color: white;
   padding: 10px 12px;
   border-radius: 12px;
@@ -741,11 +742,7 @@ background: linear-gradient(180deg, var(--card), var(--surface));
 /* מודאל – המשך */
 .modal{position:fixed; inset:0; background:rgba(0,0,0,.35); display:none;
   align-items:center; justify-content:center; z-index:1000;}
-.modal-content{
-  background:#1f2b38; width:min(980px,95vw); max-height:90vh; overflow:auto;
-  border-radius:16px; border:2px solid var(--stroke-1); box-shadow: var(--shadow-4);
-  padding:22px;
-}
+
 .modal-content h2{margin:0 0 10px; color: var(--ink);}
 .modal-content h3{margin:10px 0 6px; color: var(--ink);}
 .modal-content label{font-weight:600; margin-top:10px; display:block;}
