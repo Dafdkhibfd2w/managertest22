@@ -1,16 +1,9 @@
-self.addEventListener("push", e => {
-  let data = {};
-  try {
-    data = e.data.json();
-  } catch {
-    data = { title: "התראה חדשה", body: e.data.text() };
-  }
-
-  self.registration.showNotification(
-    data.title || "התראה חדשה",
-    {
-      body: data.body || data.message || "",
+self.addEventListener("push", function (event) {
+  const data = event.data?.json() || { title: "התראה חדשה", body: "" };
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
       icon: "/icons/icon-192.png"
-    }
+    })
   );
 });

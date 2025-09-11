@@ -935,21 +935,22 @@ app.post("/save-subscription", (req, res) => {
 });
 // שליחת הודעה
 app.post("/send-notification", async (req, res) => {
-const payload = JSON.stringify({
-  title: "NEW DELI",
-  body: req.body.message || "התראה חדשה מהמערכת 🚀"
-});
+  const message = req.body.message || "התראה חדשה";
+  const payload = JSON.stringify({
+    title: "📢 הודעה מהאדמין",
+    body: message
+  });
+
   try {
     await Promise.all(
       subscriptions.map(sub => webpush.sendNotification(sub, payload))
     );
     res.json({ ok: true, message: "נשלח בהצלחה" });
   } catch (err) {
-    console.error(err);
+    console.error("שגיאה בשליחת התראה:", err);
     res.status(500).json({ ok: false, error: err.message });
   }
 });
-
 
 
 

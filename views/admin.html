@@ -137,7 +137,14 @@
 
     <div id="shiftsContainer"></div>
   </div>
-
+<div class="card">
+  <h2>שליחת התראה</h2>
+  <form id="notifForm">
+    <input type="text" id="notifMessage" placeholder="כתוב הודעה להתראה..." required />
+    <button type="submit">📢 שלח התראה</button>
+  </form>
+  <p id="notifStatus"></p>
+</div>
   <!-- מודאל: הצגה / עריכה -->
   <div id="editModal" class="modal" aria-hidden="true">
     <div class="modal-content" role="dialog" aria-modal="true">
@@ -435,6 +442,38 @@
 
     window.onload = loadShifts;
   </script>
+  <div class="card">
+  <h2>שליחת התראה</h2>
+  <form id="notifForm">
+    <input type="text" id="notifMessage" placeholder="כתוב הודעה להתראה..." required />
+    <button type="submit">📢 שלח התראה</button>
+  </form>
+  <p id="notifStatus"></p>
+</div>
+
+<script>
+  const notifForm = document.getElementById("notifForm");
+  const notifMessage = document.getElementById("notifMessage");
+  const notifStatus = document.getElementById("notifStatus");
+
+  notifForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    notifStatus.textContent = "⏳ שולח...";
+    try {
+      const res = await fetch("/send-notification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: notifMessage.value })
+      });
+      const data = await res.json();
+      notifStatus.textContent = data.ok ? "✅ נשלח בהצלחה!" : "❌ שגיאה בשליחה";
+      notifForm.reset();
+    } catch (err) {
+      notifStatus.textContent = "❌ שגיאה: " + err.message;
+    }
+  });
+</script>
+
   <script src="/js/global.js"></script>
 
 </body>
