@@ -908,6 +908,52 @@ app.post('/suppliers/migrate-days-to-numbers', async (req, res) => {
   }
 });
 
+
+
+
+const webpush = require('web-push');
+
+const publicVapidKey = 'BGEYruudNkeNhSyxPmrvHjnvUFnFe3Ca2KmA6IZU6UJU7_fJvVldk4qd90nNil_i_HRR6dY02I_j8oD6hS-4U0E';
+const privateVapidKey = 'e_R-V_uyRhsRMONuURKqwkMKQGhGguivKjFsNUd0a_A';
+
+webpush.setVapidDetails(
+  "mailto:admin@newdeli.com",
+  publicVapidKey,
+  privateVapidKey
+);
+// app.use(express.json());
+
+const subscriptions = [];
+
+app.post("/save-subscription", (req, res) => {
+  console.log("Got subscription:", req.body);
+  if (!req.body || !req.body.endpoint) {
+    return res.status(400).json({ ok: false, error: "No subscription" });
+  }
+  subscriptions.push(req.body);
+  res.json({ ok: true });
+});
+// שליחת הודעה
+app.post("/send-notification", async (req, res) => {
+const payload = JSON.stringify({
+  title: "NEW DELI",
+  body: req.body.message || "התראה חדשה מהמערכת 🚀"
+});
+  try {
+    await Promise.all(
+      subscriptions.map(sub => webpush.sendNotification(sub, payload))
+    );
+    res.json({ ok: true, message: "נשלח בהצלחה" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+
+
+
+
 // ===== API: פיזורים =====
 app.post('/dispersals', async (req, res) => {
   try {
