@@ -349,7 +349,7 @@ function buildFinalizeSummaryHTML(shift) {
       const worker = ex?.worker || "—";
       const ok = worker !== "—";
       rows.push(`
-        <li style="background:#fbfff6;border:1px dashed #d7efd0;border-radius:10px;padding:8px 10px;margin:6px 0">
+        <li style="background: linear-gradient(180deg, #1f2937, #111827);border-radius:10px;padding:8px 10px;margin:6px 0">
           <strong>${task}</strong>
           <div style="font-size:14px;color:#2b5329">בוצע על ידי: <b>${worker}</b> ${ok ? "✅" : "❗"}</div>
         </li>
