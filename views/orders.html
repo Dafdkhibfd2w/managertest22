@@ -194,7 +194,7 @@ document.getElementById('dateInput').addEventListener('change', updateWeekdayHin
                     </td>
                     <td><input type="number" class="qty" min="0" step="1" value="${num(it.currentQty)}" data-bi="${bi}" data-ii="${ii}" data-field="currentQty"></td>
                     <td><input type="number" class="qty" min="0" step="1" value="${num(it.toOrderQty)}" data-bi="${bi}" data-ii="${ii}" data-field="toOrderQty"></td>
-                    <td><input type="text" value="${escapeAttr(it.notes||'')}" data-bi="${bi}" data-ii="${ii}" data-field="notes" style="width:100%"></td>
+                    <td><input type="text" value="${escapeAttr(it.notes||'')}" data-bi="${bi}" data-ii="${ii}" placeholder="לדוגמא:" data-field="notes" style="width:100%"></td>
                   </tr>
                 `).join('')}
               </tbody>
