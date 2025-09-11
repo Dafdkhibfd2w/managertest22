@@ -748,7 +748,7 @@ background: linear-gradient(180deg, var(--card), var(--surface));
 .modal-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px; margin-top:12px;}
 .modal-actions{display:flex; gap:10px; justify-content:flex-start; margin-top:14px;}
 .modal-actions .save{background:#2d3147; color:#fff; border:none; border-radius:10px; padding:10px 18px; cursor:pointer;}
-.modal-actions .cancel{background:#2d3147; color:#000; border:none; border-radius:10px; padding:10px 18px; cursor:pointer;}
+.modal-actions .cancel{background:#2d3147; color:#fff; border:none; border-radius:10px; padding:10px 18px; cursor:pointer;}
 .edit-status{margin-top:8px; color: var(--ink); font-weight:700;}
 
 .section {
