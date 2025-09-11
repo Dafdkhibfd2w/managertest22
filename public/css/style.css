@@ -104,9 +104,7 @@ body {
   stroke: #ccc; /* אפור במצב התחלתי */
 }
 
-.notif-icon:hover svg {
-  transform: scale(1.2);
-}
+
 
 
 /* כותרות */
@@ -313,21 +311,22 @@ button:hover {
   align-items: center;
   padding: 14px 24px;
   background: linear-gradient(135deg, #1a1f2e, #141824); /* כהה אלגנטי */
-  /* background: linear-gradient(135deg, #1c1c1c, #2a2a2a); רקע כהה יוקרתי */
   color: #e5eaf0;
   font-family: "Segoe UI", "Heebo", Arial, sans-serif;
   font-weight: 700;
   font-size: 20px;
   letter-spacing: 1px;
-
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 1000;
-
   box-shadow: 0 4px 14px rgba(0,0,0,.35);
 }
 
-
+.brandbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* שליטה ברווח בין הפעמון ל־burger */
+}
 .brandbar .left {
   text-align: left;
 }
