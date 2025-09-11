@@ -168,6 +168,9 @@ app.get('/orders-page', (req, res) => {               // << דף ההזמנות
 app.get('/invoices-page', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'invoices.html'));
 });
+app.get('/task', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'tasks.html'));
+});
 app.get('/suppliers-page', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'suppliers.html'));
 });
