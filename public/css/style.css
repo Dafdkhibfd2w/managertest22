@@ -104,10 +104,6 @@ body {
   stroke: #ccc; /* אפור במצב התחלתי */
 }
 
-.notif-icon.enabled svg {
-  stroke: #ffcb05; /* צהוב אחרי הרשאה */
-}
-
 .notif-icon:hover svg {
   transform: scale(1.2);
 }
