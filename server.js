@@ -299,32 +299,7 @@ app.delete('/invoice/:id', async (req, res) => {
     res.status(500).json({ ok:false, message:'שגיאה במחיקה' });
   }
 });
-app.get("/tasks", async (req, res) => {
-  try {
-    const tasks = await Task.find(); // מוציא את כל המשימות
-    res.json(tasks);
-  } catch (err) {
-    res.status(500).json({ ok: false, message: "שגיאה בטעינת משימות" });
-  }
-});
 
-
-// יצירת משימה
-app.post("/tasks", async (req, res) => {
-  try {
-    const task = new Task(req.body);
-    await task.save();
-    res.json({ ok: true, task });
-  } catch (err) {
-    res.json({ ok: false, message: "שגיאה בשמירה" });
-  }
-});
-
-// מחיקת משימה
-app.delete("/tasks/:id", async (req, res) => {
-  await Task.findByIdAndDelete(req.params.id);
-  res.json({ ok: true });
-});
 
 
 // ===== API: משמרות =====
@@ -791,6 +766,32 @@ app.post('/suppliers', async (req, res) => {
     console.error('POST /suppliers error', e);
     res.status(500).json({ ok:false, message: 'שגיאה ביצירה' });
   }
+});
+app.get("/tasks", async (req, res) => {
+  try {
+    const tasks = await Task.find(); // מוציא את כל המשימות
+    res.json(tasks);
+  } catch (err) {
+    res.status(500).json({ ok: false, message: "שגיאה בטעינת משימות" });
+  }
+});
+
+
+// יצירת משימה
+app.post("/tasks", async (req, res) => {
+  try {
+    const task = new Task(req.body);
+    await task.save();
+    res.json({ ok: true, task });
+  } catch (err) {
+    res.json({ ok: false, message: "שגיאה בשמירה" });
+  }
+});
+
+// מחיקת משימה
+app.delete("/tasks/:id", async (req, res) => {
+  await Task.findByIdAndDelete(req.params.id);
+  res.json({ ok: true });
 });
 // POST /orders/rebuild  { date: 'YYYY-MM-DD' }
 app.post('/orders/rebuild', async (req, res) => {
