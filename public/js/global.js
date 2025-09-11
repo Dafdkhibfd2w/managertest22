@@ -78,7 +78,33 @@ async function initPush() {
 document.addEventListener("DOMContentLoaded", () => {
   lucide.createIcons(); // יחליף את <i data-lucide="bell"> לאייקון אמיתי
 });
-// כפתור הפעלה
-document.getElementById("enableNotifications")?.addEventListener("click", () => {
-  initPush(); // הפונקציה שלך להרשמה ל־Push
+document.addEventListener("DOMContentLoaded", () => {
+  lucide.createIcons();
+
+  const notifToggle = document.getElementById("notifToggle");
+
+  // בדיקה אם כבר יש הרשאה
+  if (Notification.permission === "granted") {
+    notifToggle.innerHTML = `<i data-lucide="bell"></i>`;
+    notifToggle.classList.add("enabled");
+    lucide.createIcons();
+  }
+
+  notifToggle?.addEventListener("click", async () => {
+    try {
+      if (Notification.permission !== "granted") {
+        await initPush(); // הפונקציה שלך שמבצעת רישום ל-Push
+      }
+
+      if (Notification.permission === "granted") {
+        notifToggle.innerHTML = `<i data-lucide="bell"></i>`;
+        notifToggle.classList.add("enabled");
+        lucide.createIcons();
+      } else if (Notification.permission === "denied") {
+        alert("חסמת התראות. כדי לאפשר שוב, עדכן בהגדרות הדפדפן.");
+      }
+    } catch (err) {
+      console.error("שגיאה בהפעלת התראות:", err);
+    }
+  });
 });

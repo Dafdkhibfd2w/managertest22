@@ -101,13 +101,17 @@ body {
 .notif-icon svg {
   width: 22px;
   height: 22px;
-  stroke: #fff; /* לבן כברירת מחדל */
+  stroke: #ccc; /* אפור במצב התחלתי */
+}
+
+.notif-icon.enabled svg {
+  stroke: #ffcb05; /* צהוב אחרי הרשאה */
 }
 
 .notif-icon:hover svg {
-  stroke: #ffcb05; /* צהוב מותג */
   transform: scale(1.2);
 }
+
 
 /* כותרות */
 h1, h2, h3 {
