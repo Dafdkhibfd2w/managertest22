@@ -15,6 +15,7 @@ const CLOUD_FOLDER = process.env.CLOUDINARY_FOLDER || 'invoices';
 // ===== Models =====
 const Dispersal  = require('./models/Dispersal');
 const Supplier   = require('./models/Supplier');
+const Task = require("./models/Task");
 const DailyOrder = require('./models/DailyOrder');
 const Invoice    = require('./models/Invoice'); // ודא נתיב נכון אצלך
 
