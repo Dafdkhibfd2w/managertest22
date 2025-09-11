@@ -332,6 +332,10 @@ button:hover {
   color: inherit;         /* צבע מהטקסט */
 }
 
+.icon-btn:hover {
+  background-color: none;
+}
+
 .brandbar-left {
   display: flex;
   align-items: center;
