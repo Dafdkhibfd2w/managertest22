@@ -80,7 +80,11 @@ const ShiftSchema = new mongoose.Schema({
   date:   { type: String, required: true, unique: true }, // YYYY-MM-DD
   manager:{ type: String, default: '' },
   team:   { type: [String], default: [] },
-
+scores: {
+  type: Map,
+  of: Number,
+  default: () => new Map()
+},
   tasks: {
     daily:   { type: [String], default: [] },
     weekly:  { type: [String], default: [] },
@@ -329,13 +333,17 @@ app.post('/save-shift', async (req, res) => {
     const payload = { ...req.body };
     payload.team = normalizeTeam(payload.team);
 
-    await Shift.findOneAndUpdate(
-     { date: payload.date },
-      // { $set: payload, $setOnInsert: { executions: { daily: [], weekly: [], monthly: [] } } },
-      { $set: payload, $setOnInsert: { xecutions: { daily: [], weekly: [], monthly: [] },scores: {}} 
+await Shift.findOneAndUpdate(
+  { date: payload.date },
+  {
+    $set: payload,
+    $setOnInsert: {
+      executions: { daily: [], weekly: [], monthly: [] }, // <- היה xecutions
+      scores: {} // יווצר במסמך חדש
+    }
   },
-      { upsert: true, new: true }
-    );
+  { upsert: true, new: true }
+);
     res.json({ status: 'ok', message: 'המשמרת נשמרה בהצלחה!' });
   } catch (e) {
     console.error('save-shift error:', e);
@@ -985,35 +993,33 @@ app.post("/points/add", async (req, res) => {
     const shift = await Shift.findOne({ date });
     if (!shift) return res.status(404).json({ ok: false, message: "Shift not found" });
 
-    // חפש או צור את העובד
-    let member = shift.team.find(m => m.name === worker);
-    if (!member) {
-      member = { name: worker, points: 0 };
-      shift.team.push(member);
-    }
-    member.points += amount || 1;
+    if (!shift.scores) shift.scores = new Map();
+    const add = Number(amount || 1);
+    const cur = shift.scores.get(worker) || 0;
+    shift.scores.set(worker, cur + add);
 
     await shift.save();
-    res.json({ ok: true, worker, points: member.points });
+    res.json({ ok: true, worker, points: shift.scores.get(worker) });
   } catch (err) {
     res.status(500).json({ ok: false, message: err.message });
   }
 });
 
+
 // דירוג כללי (Leaderboard)
 app.get("/points/leaderboard", async (req, res) => {
   try {
-    const shifts = await Shift.find({});
+    const shifts = await Shift.find({}); // בלי lean כדי ש-Mongoose Map יעבוד
     const totals = {};
 
-    // חישוב נקודות מכל המשמרות
-    shifts.forEach(shift => {
-      shift.team.forEach(member => {
-        totals[member.name] = (totals[member.name] || 0) + member.points;
-      });
+    shifts.forEach(s => {
+      if (s.scores) {
+        s.scores.forEach((pts, name) => {
+          totals[name] = (totals[name] || 0) + (pts || 0);
+        });
+      }
     });
 
-    // המרה למערך מסודר
     const leaderboard = Object.entries(totals)
       .map(([name, points]) => ({ name, points }))
       .sort((a, b) => b.points - a.points);
