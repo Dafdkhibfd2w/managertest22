@@ -330,8 +330,10 @@ app.post('/save-shift', async (req, res) => {
     payload.team = normalizeTeam(payload.team);
 
     await Shift.findOneAndUpdate(
-      { date: payload.date },
-      { $set: payload, $setOnInsert: { executions: { daily: [], weekly: [], monthly: [] } } },
+     { date: payload.date },
+      // { $set: payload, $setOnInsert: { executions: { daily: [], weekly: [], monthly: [] } } },
+      { $set: payload, $setOnInsert: { xecutions: { daily: [], weekly: [], monthly: [] },scores: {}} 
+  },
       { upsert: true, new: true }
     );
     res.json({ status: 'ok', message: 'המשמרת נשמרה בהצלחה!' });
