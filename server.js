@@ -554,7 +554,9 @@ app.post('/finalize-shift', async (req, res) => {
         manager: manager || '',
         team: normalizeTeam(team),
         tasks: { daily: [], weekly: [], monthly: [] },
-        executions: { daily: [], weekly: [], monthly: [] }
+        executions: { daily: [], weekly: [], monthly: [] },
+          scores: new Map()   // 👈 זהו הטריק
+
       });
     } else {
       if (manager !== undefined) shift.manager = manager;

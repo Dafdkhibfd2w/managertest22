@@ -21,8 +21,11 @@ const ShiftSchema = new mongoose.Schema({
   team:   { type: [String], default: [] },
 
   // 👇 ניקוד לכל עובד – מפתחות זה שם העובד, ערך זה מספר נקודות
-  scores: { type: Map, of: Number, default: {} },
-
+scores: {
+  type: Map,
+  of: Number,
+  default: () => new Map()
+},
   tasks: {
     daily:   { type: [String], default: [] },
     weekly:  { type: [String], default: [] },
