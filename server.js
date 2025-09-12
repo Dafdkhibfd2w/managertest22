@@ -329,17 +329,11 @@ app.post('/save-shift', async (req, res) => {
     const payload = { ...req.body };
     payload.team = normalizeTeam(payload.team);
 
-await Shift.findOneAndUpdate(
-  { date: payload.date },
-  { 
-    $set: payload, 
-    $setOnInsert: { 
-      executions: { daily: [], weekly: [], monthly: [] },
-      scores: {} // 👈 חשוב
-    } 
-  },
-  { upsert: true, new: true }
-);
+    await Shift.findOneAndUpdate(
+      { date: payload.date },
+      { $set: payload, $setOnInsert: { executions: { daily: [], weekly: [], monthly: [] } } },
+      { upsert: true, new: true }
+    );
     res.json({ status: 'ok', message: 'המשמרת נשמרה בהצלחה!' });
   } catch (e) {
     console.error('save-shift error:', e);
@@ -560,7 +554,7 @@ app.post('/finalize-shift', async (req, res) => {
         manager: manager || '',
         team: normalizeTeam(team),
         tasks: { daily: [], weekly: [], monthly: [] },
-        executions: { daily: [], weekly: [], monthly: [] },
+        executions: { daily: [], weekly: [], monthly: [] }
       });
     } else {
       if (manager !== undefined) shift.manager = manager;
@@ -580,10 +574,7 @@ app.post('/finalize-shift', async (req, res) => {
     return res.status(500).json({ ok: false, message: 'שגיאה בסגירת המשמרת.' });
   }
 });
-await Shift.updateMany(
-  { scores: { $exists: false } },
-  { $set: { scores: {} } }
-);
+
 // ===== API: הזמנות יומיות =====
 // GET /orders?date=YYYY-MM-DD  → מחזיר/יוצר טופס לפי ספקים פעילים ליום הזה
 // ✅ להשאיר – בונה מחדש אם אין מסמך או אם ה־blocks ריק
