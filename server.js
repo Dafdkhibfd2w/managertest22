@@ -358,7 +358,7 @@ app.post('/update-shift', async (req, res) => {
     res.status(500).json({ message: 'שגיאת שרת' });
   }
 });
-app.post('/update-single-task', async (req, res) => {
+app.post('/api/update-single-task', async (req, res) => {
   try {
     const { date, category, task, worker, time } = req.body || {};
     if (!date || !category || !task) {
