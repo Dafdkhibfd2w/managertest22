@@ -368,15 +368,21 @@ app.post('/update-single-task', async (req, res) => {
     const shift = await Shift.findOne({ date });
     if (!shift) return res.status(404).json({ message: 'Shift not found' });
 
-    if (!shift.executions) shift.executions = { daily: [], weekly: [], monthly: [] };
-    const list = Array.isArray(shift.executions[category]) ? shift.executions[category] : (shift.executions[category] = []);
+    if (!shift.executions) {
+      shift.executions = { daily: [], weekly: [], monthly: [] };
+    }
+
+    const list = Array.isArray(shift.executions[category])
+      ? shift.executions[category]
+      : (shift.executions[category] = []);
+
     const existing = list.find(e => e.task === task);
 
     if (existing) {
       if (worker !== undefined) existing.worker = worker;
       if (time   !== undefined) existing.time   = time;
     } else {
-      list.push({ task, worker: worker || '', time: time || '' });
+      list.push({ task, worker: worker || "", time: time || "" });
     }
 
     // === הוספת ניקוד אוטומטית ===
@@ -384,23 +390,19 @@ app.post('/update-single-task', async (req, res) => {
       const pointsMap = { daily: 1, weekly: 3, monthly: 5 };
       const points = pointsMap[category] || 1;
 
-      // חפש אם כבר יש לעובד ניקוד
-      if (!shift.team) shift.team = [];
-      let member = shift.team.find(m => m.name === worker);
-      if (!member) {
-        member = { name: worker, points: 0 };
-        shift.team.push(member);
-      }
-      member.points += points;
+      // אם אין עדיין ניקוד לעובד → התחל מ־0
+      const currentPoints = shift.scores.get(worker) || 0;
+      shift.scores.set(worker, currentPoints + points);
     }
 
     await shift.save();
-    res.json({ message: 'נשמר ✔', shift });
+    res.json({ ok: true, message: "נשמר ✔", shift });
   } catch (e) {
-    console.error('update-single-task error:', e);
-    res.status(500).json({ message: 'שגיאת שרת' });
+    console.error("update-single-task error:", e);
+    res.status(500).json({ ok: false, message: "שגיאת שרת" });
   }
 });
+
 
 app.post('/admin-update-shift', async (req, res) => {
   try {
