@@ -364,6 +364,7 @@ app.post('/update-single-task', async (req, res) => {
     if (!date || !category || !task) {
       return res.status(400).json({ message: 'חובה date, category, task' });
     }
+
     const shift = await Shift.findOne({ date });
     if (!shift) return res.status(404).json({ message: 'Shift not found' });
 
@@ -378,13 +379,29 @@ app.post('/update-single-task', async (req, res) => {
       list.push({ task, worker: worker || '', time: time || '' });
     }
 
+    // === הוספת ניקוד אוטומטית ===
+    if (worker) {
+      const pointsMap = { daily: 1, weekly: 3, monthly: 5 };
+      const points = pointsMap[category] || 1;
+
+      // חפש אם כבר יש לעובד ניקוד
+      if (!shift.team) shift.team = [];
+      let member = shift.team.find(m => m.name === worker);
+      if (!member) {
+        member = { name: worker, points: 0 };
+        shift.team.push(member);
+      }
+      member.points += points;
+    }
+
     await shift.save();
-    res.json({ message: 'נשמר ✔' });
+    res.json({ message: 'נשמר ✔', shift });
   } catch (e) {
     console.error('update-single-task error:', e);
     res.status(500).json({ message: 'שגיאת שרת' });
   }
 });
+
 app.post('/admin-update-shift', async (req, res) => {
   try {
     const { date, manager, team, notes } = req.body || {};
@@ -949,6 +966,53 @@ app.post("/send-notification", async (req, res) => {
   } catch (err) {
     console.error("שגיאה בשליחת התראה:", err);
     res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+
+// הוספת נקודות לעובד
+app.post("/points/add", async (req, res) => {
+  try {
+    const { date, worker, amount } = req.body;
+    const shift = await Shift.findOne({ date });
+    if (!shift) return res.status(404).json({ ok: false, message: "Shift not found" });
+
+    // חפש או צור את העובד
+    let member = shift.team.find(m => m.name === worker);
+    if (!member) {
+      member = { name: worker, points: 0 };
+      shift.team.push(member);
+    }
+    member.points += amount || 1;
+
+    await shift.save();
+    res.json({ ok: true, worker, points: member.points });
+  } catch (err) {
+    res.status(500).json({ ok: false, message: err.message });
+  }
+});
+
+// דירוג כללי (Leaderboard)
+app.get("/points/leaderboard", async (req, res) => {
+  try {
+    const shifts = await Shift.find({});
+    const totals = {};
+
+    // חישוב נקודות מכל המשמרות
+    shifts.forEach(shift => {
+      shift.team.forEach(member => {
+        totals[member.name] = (totals[member.name] || 0) + member.points;
+      });
+    });
+
+    // המרה למערך מסודר
+    const leaderboard = Object.entries(totals)
+      .map(([name, points]) => ({ name, points }))
+      .sort((a, b) => b.points - a.points);
+
+    res.json({ ok: true, leaderboard });
+  } catch (err) {
+    res.status(500).json({ ok: false, message: err.message });
   }
 });
 
