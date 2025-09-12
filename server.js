@@ -386,14 +386,18 @@ app.post('/update-single-task', async (req, res) => {
     }
 
     // === הוספת ניקוד אוטומטית ===
-    if (worker) {
-      const pointsMap = { daily: 1, weekly: 3, monthly: 5 };
-      const points = pointsMap[category] || 1;
+if (worker) {
+  const pointsMap = { daily: 1, weekly: 3, monthly: 5 };
+  const points = pointsMap[category] || 1;
 
-      // אם אין עדיין ניקוד לעובד → התחל מ־0
-      const currentPoints = shift.scores.get(worker) || 0;
-      shift.scores.set(worker, currentPoints + points);
-    }
+  // ודא ש-shift.scores קיים
+  if (!shift.scores) shift.scores = new Map();
+
+  const currentPoints = shift.scores.get(worker) || 0;
+  shift.scores.set(worker, currentPoints + points);
+} else {
+  console.log("its old")
+}
 
     await shift.save();
     res.json({ ok: true, message: "נשמר ✔", shift });
