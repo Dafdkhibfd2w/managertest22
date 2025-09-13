@@ -1,4 +1,4 @@
-const { apiFetch, toast, $, $$ } = require('./core.js');
+const { toast, $, $$ } = require('./core.js');
 
 const state = {
   date: '',
