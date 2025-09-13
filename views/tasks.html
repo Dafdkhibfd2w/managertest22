@@ -1,323 +1,80 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
-<head>
-<meta charset="UTF-8" />
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
 
 
-  <title>ניהול משימות</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://unpkg.com/lucide@latest"></script>
-
-  <link rel="stylesheet" href="/css/style.css?v=2" />
-  <link rel="stylesheet" href="/css/premium.css" />
-</head>
-<body class="theme-dark-premium">
-<style>
-    #tasksTable {
-  width: 100%;
-  border-collapse: collapse;
-  direction: rtl;
-  text-align: right;
-}
-
-#tasksTable th, #tasksTable td {
-  padding: 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-#tasksTable th {
-  background: rgba(255,255,255,0.05);
-  font-weight: 600;
-  color: #fff;
-}
-
-#tasksTable td {
-  color: #ddd;
-}
-#tasksTable td.actions, 
-#tasksTable th.actions {
-  text-align: center;
-  width: 80px;
-}
-.task-category {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 14px;
-  margin-bottom: 24px;
-  padding: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-}
-
-.task-category h2 {
-  margin: 0 0 12px;
-  font-size: 1.2rem;
-  color: white;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  padding-bottom: 6px;
-}
-
-.tasks-table {
-  width: 100%;
-  border-collapse: collapse;
-  direction: rtl;
-}
-
-.tasks-table th,
-.tasks-table td {
-  padding: 10px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  text-align: right;
-}
-
-.tasks-table th {
-  background: rgba(255,255,255,0.05);
-  font-weight: 600;
-  color: #fff;
-}
-
-.tasks-table td {
-  color: #ddd;
-}
-
-.tasks-table td.actions {
-  text-align: center;
-  width: 80px;
-}
-
-.delete-btn {
-  background: linear-gradient(135deg, #3cb371, #2e8b57);
-  border: none;
-  border-radius: 10px;
-  padding: 6px 12px;
-  cursor: pointer;
-  color: #fff;
-  font-size: 14px;
-  transition: 0.2s;
-}
-.delete-btn:hover {
-  filter: brightness(1.2);
-  transform: scale(1.05);
-}
-.edit-btn {
-  background: linear-gradient(135deg, #ffa500, #ff7f50);
-  border: none;
-  border-radius: 10px;
-  padding: 6px 12px;
-  cursor: pointer;
-  color: #fff;
-  font-size: 14px;
-  margin-left: 6px;
-  transition: 0.2s;
-}
-.edit-btn:hover {
-  filter: brightness(1.2);
-  transform: scale(1.05);
-}
-.actions button {
-  display: inline-flex;   /* במקום block */
-  justify-content: center;
-  align-items: center;
-  width: auto;            /* שלא יתפרס על כל התא */
-  min-width: 36px;
-  padding: 6px 12px;
-  margin: 0 4px;          /* ריווח בין הכפתורים */
-  border-radius: 10px;
-  cursor: pointer;
-  color: #fff;
-  font-size: 14px;
-  margin-top: 10px;
-  transition: 0.2s;
-}
-.no-tasks {
-  text-align: center;
-  color: #999;
-  font-size: 0.95rem;
-  padding: 12px;
-  font-style: italic;
-}
-
-.edit-btn {
-  background: linear-gradient(135deg, #ffa500, #ff7f50);
-}
-.edit-btn:hover {
-  filter: brightness(1.15);
-  transform: scale(1.05);
-}
-
-.delete-btn {
-  background: linear-gradient(135deg, #3cb371, #2e8b57);
-}
-.delete-btn:hover {
-  filter: brightness(1.15);
-  transform: scale(1.05);
-}
-
-</style>
+<aside id="mobileNav" class="drawer mobile-nav"><div class="drawer-head"><div class="brand">Shift<span class="brand-accent">Pro</span></div><button class="icon-btn" id="closeNav"><svg data-lucide="x"></svg></button></div><nav class="drawer-nav"><a href="/" class="drawer-link"><svg data-lucide="home"></svg> דף הבית</a><a href="/task" class="drawer-link active"><svg data-lucide="list-todo"></svg> משימות</a></nav></aside>
 
 
-<header class="brandbar">
-  <div class="brandbar-left">
-    <span class="burger" id="burger">&#9776;</span>
-        <button id="notifToggle" class="icon-btn">
-      <i data-lucide="bell-off"></i>
-    </button>
-  </div>
-  <span class="brand-title">NEW DELI</span>
-</header>
+<main class="wrap">
+<h1>ניהול משימות</h1>
 
 
-
-<nav class="mobile-nav" id="mobileNav">
-  <button id="closeNav" class="close-btn">✖</button>
-  <ul>
-    <li><a href="/"><span class="icon">🏠</span> דף הבית</a></li>
-    <li><a href="/create"><span class="icon">🗓️</span> יצירת משמרת</a></li>
-    <li><a href="/manage"><span class="icon">✅</span> ניהול משמרת</a></li>
-    <li><a href="/admin-login"><span class="icon">📚</span> ארכיון / דשבורד מנהל</a></li>
-    <li><a href="/invoices-page"><span class="icon">🧾</span> חשבוניות</a></li>
-    <li><a href="/suppliers-page"><span class="icon">🏷️</span> ספקים</a></li>
-    <li><a href="/task"><span class="icon">⚒</span> משימות</a></li>
-    <li><a href="/orders-page"><span class="icon">📦</span> הזמנות</a></li>
-    <li><a href="/dispersals-page"><span class="icon">🚕</span> פיזורים</a></li>
-  </ul>
-</nav>
-
-  <div class="wrap">
-    <h1>ניהול משימות</h1>
-    
-    <div class="card">
-      <form id="addTaskForm">
-        <label>קטגוריה</label>
-        <select name="category" required>
-          <option value="daily">יומי</option>
-          <option value="weekly">שבועי</option>
-          <option value="monthly">חודשי</option>
-        </select>
-
-        <label>שם המשימה</label>
-        <input type="text" name="name" placeholder="לדוג׳: לסגור קופה" required />
-
-        <button type="submit">➕ הוסף משימה</button>
-      </form>
-    </div>
-
-<div class="task-category">
-  <h2>משימות יומיות</h2>
-  <table class="tasks-table">
-    <thead>
-      <tr>
-        <th>משימה</th>
-        <th class="actions">פעולות</th>
-      </tr>
-    </thead>
-    <tbody id="dailyTasks"></tbody>
-  </table>
+<section class="card">
+<form id="addTaskForm" class="form-grid">
+<div>
+<label>קטגוריה</label>
+<select name="category" required>
+<option value="daily">יומי</option>
+<option value="weekly">שבועי</option>
+<option value="monthly">חודשי</option>
+</select>
 </div>
-
-<div class="task-category">
-  <h2>משימות שבועיות</h2>
-  <table class="tasks-table">
-    <thead>
-      <tr>
-        <th>משימה</th>
-        <th class="actions">פעולות</th>
-      </tr>
-    </thead>
-    <tbody id="weeklyTasks"></tbody>
-  </table>
+<div class="full">
+<label>שם המשימה</label>
+<input type="text" name="name" placeholder="לדוג׳: לסגור קופה" required />
 </div>
-
-<div class="task-category">
-  <h2>משימות חודשיות</h2>
-  <table class="tasks-table">
-    <thead>
-      <tr>
-        <th>משימה</th>
-        <th class="actions">פעולות</th>
-      </tr>
-    </thead>
-    <tbody id="monthlyTasks"></tbody>
-  </table>
+<div class="actions right full">
+<button class="btn primary" type="submit">הוסף משימה</button>
 </div>
-  </div>
+</form>
+</section>
 
 
-  
+<section class="card">
+<h3>משימות יומיות</h3>
+<div class="table-wrap"><table class="table"><thead><tr><th>משימה</th><th>פעולות</th></tr></thead><tbody id="dailyTasks"><tr class="skeleton shimmer"><td colspan="2">&nbsp;</td></tr></tbody></table></div>
+</section>
+
+
+<section class="card">
+<h3>משימות שבועיות</h3>
+<div class="table-wrap"><table class="table"><thead><tr><th>משימה</th><th>פעולות</th></tr></thead><tbody id="weeklyTasks"><tr class="skeleton shimmer"><td colspan="2">&nbsp;</td></tr></tbody></table></div>
+</section>
+
+
+<section class="card">
+<h3>משימות חודשיות</h3>
+<div class="table-wrap"><table class="table"><thead><tr><th>משימה</th><th>פעולות</th></tr></thead><tbody id="monthlyTasks"><tr class="skeleton shimmer"><td colspan="2">&nbsp;</td></tr></tbody></table></div>
+</section>
+</main>
+
+
 <script>
-  const addForm = document.getElementById("addTaskForm");
+const addForm = document.getElementById('addTaskForm');
+addForm.addEventListener('submit', async e=>{ e.preventDefault(); const fd=new FormData(addForm);
+await fetch('/api/tasks',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(Object.fromEntries(fd)) }); addForm.reset(); loadTasks();
+});
 
-  // טעינת משימות מהשרת
-  async function loadTasks() {
-    const res = await fetch("/api/tasks");
-    const data = await res.json();
-    renderTasks(data); // שימוש בפונקציה הקיימת
-  }
 
-  // הוספת משימה
-  addForm.addEventListener("submit", async e => {
-    e.preventDefault();
-    const fd = new FormData(addForm);
-    await fetch("/api/tasks", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(Object.fromEntries(fd))
-    });
-    addForm.reset();
-    loadTasks();
-  });
+async function loadTasks(){ const res=await fetch('/api/tasks'); const data=await res.json(); renderTasks(data) }
 
-  // מחיקת משימה
-  async function delTask(id) {
-    if (!confirm("למחוק משימה?")) return;
-    await fetch("/api/tasks/" + id, { method: "DELETE" });
-    loadTasks();
-  }
 
-  // רינדור משימות לקטגוריות
-  function renderTasks(tasks) {
-    const daily = tasks.filter(t => t.category === "daily");
-    const weekly = tasks.filter(t => t.category === "weekly");
-    const monthly = tasks.filter(t => t.category === "monthly");
+async function delTask(id){ if(!confirm('למחוק משימה?')) return; await fetch('/api/tasks/'+id,{ method:'DELETE' }); loadTasks(); }
+async function editTask(id, oldName, oldCat){ const name=prompt('שם חדש:', oldName); if(!name) return; const category=prompt('קטגוריה (daily/weekly/monthly):', oldCat)||oldCat; await fetch('/api/tasks/'+id,{ method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ name, category })}); loadTasks(); }
 
-const renderRows = (arr, elId) => {
-  document.getElementById(elId).innerHTML = arr.map(t => `
-    <tr>
-      <td>${t.name}</td>
-      <td class="actions">
-        <button class="edit-btn" onclick="editTask('${t._id}', '${t.name}', '${t.category}')">✏️</button>
-        <button class="delete-btn" onclick="delTask('${t._id}')">🗑️</button>
-      </td>
-    </tr>
-  `).join("");
-};
 
-    renderRows(daily, "dailyTasks");
-    renderRows(weekly, "weeklyTasks");
-    renderRows(monthly, "monthlyTasks");
-  }
-async function editTask(id, oldName, oldCategory) {
-  const newName = prompt("ערוך שם משימה:", oldName);
-  if (!newName || newName.trim() === "" || newName === oldName) return;
-
-  const newCategory = prompt("ערוך קטגוריה (daily/weekly/monthly):", oldCategory);
-  if (!["daily","weekly","monthly"].includes(newCategory)) {
-    alert("קטגוריה לא תקינה");
-    return;
-  }
-
-  await fetch("/api/tasks/" + id, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name: newName.trim(), category: newCategory })
-  });
-
-  loadTasks();
+function renderTasks(tasks){ const daily=tasks.filter(t=>t.category==='daily'); const weekly=tasks.filter(t=>t.category==='weekly'); const monthly=tasks.filter(t=>t.category==='monthly');
+const rows = arr => arr.map(t=>`<tr><td>${escapeHtml(t.name)}</td><td><button class="btn" onclick="editTask('${t._id}','${escapeAttr(t.name)}','${t.category}')">ערוך</button> <button class="btn danger" onclick="delTask('${t._id}')">מחק</button></td></tr>`).join('');
+document.getElementById('dailyTasks').innerHTML = rows(daily) || '<tr><td colspan="2" class="muted">אין משימות</td></tr>';
+document.getElementById('weeklyTasks').innerHTML = rows(weekly) || '<tr><td colspan="2" class="muted">אין משימות</td></tr>';
+document.getElementById('monthlyTasks').innerHTML = rows(monthly) || '<tr><td colspan="2" class="muted">אין משימות</td></tr>';
 }
 
-  // טעינה ראשונית
-  loadTasks();
+
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;' }[m])) }
+function escapeAttr(s){ return escapeHtml(s).replace(/"/g,'&quot;') }
+
+
+loadTasks();
 </script>
-<script src="/js/global.js"></script>
 </body>
 </html>

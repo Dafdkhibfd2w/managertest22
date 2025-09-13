@@ -1,188 +1,83 @@
-<!DOCTYPE html>
 <html lang="he" dir="rtl">
-<head>
-<meta charset="UTF-8" />
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
-
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" href="/icons/icon-512.png" type="image/png">
-<link rel="apple-touch-icon" href="/icons/icon-192.png">
-<script src="https://unpkg.com/lucide@latest"></script>
-
-  <title>מערכת ניהול משמרות • דף הבית</title>
-  <link rel="stylesheet" href="/css/style.css" />
-<link rel="manifest" href="/manifest.json">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="ניהול משמרות">
-<meta name="theme-color" content="#2b5329">
-  <style>
-    body {
-      background: linear-gradient(135deg, #e8ffd1, #fffabe);
-font-family: 'Heebo', Arial, sans-serif;
-
-      margin: 0;
-      padding-top: 80px;
-    }
-
-    .container {
-      max-width: 960px;
-      margin: auto;
-      padding: 24px;
-      animation: fadeIn 0.8s ease-in-out;
-    }
-
-    h1.app-title {
-      font-size: 2.4rem;
-      color: #2b5329;
-      text-align: center;
-      margin-bottom: 8px;
-    }
-
-    .subtitle {
-      color: #496c47;
-      font-size: 1.2rem;
-      text-align: center;
-      margin-bottom: 40px;
-    }
-
-    .nav-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-    }
-
-    .nav-card {
-      background: white;
-      border: 2px solid #d4f4c2;
-      border-left: 10px solid #ffcb05;
-      border-radius: 18px;
-      padding: 24px;
-      text-decoration: none;
-      color: #1f2e1e;
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .nav-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
-    }
-
-    .nav-icon {
-      font-size: 30px;
-      margin-left: 10px;
-    }
-
-    .nav-title {
-      font-weight: 800;
-      font-size: 1.2rem;
-      margin: 6px 0 10px;
-      display: flex;
-      align-items: center;
-    }
-
-    .nav-desc {
-      font-size: 0.95rem;
-      color: #586e57;
-      line-height: 1.6;
-    }
-
-    .footer-tip {
-      margin-top: 40px;
-      text-align: center;
-      font-size: 0.9rem;
-      color: #6b7d69;
-    }
-
-    /* אנימציה */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  </style>
-  <link rel="stylesheet" href="/css/premium.css">
-  <script defer src="/js/ui.js"></script>
+<link rel="manifest" href="/manifest.json" />
+<link rel="icon" href="/icons/icon-192.png" />
+<link rel="stylesheet" href="/css/premium.css" />
+<script defer src="https://unpkg.com/lucide@latest"></script>
+<script defer type="module" src="/js/ui.js"></script>
 </head>
-<body class="theme-dark-premium">
-
-<header class="brandbar">
-  <div class="brandbar-left">
-    <span class="burger" id="burger">&#9776;</span>
-        <button style=":hover{background-color: none;}" id="notifToggle" class="icon-btn">
-      <i data-lucide="bell-off"></i>
-    </button>
-  </div>
-  <span class="brand-title">NEW DELI</span>
+<body class="app-surface">
+<header class="navbar">
+<div class="nav-left">
+<button class="icon-btn only-mobile" id="burger" aria-label="תפריט"><svg data-lucide="menu"></svg></button>
+<div class="brand">Shift<span class="brand-accent">Pro</span></div>
+</div>
+<div class="nav-center only-desktop">
+<a href="/" class="nav-link active">בית</a>
+<a href="/manage" class="nav-link">ניהול משמרת</a>
+<a href="/admin-login" class="nav-link">מנהל</a>
+</div>
+<div class="nav-right">
+<button class="icon-btn" id="themeToggle" aria-label="החלפת ערכת צבע"><svg data-lucide="sun"></svg></button>
+</div>
 </header>
 
 
-
-<nav class="mobile-nav" id="mobileNav">
-  <button id="closeNav" class="close-btn">✖</button>
-  <ul>
-    <li><a href="/"><span class="icon">🏠</span> דף הבית</a></li>
-    <li><a href="/create"><span class="icon">🗓️</span> יצירת משמרת</a></li>
-    <li><a href="/manage"><span class="icon">✅</span> ניהול משמרת</a></li>
-    <li><a href="/admin-login"><span class="icon">📚</span> ארכיון / דשבורד מנהל</a></li>
-    <li><a href="/invoices-page"><span class="icon">🧾</span> חשבוניות</a></li>
-    <li><a href="/suppliers-page"><span class="icon">🏷️</span> ספקים</a></li>
-    <li><a href="/task"><span class="icon">⚒</span> משימות</a></li>
-    <li><a href="/orders-page"><span class="icon">📦</span> הזמנות</a></li>
-    <li><a href="/dispersals-page"><span class="icon">🚕</span> פיזורים</a></li>
-  </ul>
+<aside id="mobileNav" class="drawer mobile-nav">
+<div class="drawer-head">
+<div class="brand">Shift<span class="brand-accent">Pro</span></div>
+<button class="icon-btn" id="closeNav" aria-label="סגור"><svg data-lucide="x"></svg></button>
+</div>
+<nav class="drawer-nav">
+<a href="/" class="drawer-link active"><svg data-lucide="home"></svg> דף הבית</a>
+<a href="/create" class="drawer-link"><svg data-lucide="calendar-plus"></svg> יצירת משמרת</a>
+<a href="/manage" class="drawer-link"><svg data-lucide="check-square"></svg> ניהול משמרת</a>
+<a href="/admin-login" class="drawer-link"><svg data-lucide="library-big"></svg> ארכיון / מנהל</a>
+<a href="/invoices-page" class="drawer-link"><svg data-lucide="receipt"></svg> חשבוניות</a>
+<a href="/suppliers-page" class="drawer-link"><svg data-lucide="tags"></svg> ספקים</a>
+<a href="/orders-page" class="drawer-link"><svg data-lucide="package"></svg> הזמנות</a>
+<a href="/dispersals-page" class="drawer-link"><svg data-lucide="car"></svg> פיזורים</a>
+<a href="/task" class="drawer-link"><svg data-lucide="list-todo"></svg> משימות</a>
 </nav>
+</aside>
 
-  <div class="container">
-    <h1 class="app-title">ברוכים הבאים למערכת ניהול משמרות</h1>
-    <p class="subtitle">בחרו פעולה כדי להתחיל 👇</p>
-<p id="notifStatus"></p>
-    <div class="nav-grid">
-      <a href="/create" class="nav-card">
-        <div class="nav-title"><span class="nav-icon">🗓️</span> יצירת משמרת</div>
-        <div class="nav-desc">בחרו תאריך, צוות, משימות יומיות/שבועיות/חודשיות – ושמרו הכל בלחיצה אחת.</div>
-      </a>
 
-      <a href="/manage" class="nav-card">
-        <div class="nav-title"><span class="nav-icon">✅</span> ניהול משמרת</div>
-        <div class="nav-desc">סמנו מי ביצע מה ומתי, עם ממשק מעודכן ונוח לאחמ״שים.</div>
-      </a>
+<main class="wrap">
+<section class="page-head">
+<h1>ברוך הבא 👋</h1>
+<p class="muted">בחר פעולה כדי להתחיל.</p>
+</section>
 
-      <a href="/admin-login" class="nav-card">
-        <div class="nav-title"><span class="nav-icon">📚</span> ארכיון / דשבורד מנהל</div>
-        <div class="nav-desc">צפו בכל המשמרות, סננו לפי שם או תאריך, ערכו ושמרו.</div>
-      </a>
 
-<a href="/task" class="nav-card">
-  <div class="nav-title"><span class="nav-icon">⚒</span> ניהול משימות</div>
-  <div class="nav-desc">הוסיפו, ערכו ומחקו משימות יומיות, שבועיות וחודשיות בקלות.</div>
+<section class="grid-3" id="homeCards">
+<!-- skeletons while booting -->
+<div class="card skeleton shimmer" style="height:120px"></div>
+<div class="card skeleton shimmer" style="height:120px"></div>
+<div class="card skeleton shimmer" style="height:120px"></div>
+</section>
+</main>
+
+
+<div id="toasts" class="toasts"></div>
+
+
+<script>
+// Render cards after a tiny delay (simulate data)
+setTimeout(()=>{
+const wrap = document.getElementById('homeCards');
+wrap.innerHTML = `
+<a href="/create" class="card" style="text-decoration:none;color:inherit">
+<h3>🗓️ יצירת משמרת</h3>
+<p class="muted">בחרו תאריך, צוות ומשימות ושמרו בלחיצה.</p>
 </a>
-
-
-<a href="/invoices-page" class="nav-card">
-  <div class="nav-title"><span class="nav-icon">🧾</span> חשבוניות</div>
-  <div class="nav-desc">העלו ושמרו חשבוניות, סננו לפי ספק ותאריך, וצפו בפרטים בקלות.</div>
+<a href="/manage" class="card" style="text-decoration:none;color:inherit">
+<h3>✅ ניהול משמרת</h3>
+<p class="muted">סמנו ביצועים בזמן אמת ואשרו סגירה.</p>
 </a>
-<a href="/suppliers-page" class="nav-card">
-  <div class="nav-title"><span class="nav-icon">🏷️</span> ספקים</div>
-  <div class="nav-desc">הוספה/עריכה של ספקים, ימי פעילות ומוצרים — הכל ללא קוד.</div>
-</a>
-<a href="/orders-page" class="nav-card">
-  <div class="nav-title"><span class="nav-icon">📦</span> הזמנות</div>
-  <div class="nav-desc">מלאו הזמנות יומיות לפי ספקים ומוצרים, ושמרו למעקב נוח.</div>
-</a>
-
-      <a href="/dispersals-page" class="nav-card">
-  <div class="nav-title"><span class="nav-icon">🚕</span> פיזורים</div>
-  <div class="nav-desc">תעדו נסיעות מונית אחרי משמרת, כולל מחיר, נוסעים ומי שילם.</div>
-</a>
-
-    </div>
-
-    <p class="footer-tip" style="font-size: x-large; font-weight: bold;">💡 שמרו את האתר במסך הבית כדי להשתמש בו כאפליקציה!</p>
-  </div>
-  <script src="/js/global.js"></script>
-
+<a href="/admin-login" class="card" style="text-decoration:none;color:inherit">
+<h3>📚 ארכיון / מנהל</h3>
+<p class="muted">סינון לפי תאריך, יצוא וסקירה.</p>
+</a>`;
+}, 300);
+</script>
 </body>
 </html>

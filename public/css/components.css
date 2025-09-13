@@ -1,0 +1,21 @@
+.kpi{ position:relative; overflow:hidden }
+.kpi header{ color:var(--muted); margin-bottom:6px }
+.kpi-value{ font-size: clamp(22px, 3.4vw, 28px); font-weight:800 }
+.kpi .chip{ margin-top:6px }
+
+.activity-list{ list-style:none; padding:0; margin:0; display:grid; gap:10px }
+.activity-item{
+  background:#fff; border:1px solid var(--border); border-radius:12px; padding:12px; display:grid; gap:4px
+}
+.activity-item .meta{ font-size:.85rem; color:var(--muted) }
+
+.add-row{ display:flex; gap:8px; margin-top:10px }
+.add-row input{ flex:1 }
+
+.summary{ display:grid; gap:8px; background:#f1f5f9; border:1px solid var(--border); border-radius:12px; padding:12px }
+
+.table .status{
+  padding:.25rem .5rem; border-radius:999px; font-size:.85rem; border:1px solid var(--border); background:#f8fafc
+}
+.table .status.closed{ background:#ecfdf5; border-color:#bbf7d0; color:#065f46 }
+.table .status.open{ background:#fff7ed; border-color:#fed7aa; color:#9a3412 }
