@@ -1028,7 +1028,7 @@ app.get("/points/leaderboard", async (req, res) => {
   } catch (err) {
     res.status(500).json({ ok: false, message: err.message });
   }
-});
+}); 
 
 
 

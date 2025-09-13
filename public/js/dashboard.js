@@ -1,4 +1,4 @@
-const { API, apiFetch, toast, $, $$, hideBoot } = require( './core.js');
+const { API, piFetch, toast, $, $$, hideBoot } = require( './core.js');
 
 (async function init(){
   try{

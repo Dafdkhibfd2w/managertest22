@@ -1,4 +1,4 @@
-import { API, apiFetch, toast, $, $$, csv } from './core.js';
+const { API, apiFetch, toast, $, $$, csv } = require('./core.js');
 
 function setDefaultDates(){
   const to = new Date();
