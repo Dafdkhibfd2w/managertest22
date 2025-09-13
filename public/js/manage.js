@@ -1,4 +1,3 @@
-const { $, $$ } = require('./core.js');
 
 const state = {
   date: '',
