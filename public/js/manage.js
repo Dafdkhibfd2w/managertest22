@@ -1,4 +1,4 @@
-const { toast, $, $$ } = require('./core.js');
+const { $, $$ } = require('./core.js');
 
 const state = {
   date: '',
