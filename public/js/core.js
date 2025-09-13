@@ -41,15 +41,15 @@ drawer && drawer.addEventListener('click', (e)=>{ if(e.target === drawer) drawer
 
 // ===== Boot loader control
 const boot = document.getElementById('boot-loader');
-export function showBoot(){ boot && boot.classList.add('active'); }
-export function hideBoot(){ boot && boot.classList.remove('active'); }
+function showBoot(){ boot && boot.classList.add('active'); }
+function hideBoot(){ boot && boot.classList.remove('active'); }
 
 // ===== Utility
-export const $$ = (sel, root=document)=> Array.from(root.querySelectorAll(sel));
-export const $ = (sel, root=document)=> root.querySelector(sel);
+const $$ = (sel, root=document)=> Array.from(root.querySelectorAll(sel));
+const $ = (sel, root=document)=> root.querySelector(sel);
 
-export function fmtDate(d){ return new Date(d).toLocaleDateString('he-IL') }
-export function csv(rows){
+function fmtDate(d){ return new Date(d).toLocaleDateString('he-IL') }
+function csv(rows){
   return rows.map(r => r.map(v => `"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n');
 }
 
@@ -68,4 +68,4 @@ installBtn?.addEventListener('click', async ()=>{
 // ===== Service worker
 if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js').catch(()=>{}) }
 
-export { API, apiFetch, toast };
+{ API, apiFetch, toast };

@@ -1,4 +1,4 @@
-import { API, apiFetch, toast, $, $$, hideBoot } from './core.js';
+const { API, apiFetch, toast, $, $$, hideBoot } = require( './core.js');
 
 (async function init(){
   try{
