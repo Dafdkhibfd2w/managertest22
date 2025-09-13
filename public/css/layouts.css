@@ -1,9 +1,0 @@
-.page-head{ margin: 8px 0 12px }
-
-.table-wrap{ border:1px solid var(--border); border-radius:12px; background:#fff; overflow:hidden }
-
-/* Mobile tweaks */
-@media (max-width: 520px){
-  .table th:nth-child(3), .table td:nth-child(3){ display:none } /* hide team column on tiny screens */
-  .nav-right .btn{ padding:.5rem .7rem }
-}

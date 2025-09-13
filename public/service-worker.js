@@ -1,21 +1,9 @@
-self.addEventListener('install', (event) => {
-  const CACHE = 'app-v1';
-  const filesToCache = [
-    '/', '/index.html',
-    '/css/styles.css',
-    '/js/dashboard.js',
-    // הוצא מפה כל קובץ שלא קיים בפועל או קבצי API דינמיים
-  ];
-
+self.addEventListener("push", function (event) {
+  const data = event.data?.json() || { title: "התראה חדשה", body: "" };
   event.waitUntil(
-    caches.open(CACHE).then(async (cache) => {
-      for (const url of filesToCache) {
-        try {
-          await cache.add(url);
-        } catch (err) {
-          console.warn('Skip cache:', url, err);
-        }
-      }
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: "/icons/icon-192.png"
     })
   );
 });
