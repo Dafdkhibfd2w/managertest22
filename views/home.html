@@ -32,24 +32,6 @@
     --warning: #FFD600;
   }
 
-  body {
-    background: var(--bg);
-    font-family: 'Heebo', Arial, sans-serif;
-    margin: 0;
-    padding-top: 80px;
-    color: var(--ink);
-  }
-.icon-btn {
-  border: none;
-  background: none;
-  cursor: pointer;
-  padding: 8px;
-}
-.icon-btn svg {
-  stroke: currentColor;
-  width: 24px;
-  height: 24px;
-}
 
   .container {
     max-width: 960px;
@@ -140,7 +122,19 @@
     <span class="burger" id="burger">&#9776;</span>
   </div>
 </header>
-
+<nav class="mobile-nav" id="mobileNav">
+  <button id="closeNav" class="close-btn">✖</button>
+  <ul>
+    <li><a href="/"><span class="icon">🏠</span> דף הבית</a></li>
+    <li><a href="/create"><span class="icon">🗓️</span> יצירת משמרת</a></li>
+    <li><a href="/manage"><span class="icon">✅</span> ניהול משמרת</a></li>
+    <li><a href="/admin-login"><span class="icon">📚</span> ארכיון / דשבורד מנהל</a></li>
+    <li><a href="/invoices-page"><span class="icon">🧾</span> חשבוניות</a></li>
+    <li><a href="/suppliers-page"><span class="icon">🏷️</span> ספקים</a></li>
+    <li><a href="/orders-page"><span class="icon">📦</span> הזמנות</a></li>
+    <li><a href="/dispersals-page"><span class="icon">🚕</span> פיזורים</a></li>
+  </ul>
+</nav>
 <div class="container">
   <h1 class="app-title">ברוכים הבאים למערכת ניהול משמרות</h1>
   <p class="subtitle">בחרו פעולה כדי להתחיל 👇</p>
