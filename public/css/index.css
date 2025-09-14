@@ -1,0 +1,70 @@
+
+/* Premium Index Page Styling */
+body {
+  margin:0; font-family: "Heebo", sans-serif;
+  background: radial-gradient(1200px 600px at 10% 0%, rgba(124,58,237,.20), transparent 60%),
+              radial-gradient(1000px 600px at 90% 20%, rgba(34,211,238,.12), transparent 60%),
+              linear-gradient(180deg,#0b1022,#070b1a 60%);
+  color:#e5e7eb; min-height:100vh;
+}
+.container { width:min(1000px,94%); margin:0 auto; padding:20px; }
+
+.card {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.15);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,.45);
+  padding:24px; margin-top:20px;
+}
+h2 { margin:0 0 12px; font-size:22px; font-weight:700; color:#fff; display:flex; align-items:center; gap:8px; }
+
+.field { display:grid; gap:6px; margin-bottom:16px; }
+label { font-size:14px; color:#9ca3af; }
+input, select, textarea {
+  padding:12px 14px; border-radius:12px; border:1px solid #283248;
+  background:rgba(255,255,255,.08); color:#fff; outline:none;
+  transition:border .2s, box-shadow .2s;
+}
+input:focus, select:focus, textarea:focus {
+  border-color:#7c3aed;
+  box-shadow:0 0 0 3px rgba(124,58,237,.35);
+}
+
+.grid { display:grid; gap:16px; }
+.grid.cols-2 { grid-template-columns:repeat(2,1fr); }
+@media(max-width:720px){.grid.cols-2{grid-template-columns:1fr;}}
+
+.toggle-group { display:flex; flex-wrap:wrap; gap:10px; }
+.toggle {
+  padding:8px 14px; border-radius:999px;
+  background:rgba(255,255,255,.05); border:1px solid #374151;
+  color:#e5e7eb; font-size:14px; cursor:pointer;
+  transition:all .2s;
+}
+.toggle.active { background:linear-gradient(135deg,#7c3aed,#22d3ee); color:#fff; border-color:transparent; box-shadow:0 4px 12px rgba(124,58,237,.35); }
+
+.btn {
+  padding:12px 22px; border-radius:999px; font-weight:600;
+  background:linear-gradient(135deg,#7c3aed,#22d3ee); border:none;
+  color:#fff; cursor:pointer;
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  transition:transform .2s, filter .2s;
+}
+.btn:hover{transform:translateY(-1px); filter:brightness(1.05);}
+.btn:active{transform:translateY(0);}
+
+.btn .spinner {
+  width:16px; height:16px; border:3px solid rgba(255,255,255,.3); border-top-color:#fff;
+  border-radius:50%; animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.skeleton { background:rgba(255,255,255,.08); border-radius:12px; position:relative; overflow:hidden; }
+.skeleton::after {
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.12),rgba(255,255,255,0));
+  transform:translateX(-100%); animation:shimmer 1.5s infinite;
+}
+@keyframes shimmer{to{transform:translateX(100%);}}
+

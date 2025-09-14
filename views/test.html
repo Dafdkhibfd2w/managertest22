@@ -1,0 +1,167 @@
+<!-- =====================================================
+IPW Premium UI Pack (HTML + CSS only)
+Author: ChatGPT
+Notes:
+- שמור על כל ה-fetch / IDs / dataset הקיימים. אין שינוי JS.
+- העתק את ה-<header> (Navbar) ואת ה-<div class="page-loader"> לכל דף.
+- החלף קובץ CSS ישן לקובץ החדש: /css/premium.css
+- אם יש class/ID קיימים – השאר אותם. הקובץ מוסיף עיצוב ולא תלוי בשמות חדשים.
+====================================================== -->
+
+<!-- =============================
+📁 /views/layout-example.html
+(תבנית בסיס לכל הדפים)
+============================= -->
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IPW • לוח ניהול</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/premium.css?v=1" />
+</head>
+<body>
+<div class="loader" aria-hidden="true"><div class="spinner"></div></div>
+
+<header class="navwrap">
+  <div class="container nav">
+    <div class="brand"><div class="logo"></div><div>Manager Pro</div></div>
+    <nav class="nav-links">
+      <a href="/views/index.html">דשבורד</a>
+      <a href="/views/manage.html">ניהול משמרות</a>
+      <a href="/views/invoices.html">חשבוניות</a>
+      <a href="/views/suppliers.html">ספקים</a>
+      <a href="/views/tasks.html">משימות</a>
+      <a href="/views/admin.html">אדמין</a>
+    </nav>
+    <div class="nav-cta">
+      <button class="btn secondary" onclick="location.href='/views/admin-login.html'">כניסת מנהלים</button>
+      <button class="burger" aria-label="תפריט"></button>
+    </div>
+  </div>
+  <div class="drawer"><div class="sheet">
+    <a href="/views/index.html">דשבורד</a>
+    <a href="/views/manage.html">ניהול משמרות</a>
+    <a href="/views/invoices.html">חשבוניות</a>
+    <a href="/views/suppliers.html">ספקים</a>
+    <a href="/views/tasks.html">משימות</a>
+    <a href="/views/admin.html">אדמין</a>
+  </div></div>
+</header>
+
+  <!-- Loader (נשען רק על CSS. נטען בהתחלה ונעלם באנימציה קצרה) -->
+  <div class="page-loader" aria-hidden="true">
+    <div class="spinner"></div>
+    <div class="loader-label">טוען נתונים…</div>
+  </div>
+
+  <!-- Navbar קבוע לראש הדף -->
+  <header class="appbar" role="banner">
+    <div class="appbar-inner">
+      <div class="brand">
+        <button class="icon-btn only-mobile" aria-label="פתח תפריט" id="nav-open" aria-controls="drawer" aria-expanded="false">☰</button>
+        <img src="/icons/icon-192.png" alt="IPW" class="brand-icon" />
+        <span class="brand-title">IPW Manager</span>
+      </div>
+      <nav class="top-nav only-desktop" aria-label="ראשי">
+        <a href="/" class="nav-link">בית</a>
+        <a href="/create" class="nav-link">יצירת משמרת</a>
+        <a href="/manage" class="nav-link">ניהול משמרת</a>
+        <a href="/admin" class="nav-link">דף מנהל</a>
+        <a href="/suppliers" class="nav-link">ספקים</a>
+        <a href="/invoices" class="nav-link">חשבוניות</a>
+      </nav>
+      <div class="appbar-actions">
+        <button class="icon-btn" title="רענון" aria-label="רענון" onclick="location.reload()">⟳</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Drawer לנייד (טהר CSS, בלי JS שמחליף fetch) -->
+  <input type="checkbox" id="drawer-toggle" class="drawer-toggle" hidden>
+  <aside id="drawer" class="drawer" aria-label="תפריט צד לנייד">
+    <label class="drawer-close" for="drawer-toggle" aria-label="סגירת תפריט"></label>
+    <nav class="drawer-nav">
+      <a href="/" class="drawer-link">בית</a>
+      <a href="/create" class="drawer-link">יצירת משמרת</a>
+      <a href="/manage" class="drawer-link">ניהול משמרת</a>
+      <a href="/admin" class="drawer-link">דף מנהל</a>
+      <a href="/suppliers" class="drawer-link">ספקים</a>
+      <a href="/invoices" class="drawer-link">חשבוניות</a>
+    </nav>
+  </aside>
+
+  <!-- תוכן הדף -->
+  <main class="page" id="content">
+    <section class="page-head">
+      <h1 class="title">ברוך הבא</h1>
+      <p class="subtitle">ניהול משמרות, צוותים ומשימות – עיצוב פרימיום, מותאם לנייד ולמחשב.</p>
+    </section>
+
+    <!-- דוגמת כרטיסים (Card) -->
+    <section class="cards-grid">
+      <article class="card clickable" onclick="location.href='/create'">
+        <div class="card-head">
+          <div class="chip">חדש</div>
+          <h2>יצירת משמרת</h2>
+        </div>
+        <p>בחרו תאריך, צוות ומשימות – שמירה בלחיצה.</p>
+      </article>
+
+      <article class="card clickable" onclick="location.href='/manage'">
+        <div class="card-head"><h2>ניהול משמרת</h2></div>
+        <p>סימון ביצועים, הוספת הערות, סגירת יום.</p>
+      </article>
+
+      <article class="card clickable" onclick="location.href='/admin'">
+        <div class="card-head"><h2>דף מנהל</h2></div>
+        <p>סקירת משמרות, סטטוסים וסיכומים.</p>
+      </article>
+    </section>
+
+    <!-- טבלה ריספונסיבית (לא משנה את הנתונים / IDs) -->
+    <section class="panel">
+      <header class="panel-head">
+        <h3>דוגמת טבלה</h3>
+        <div class="panel-actions">
+          <button class="btn primary">פעולה</button>
+          <button class="btn ghost">ייצוא</button>
+        </div>
+      </header>
+      <div class="table-wrap">
+        <table class="nice-table" role="table">
+          <thead>
+            <tr><th>תאריך</th><th>אחמ"ש</th><th>צוות</th><th>סטטוס</th><th></th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>2025-09-12</td>
+              <td>דוגמה</td>
+              <td class="nowrap">א' + ב' + ג'</td>
+              <td><span class="badge ok">פעילה</span></td>
+              <td class="nowrap"><button class="btn sm">פתח</button></td>
+            </tr>
+            <tr>
+              <td>2025-09-11</td>
+              <td>דוגמה</td>
+              <td class="nowrap">ד' + ה'</td>
+              <td><span class="badge warn">ממתין</span></td>
+              <td class="nowrap"><button class="btn sm ghost">פרטים</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- כפתור לפתיחת התפריט בנייד עובד עם ה-checkbox -->
+  <label for="drawer-toggle" class="fab only-mobile" title="תפריט" aria-label="פתיחת תפריט">☰</label>
+
+  <footer class="footer">© IPW • All rights reserved</footer>
+
+<script src="/js/ui.js"></script>
+</body>
+</html>
+
