@@ -131,7 +131,7 @@ loadForm.addEventListener("submit", async (e) => {
   }
   leadChip.innerHTML = `<span class="dot"></span>אחמ״ש: ${leadName || "—"}`;
   leadChip.style.display = "inline-flex";
-    leadChip.style.border = "2px solid var(--card-border)";
+    leadChip.style.border = "2px solid #27af59";
     leadChip.style.maxWidth = "100px";
     leadChip.style.borderRadius = "14px";
     leadChip.style.padding = "6px";
