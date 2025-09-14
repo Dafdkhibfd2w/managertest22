@@ -87,8 +87,14 @@ loadForm.addEventListener("submit", async (e) => {
     finalizeBtn.style.display = "none";
     leadChip.textContent = "אחמ״ש: —";
     updateStatus(null);
-    leadChip.style.display = "inline-flex";
-    leadChip.style.border = "2px solid red";
+    
+
+      leadChip.style.display = "inline-flex";
+    leadChip.style.border = "2px solid #8f4444";
+    leadChip.style.maxWidth = "100px";
+    leadChip.style.borderRadius = "14px";
+    leadChip.style.padding = "6px";
+    leadChip.style.backgroundColor = "##e5666630";
     return;
   }
 
@@ -105,8 +111,11 @@ loadForm.addEventListener("submit", async (e) => {
   }
   leadChip.innerHTML = `<span class="dot"></span>אחמ״ש: ${leadName || "—"}`;
   leadChip.style.display = "inline-flex";
-    leadChip.style.border = "2px solid green";
-
+    leadChip.style.border = "2px solid var(--card-border)";
+    leadChip.style.maxWidth = "100px";
+    leadChip.style.borderRadius = "14px";
+    leadChip.style.padding = "6px";
+    leadChip.style.backgroundColor = "#fdfdfd30";
   // סטטוס
   updateStatus(shift);
 
