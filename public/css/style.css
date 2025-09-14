@@ -90,7 +90,6 @@ h3 { font-size: 1.2rem; color: var(--ink-muted); }
   color: var(--ink); cursor: pointer;
   padding: 6px; display: flex; align-items: center; justify-content: center;
 }
-.icon-btn:hover { color: var(--btn-primary-hover); }
 .burger { font-size: 26px; cursor: pointer; }
 
 /* =========================
@@ -330,7 +329,7 @@ textarea { min-height: 100px; resize: vertical; }
 /* =========================
    BUTTONS
    ========================= */
-button, .btn {
+button:not(#notifToggle), .btn {
   background: var(--btn-primary);
   color: #0E0E0E;
   padding: 12px 20px;

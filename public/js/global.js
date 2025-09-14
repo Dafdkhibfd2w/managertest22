@@ -1,4 +1,3 @@
-// === Toast core ===
 (function(){
   const ROOT_ID = 'toast-root';
 
@@ -15,7 +14,7 @@
   function pickIcon(type){
     switch(type){
       case 'success': return '✅';
-      case 'info':    return '💡';
+      case 'info':    return 'ℹ️';
       case 'warn':    return '⚠️';
       case 'error':   return '⛔';
       default:        return '🔔';
@@ -66,7 +65,8 @@
     };
 
     toast.querySelector('.close').addEventListener('click', close);
-    // סגירה בלחיצה על הטוסט עצמו (לא חובה – אפשר להסיר)
+
+    // אפשר לסגור בלחיצה על כל הטוסט (לא חובה)
     toast.addEventListener('click', (e) => {
       if(e.target.classList.contains('close')) return;
       close();
@@ -74,12 +74,15 @@
 
     root.appendChild(toast);
 
-    const timer = setTimeout(close, duration);
-    // אם העכבר מעל – עצור טיימר; החזר כשמסירים
-    toast.addEventListener('mouseenter', () => clearTimeout(timer));
-    toast.addEventListener('mouseleave', () => setTimeout(close, 800));
+    let timer = setTimeout(close, duration);
 
-    return close; // מאפשר לסגור ידנית מבחוץ
+    // עצירה של הטיימר כשהעכבר מעל
+    toast.addEventListener('mouseenter', () => clearTimeout(timer));
+    toast.addEventListener('mouseleave', () => {
+      timer = setTimeout(close, 800);
+    });
+
+    return close; // מאפשר סגירה ידנית מבחוץ
   };
 })();
 
@@ -139,7 +142,7 @@ async function initPush() {
  showToast('📩 מבקש הרשאה...', { type:'info', duration:4000 });
     const permission = await Notification.requestPermission();
     if (permission !== "granted") {
-      statusEl.textContent = "❌ המשתמש סירב להתראות";
+      // statusEl.textContent = "❌ המשתמש סירב להתראות";
       return;
     }
 
@@ -181,22 +184,25 @@ document.addEventListener("DOMContentLoaded", () => {
     notifToggle.classList.add("enabled");
     lucide.createIcons();
   }
+})
 
-  notifToggle?.addEventListener("click", async () => {
-    try {
-      if (Notification.permission !== "granted") {
-        await initPush(); // הפונקציה שלך שמבצעת רישום ל-Push
-      }
-
-      if (Notification.permission === "granted") {
-        notifToggle.innerHTML = `<i data-lucide="bell"></i>`;
-        notifToggle.classList.add("enabled");
-        lucide.createIcons();
-      } else if (Notification.permission === "denied") {
-        alert("חסמת התראות. כדי לאפשר שוב, עדכן בהגדרות הדפדפן.");
-      }
-    } catch (err) {
-      console.error("שגיאה בהפעלת התראות:", err);
+notifToggle?.addEventListener("click", async () => {
+  try {
+    if (Notification.permission === "default") {
+      // עדיין לא ביקשנו -> initPush יפתח בקשה
+      await initPush();
+    } else if (Notification.permission === "denied") {
+      showToast("❌ חסמת התראות. כדי לאפשר שוב, עדכן בהגדרות הדפדפן.", {type:'error'});
+      return;
     }
-  });
+
+    if (Notification.permission === "granted") {
+      notifToggle.innerHTML = `<i data-lucide="bell"></i>`;
+      notifToggle.classList.add("enabled");
+      lucide.createIcons();
+    }
+  } catch (err) {
+    console.error("שגיאה בהפעלת התראות:", err);
+    showToast("❌ שגיאה בהפעלת התראות", {type:'error'});
+  }
 });
