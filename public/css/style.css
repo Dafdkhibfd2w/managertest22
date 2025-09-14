@@ -482,20 +482,23 @@ th, td {
    MODAL
    ========================= */
 .modal {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.6);
-  display: none; align-items: center; justify-content: center;
-  z-index: 2000;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
 }
 .modal.active { display: flex; }
 .modal-content {
-  background: var(--card);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius);
-  padding: 24px;
-  width: min(90vw, 600px);
-  box-shadow: var(--shadow-2);
-  animation: popIn .3s ease;
+  background: #1c1c1c;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;       /* חשוב! */
+  overflow-y: auto;       /* מאפשר גלילה פנימית */
 }
 @keyframes popIn {
   from { opacity: 0; transform: scale(.95); }
@@ -505,6 +508,7 @@ th, td {
 /* =========================
    HIGHLIGHT
    ========================= */
+
 .highlight,
 /* tr:hover td, */
 .card:hover{
@@ -515,7 +519,8 @@ th, td {
   transform: translateY(-2px);
   transition: all 0.25s ease;
   border-radius: 20px;
-  margin-top: 25px;
+margin: 30px auto;
+    max-width: 330px;
   padding: 20px;
 }
 .highlight-strong {
@@ -682,7 +687,6 @@ th, td {
 
 /* סידור בשורה */
 .task-tabs {
-  display: flex;
   justify-content: center;
   gap: 12px;
   margin: 12px 0 18px;
@@ -812,11 +816,47 @@ th, td {
     justify-content: flex-end;
   }
 }
+  #test{
+  max-width: 550px;        /* יותר רחב, יתאים לשאר */
+  margin: 30px auto;       /* ממורכז */
+  background: #1a1a1a;     /* צבע אחיד, לא צועק */
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  text-align: center;
 
+  }
 
 @media (max-width: 768px) {
   #test{
-        max-width: 75%;
+        max-width: 430px;
 
   }
+}#globalLoader {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  color: #00ffa3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  font-family: Heebo, sans-serif;
+  font-size: 1.2rem;
+}
+
+#globalLoader .spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(255,255,255,0.2);
+  border-top-color: #00ffa3;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 12px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

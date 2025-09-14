@@ -209,23 +209,30 @@ notifToggle?.addEventListener("click", async () => {
 });
 
 
-function showSkeleton() {
-  const shiftSection = document.getElementById("shiftSection");
-  shiftSection.style.display = "block";
-
-  const updateForm = document.getElementById("updateForm");
-  updateForm.innerHTML = `
-    <div class="skeleton skeleton-line" style="width: 70%;"></div>
-    <div class="skeleton skeleton-line" style="width: 90%;"></div>
-    <div class="skeleton skeleton-line" style="width: 60%;"></div>
-  `;
-
-  document.getElementById("runtimeNotesList").innerHTML = `
-    <li class="skeleton skeleton-line" style="width: 80%;"></li>
-    <li class="skeleton skeleton-line" style="width: 60%;"></li>
-  `;
-
-  document.getElementById("managerNote").innerHTML = `
-    <div class="skeleton skeleton-line" style="width: 50%;"></div>
-  `;
+function showLoader() {
+  document.getElementById("globalLoader").style.display = "flex";
+  document.getElementById("pageContent").style.display = "none";
 }
+
+function hideLoader() {
+  document.getElementById("globalLoader").style.display = "none";
+  document.getElementById("pageContent").style.display = "block";
+}
+
+// דוגמה: עטיפה סביב fetch
+async function fetchWithLoader(url, opts) {
+  try {
+    showLoader();
+    const res = await fetch(url, opts);
+    return await res.json();
+  } finally {
+    hideLoader();
+  }
+}
+
+// שימוש:
+document.addEventListener("DOMContentLoaded", async () => {
+  // נגיד כאן אתה קורא ל־DB
+  const data = await fetchWithLoader("/api/get-shifts");
+  console.log("Loaded:", data);
+});

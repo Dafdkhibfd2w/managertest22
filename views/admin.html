@@ -18,7 +18,15 @@
 
   
 </head>
+
 <body class="theme-dark-premium">
+<div id="globalLoader">
+  <div class="spinner"></div>
+  <p>טוען נתונים...</p>
+</div>
+
+<!-- התוכן שלך -->
+<div id="pageContent" style="display:none">
 <header class="brandbar">
   <span class="brand-title">NEW DELI</span>
   <div class="brandbar-right">
@@ -47,7 +55,7 @@
   <br>
   <br>
 
-  <div class="container">
+  <div class="container" style="max-width: 800px;">
     <h1 style="margin-top: 50px;">דף ניהול 👨‍💼</h1>
     <!-- <h1>דף מנהל – משמרות</h1> -->
 
@@ -68,6 +76,7 @@
       <h2>פרטי משמרת</h2>
 
       <form id="editForm">
+
         <label>תאריך (לקריאה):</label>
         <input type="text" id="editDate" readonly>
 
@@ -96,26 +105,7 @@
     </div>
   </div>
   <script>
-    function showSkeleton() {
-  const shiftSection = document.getElementById("shiftSection");
-  shiftSection.style.display = "block";
 
-  const updateForm = document.getElementById("updateForm");
-  updateForm.innerHTML = `
-    <div class="skeleton skeleton-line" style="width: 70%;"></div>
-    <div class="skeleton skeleton-line" style="width: 90%;"></div>
-    <div class="skeleton skeleton-line" style="width: 60%;"></div>
-  `;
-
-  document.getElementById("runtimeNotesList").innerHTML = `
-    <li class="skeleton skeleton-line" style="width: 80%;"></li>
-    <li class="skeleton skeleton-line" style="width: 60%;"></li>
-  `;
-
-  document.getElementById("managerNote").innerHTML = `
-    <div class="skeleton skeleton-line" style="width: 50%;"></div>
-  `;
-}
     let allShifts = [];
 
     const CATS = [
@@ -200,7 +190,6 @@
     }
 
     async function loadShifts(){
-        showSkeleton(); // קודם מציג שלד טעינה
 
       const res = await fetch('/get-all-shifts');
       allShifts = await res.json();
@@ -381,7 +370,7 @@
 
     window.onload = loadShifts;
   </script>
-  <div class="card" id="test" style="max-width: 45%; margin: auto;">
+  <div class="card" id="test">
   <h2>שליחת התראה</h2>
   <form id="notifForm">
     <input type="text" id="notifMessage" placeholder="כתוב הודעה להתראה..." required />
@@ -415,6 +404,6 @@
 
   <script src="/js/global.js"></script>
 <script src="/js/ui-enhance.js" defer></script>
-
+</div>
 </body>
 </html>

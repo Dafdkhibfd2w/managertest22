@@ -11,207 +11,7 @@
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#1e1e2f">
 
-  <style>
-    :root {
-      --bg: #1e1e2f;
-      --card: #2a2f45;
-      --border: rgba(255,255,255,0.08);
-      --ink: #eee;
-      --muted: #aaa;
-      --accent: #ffcb05;
-    }
 
-    body {
-      font-family: "Heebo", system-ui, Arial;
-      background: var(--bg);
-      color: var(--ink);
-      margin: 0;
-      padding: clamp(12px,2vw,24px);
-    }
-
-    .wrap {
-      max-width: 1080px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 16px;
-    }
-.ss {
-    width: 70%;
-}
-    h1 {
-      font-size: clamp(20px, 4vw, 28px);
-      margin-bottom: 16px;
-      color: var(--accent);
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    }
-
-.row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
-  align-items: end;
-}
-
-
-    .row label {
-      font-size: 14px;
-      color: var(--muted);
-      display: block;
-      margin-bottom: 6px;
-    }
-
-    input[type="date"], input[type="text"], input[type="number"], textarea, select {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: #252a3b;
-      color: var(--ink);
-    }
-
-    input:focus, textarea:focus, select:focus {
-      outline: none;
-      border-color: var(--accent);
-    }
-
-    textarea {
-      min-height: 42px;
-      resize: vertical;
-    }
-
-    button {
-      padding: 10px 14px;
-      border: 0;
-      border-radius: 10px;
-      cursor: pointer;
-      background: #3a3f58;
-      color: #fff;
-      transition: 0.2s;
-    }
-    button:hover { background: #4a4f6d; }
-    button.secondary { background: #33384d; color: #eee; }
-    button.danger { background: #b23a3a; }
-
-    .muted { color: var(--muted); font-size: 12px; }
-
-    .summary {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .chip {
-      background: #33384d;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 6px 10px;
-      font-size: 13px;
-      color: var(--ink);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
-    th, td {
-      padding: 10px;
-      border-bottom: 1px solid var(--border);
-      vertical-align: top;
-      text-align: right;
-    }
-    th { background: rgba(255,255,255,0.05); color: var(--ink); }
-    td { color: var(--ink); }
-    td .pill {
-      display: inline-block;
-      background: #3a3f58;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 4px 8px;
-      margin: 2px 4px 0 0;
-      font-size: 12px;
-    }
-
-    .pager {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      justify-content: flex-end;
-      margin-top: 8px;
-    }
-
-    .nowrap { white-space: nowrap; }
-
-    /* 📱 מובייל */
-    @media (max-width: 820px) {
-      .wrap, .card {
-        width: 100% !important;
-        max-width: 100% !important;
-        padding-left: 12px;
-        padding-right: 12px;
-        box-sizing: border-box;
-        overflow-x: hidden;
-      }
-
-      .row {
-        display: flex !important;
-        flex-direction: column;
-        gap: 12px;
-      }
-
-      .row > div,
-      .row input,
-      .row select,
-      .row textarea,
-      .row button {
-        width: 100% !important;
-        max-width: 100% !important;
-        box-sizing: border-box;
-      }
-
-/* ספציפית לשורה של הכפתורים */
-.row.buttons {
-  display: flex;
-  justify-content: flex-start; /* או flex-end אם אתה רוצה בצד ימין */
-  gap: 12px;
-}
-
-.row.buttons button {
-  width: auto;   /* שלא יתפרסו על כל הרוחב */
-  min-width: 120px;
-}
-      tbody tr {
-        background: #2a2f45;
-        border-radius: 12px;
-        margin-bottom: 14px;
-        padding: 12px;
-        box-shadow: 0 2px 8px rgba(0,0,0,.15);
-      }
-
-      td { padding: 6px 0; border: none; }
-      td:before {
-        content: attr(data-label);
-        font-weight: bold;
-        margin-left: 8px;
-        color: var(--muted);
-      }
-
-      .pager {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-      }
-    }
-  </style>
 
   
 
@@ -219,6 +19,13 @@
 <script defer src="/js/ui.js"></script>
 </head>
 <body>
+  <div id="globalLoader">
+  <div class="spinner"></div>
+  <p>טוען נתונים...</p>
+</div>
+
+<!-- התוכן שלך -->
+<div id="pageContent" style="display:none">
 <header class="brandbar">
   <span class="brand-title">NEW DELI</span>
   <div class="brandbar-right">
@@ -291,8 +98,8 @@
             <input type="text" name="q" placeholder="הקלד שם נהג" />
           </div>
           <div class="row buttons">
-            <button type="submit" class="secondary">סנן</button>
-            <button type="button" id="clearFilters" class="secondary">נקה</button>
+            <button type="submit" style="margin-top: 15px;" class="secondary">סנן</button>
+            <button type="button" id="clearFilters" style="margin-top: 9px;" class="secondary">נקה</button>
           </div>
         </div>
       </form>
@@ -431,10 +238,10 @@
 
       tbody.innerHTML = page.map(d => `
 <tr>
-  <td class="nowrap">${escapeHtml(d.shiftDate)}</td>
-  <td class="nowrap">${formatPrice(d.price)} ₪</td>
-  <td>${escapeHtml(d.taxi || 'לא הוזן')}</td>
-  <td>${escapeHtml(d.payer || 'לא הוזן')}</td>
+  <td data-label="תאריך" class="nowrap">${escapeHtml(d.shiftDate)}</td>
+  <td data-label="מחיר" class="nowrap">${formatPrice(d.price)} ₪</td>
+  <td data-label="מונית">${escapeHtml(d.taxi || 'לא הוזן')}</td>
+  <td data-label="שילם">${escapeHtml(d.payer || 'לא הוזן')}</td>
   <td class="nowrap">
     <button class="secondary ss" onclick="delDisp('${d._id}')">מחק</button>
   </td>
@@ -466,6 +273,6 @@
   </script>
   <script src="/js/global.js"></script>
 <script src="/js/ui-enhance.js" defer></script>
-
+</div>
 </body>
 </html>

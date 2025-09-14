@@ -15,6 +15,14 @@
   
   <script defer src="/js/ui.js"></script>
 </head>
+<body>
+  <div id="globalLoader">
+  <div class="spinner"></div>
+  <p>טוען נתונים...</p>
+</div>
+
+<!-- התוכן שלך -->
+<div id="pageContent" style="display:none">
 <header class="brandbar">
   <span class="brand-title">NEW DELI</span>
   <div class="brandbar-right">
@@ -115,7 +123,7 @@
         <h3 style="margin:0">ספקים</h3>
       </div>
       <div style="overflow:auto; margin-top:10px;">
-<table id="tbl" class="responsive-table">
+<table id="tbl" >
 <thead>
   <tr>
     <th>שם</th>
@@ -257,9 +265,9 @@ function renderTable(){
       <td data-label="טלפון">${escapeHtml(s.phone) || 'לא הוזן'}</td>
       <td data-label="ימים">${(s.days||[]).map(dayLabel).join(', ')}</td>
       <td data-label="מוצרים">${(s.items||[]).map(it => escapeHtml(it.name)).join(', ')}</td>
-      <td data-label="פעולות" class="actions">
+      <td class="actions">
         <button class="secondary" data-edit="${s._id}">ערוך</button>
-        <button class="danger" data-del="${s._id}">מחק</button>
+        <button class="danger" style="margin-right: 5px;" data-del="${s._id}">מחק</button>
       </td>
     </tr>
   `).join('');
@@ -308,6 +316,6 @@ function renderTable(){
   </script>
   <script src="/js/global.js"></script>
 <script src="/js/ui-enhance.js" defer></script>
-  
+  </div>
 </body>
 </html>
