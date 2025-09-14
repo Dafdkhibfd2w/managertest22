@@ -7,7 +7,6 @@
   <link rel="icon" href="/icons/icon-512.png" type="image/png">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <script src="https://unpkg.com/lucide@latest"></script>
-
   <title>מערכת ניהול משמרות • דף הבית</title>
   <link rel="stylesheet" href="/css/style.css" />
 <link rel="manifest" href="/manifest.json">
@@ -17,6 +16,91 @@
 <meta name="theme-color" content="#2b5329">
   <script defer src="/js/ui.js"></script>
 </head>
+<style>
+    body {
+      background: linear-gradient(135deg, #e8ffd1, #fffabe);
+font-family: 'Heebo', Arial, sans-serif;
+
+      margin: 0;
+      padding-top: 80px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: auto;
+      padding: 24px;
+      animation: fadeIn 0.8s ease-in-out;
+    }
+
+    h1.app-title {
+      font-size: 2.4rem;
+      color: #2b5329;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: #496c47;
+      font-size: 1.2rem;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .nav-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .nav-card {
+      background: white;
+      border: 2px solid #d4f4c2;
+      border-left: 10px solid #ffcb05;
+      border-radius: 18px;
+      padding: 24px;
+      text-decoration: none;
+      color: #1f2e1e;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .nav-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .nav-icon {
+      font-size: 30px;
+      margin-left: 10px;
+    }
+
+    .nav-title {
+      font-weight: 800;
+      font-size: 1.2rem;
+      margin: 6px 0 10px;
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-desc {
+      font-size: 0.95rem;
+      color: #586e57;
+      line-height: 1.6;
+    }
+
+    .footer-tip {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #6b7d69;
+    }
+
+    /* אנימציה */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+</style>
 <body class="theme-dark-premium">
 
 <header class="brandbar">
