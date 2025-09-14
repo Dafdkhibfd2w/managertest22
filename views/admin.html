@@ -96,7 +96,7 @@
     </div>
   </div>
   <script>
-    function showSkeletonInShift() {
+    function showSkeleton() {
   const shiftSection = document.getElementById("shiftSection");
   shiftSection.style.display = "block";
 
@@ -200,7 +200,7 @@
     }
 
     async function loadShifts(){
-        showSkeletonInShift(); // קודם מציג שלד טעינה
+        showSkeleton(); // קודם מציג שלד טעינה
 
       const res = await fetch('/get-all-shifts');
       allShifts = await res.json();

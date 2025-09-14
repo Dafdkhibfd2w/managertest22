@@ -209,7 +209,7 @@ notifToggle?.addEventListener("click", async () => {
 });
 
 
-function showSkeletonInShift() {
+function showSkeleton() {
   const shiftSection = document.getElementById("shiftSection");
   shiftSection.style.display = "block";
 

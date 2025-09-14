@@ -20,7 +20,7 @@ const categories = [
   { name: "משימות שבועיות", key: "weekly" },
   { name: "משימות חודשיות", key: "monthly" }
 ];
-function showSkeletonInShift() {
+function showSkeleton() {
   const shiftSection = document.getElementById("shiftSection");
   shiftSection.style.display = "block";
 
