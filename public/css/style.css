@@ -383,8 +383,7 @@ th, td {
    ========================= */
 .highlight,
 /* tr:hover td, */
-.card:hover,
-.task-item:hover {
+.card:hover{
   background: rgba(0, 255, 163, 0.1);
   border-color: var(--btn-primary);
   box-shadow: 0 0 12px rgba(0, 255, 163, 0.4),
