@@ -11,125 +11,18 @@
   <link rel="icon" href="/icons/icon-512.png" type="image/png">
 <script src="https://unpkg.com/lucide@latest"></script>
 
- <style>
-    body {
-      font-family: "Heebo", "Segoe UI", Arial, sans-serif;
-      background: #1e1e2f;
-      color: #eee;
-      margin: 0;
-      padding-top: 80px;
-    }
 
-    h1 {
-      font-size: 1.6rem;
-      margin-bottom: 16px;
-      color: #ffcb05;
-    }
-
-    .wrap {
-      max-width: 1080px;
-      margin: 0 auto;
-      padding: 0 16px;
-    }
-
-    .card {
-      background: #2a2f45;
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-      animation: fadeIn .4s ease;
-    }
-
-    label {
-      font-size: 0.9rem;
-      color: #ccc;
-      display: block;
-      margin-bottom: 6px;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 10px;
-      background: #252a3b;
-      color: #eee;
-    }
-    input:focus, select:focus {
-      outline: none;
-      border-color: #ffcb05;
-    }
-
-    .task-tab {
-      display: inline-block;
-      margin: 4px 8px 4px 0;
-      background: #33384d;
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 8px;
-      padding: 6px 10px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .task-tab input { margin-left: 6px; }
-    .task-tab:hover { background: #3b4059; }
-
-    button {
-      padding: 10px 14px;
-      border: 0;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: 0.25s;
-      font-weight: 500;
-    }
-    button.save { background: #3a3f58; color: #fff; }
-    button.save:hover { background: #4a4f6d; }
-    button.secondary { background: #2d3147; color: #eee; }
-    button.secondary:hover { background: #3b4059; }
-    button.danger { background: #d9534f; color: #fff; }
-    button.danger:hover { background: #e66864; }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.95rem;
-      margin-top: 12px;
-    }
-    th, td {
-      padding: 10px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-    th {
-      background: #2f3449;
-      color: #ffcb05;
-      text-align: right;
-    }
-    td {
-      color: #ddd;
-    }
-
-    .muted {
-      color: #aaa;
-      font-size: 0.85rem;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  </style>
   
   <script defer src="/js/ui.js"></script>
 </head>
 <header class="brandbar">
-  <div class="brandbar-left">
-    <span class="burger" id="burger">&#9776;</span>
-        <button id="notifToggle" class="icon-btn">
+  <span class="brand-title">NEW DELI</span>
+  <div class="brandbar-right">
+    <button id="notifToggle" class="icon-btn">
       <i data-lucide="bell-off"></i>
     </button>
+    <span class="burger" id="burger">&#9776;</span>
   </div>
-  <span class="brand-title">NEW DELI</span>
 </header>
 
 
@@ -174,13 +67,29 @@
 
     <div class="section">
       <label>ימי פעילות</label>
-      <div class="task-tabs">
-        <label class="task-tab"><input type="checkbox" class="day" value="0"> א'</label>
-        <label class="task-tab"><input type="checkbox" class="day" value="1"> ב'</label>
-        <label class="task-tab"><input type="checkbox" class="day" value="2"> ג'</label>
-        <label class="task-tab"><input type="checkbox" class="day" value="3"> ד'</label>
-        <label class="task-tab"><input type="checkbox" class="day" value="4"> ה'</label>
-      </div>
+<div class="task-tabs">
+  <label class="check-label" style="padding:10px; border-radius: 20px; background: rgba(0, 255, 163, 0.08);">
+    <input type="checkbox" class="day styled-checkbox" value="0">
+    <span class="day-text">א'</span>
+  </label>
+  <label class="check-label" style="padding:10px; border-radius: 20px; background: rgba(0, 255, 163, 0.08);">
+    <input type="checkbox" class="day styled-checkbox" value="1">
+    <span class="day-text">ב'</span>
+  </label>
+  <label class="check-label" style="padding:10px; border-radius: 20px; background: rgba(0, 255, 163, 0.08);">
+    <input type="checkbox" class="day styled-checkbox" value="2">
+    <span class="day-text">ג'</span>
+  </label>
+  <label class="check-label" style="padding:10px; border-radius: 20px; background: rgba(0, 255, 163, 0.08);">
+    <input type="checkbox" class="day styled-checkbox" value="3">
+    <span class="day-text">ד'</span>
+  </label>
+  <label class="check-label" style="padding:10px; border-radius: 20px; background: rgba(0, 255, 163, 0.08);">
+    <input type="checkbox" class="day styled-checkbox" value="4">
+    <span class="day-text">ה'</span>
+  </label>
+</div>
+
     </div>
 
     <div class="section">
@@ -193,7 +102,7 @@
 
     <div class="modal-actions" style="margin-top: 20px;">
       <button type="submit" class="btn save">שמור</button>
-      <button type="button" id="resetForm" class="btn cancel">נקה טופס</button>
+      <button type="button" id="resetForm" class="btn cancel" style="margin-top: 10px;">נקה טופס</button>
     </div>
     <p class="muted" id="msg"></p>
   </form>
@@ -210,6 +119,7 @@
 <thead>
   <tr>
     <th>שם</th>
+    <th>טלפון</th>
     <th>ימים</th>
     <th>מוצרים</th>
     <th style="width:160px">פעולות</th>
@@ -257,7 +167,7 @@ function addItemRow(name = '', unit = '') {
   row.innerHTML = `
     <input type="text" placeholder="שם מוצר" value="${escapeAttr(name)}">
     <input type="text" placeholder="יחידה (למשל: קרטון)" value="${escapeAttr(unit)}">
-    <button type="button" class="secondary">מחק</button>
+    <button style="margin-top: 10px;" type="button" class="secondary">מחק</button>
   `;
 
   const delBtn = row.querySelector('button');
@@ -344,7 +254,7 @@ function renderTable(){
   tblBody.innerHTML = currentList.map(s => `
     <tr>
       <td data-label="שם">${escapeHtml(s.name)}</td>
-      <td data-label="מס טלפון">${escapeHtml(s.phone) || 'לא הוזן'}</td>
+      <td data-label="טלפון">${escapeHtml(s.phone) || 'לא הוזן'}</td>
       <td data-label="ימים">${(s.days||[]).map(dayLabel).join(', ')}</td>
       <td data-label="מוצרים">${(s.items||[]).map(it => escapeHtml(it.name)).join(', ')}</td>
       <td data-label="פעולות" class="actions">

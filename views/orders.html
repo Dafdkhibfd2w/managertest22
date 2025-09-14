@@ -11,39 +11,19 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 
   <link rel="stylesheet" href="/css/style.css?v=2" />
-  <style>
-    :root { --green:#2b5329; --bg:#fbfff6; --border:#e2eadc; --ink:#0a0a0a; }
-    body { font-family: system-ui, Arial; background: var(--bg); color: var(--ink); padding: clamp(12px,2vw,24px); }
-    .wrap { max-width: 1080px; margin: 0 auto; }
-    h1 { color: var(--green); margin-bottom: 12px; }
-    .card { background:#33333300; border:1px solid var(--border); border-radius:14px; padding:16px; box-shadow:0 2px 10px rgba(0,0,0,.05); margin-bottom:16px; }
-    .row { display:grid; grid-template-columns: 1fr 1fr auto; gap:12px; align-items:end; }
-    label { font-size:14px; display:block; margin-bottom:6px; }
-    input, textarea { width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; }
-    textarea { min-height: 46px; }
-    button { padding:10px 14px; border:0; border-radius:10px; background:var(--green); color:#fff; cursor:pointer; }
-    .supplier { border:1px dashed var(--border); border-radius:12px; padding:12px; margin-bottom:12px; }
-    .supplier h3 { margin:0 0 10px; color:white; font-size:16px; }
-    table { width:100%; border-collapse: collapse; }
-    th, td { border-bottom:1px solid var(--border); padding:8px; text-align:right; }
-    th { background:var(--primary); }
-    .qty { width:90px; text-align:center; }
-    .unit { color:#666; font-size:12px; white-space:nowrap; }
-    .muted { color:#666; font-size:12px; }
-    @media (max-width: 820px){ .row { grid-template-columns: 1fr; } }
-  </style>
+
   
   <script defer src="/js/ui.js"></script>
   
 </head>
 <header class="brandbar">
-  <div class="brandbar-left">
-    <span class="burger" id="burger">&#9776;</span>
-        <button id="notifToggle" class="icon-btn">
+  <span class="brand-title">NEW DELI</span>
+  <div class="brandbar-right">
+    <button id="notifToggle" class="icon-btn">
       <i data-lucide="bell-off"></i>
     </button>
+    <span class="burger" id="burger">&#9776;</span>
   </div>
-  <span class="brand-title">NEW DELI</span>
 </header>
 
 

@@ -14,211 +14,20 @@
   <link rel="icon" href="/icons/icon-512.png" type="image/png">
 <script src="https://unpkg.com/lucide@latest"></script>
 
-  <style>
-    :root {
-      --green: #2b5329; --amber: #ffcb05; --bg: #fbfff6; --border:#e2eadc; --ink:#0a0a0a;
-    }
-/* מניעת גלילה אופקית */
-html, body {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
-}
-h1 {
-  color: #ffffff;
-}
-.file-upload {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-@media (max-width: 720px) {
-  .row {
-    display: flex !important;
-    flex-direction: column;
-    gap: 12px;
-  }
 
-  .row > div,
-  .row button {
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-
-  .row.buttons {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .row.buttons button {
-    flex: 1;
-  }
-}
-
-.file-upload button {
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: none;
-  background: var(--green);
-  color: #fff;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.file-upload span {
-  font-size: 0.9rem;
-  color: #ccc;
-  word-break: break-word;
-  max-width: 200px;
-}
-
-/* ווידוא שכל האלמנטים מתכנסים למסך */
-.wrap, .card, form, .row, table, input, select, button {
-  max-width: 100% !important;
-  box-sizing: border-box;
-}
-
-/* הקובץ input[type=file] – שלא יחרוג */
-input[type="file"] {
-  white-space: normal;
-  text-overflow: ellipsis;
-  overflow: hidden;
-}
-
-/* כפתורי סינון – מסתדרים יפה במובייל */
-@media (max-width: 720px) {
-  .row {
-    grid-template-columns: 1fr !important;
-    gap: 10px;
-  }
-
-  .row > div {
-    width: 100%;
-  }
-
-  button, input, select {
-    width: 100% !important;
-  }
-}
-
-    .row {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr auto;
-      gap: 12px;
-      align-items: end;
-    }
-
-    .row label { font-size: 14px; color:#333; display:block; margin-bottom: 6px; }
-    input[type="date"], input[type="text"], input[type="file"], select {
-      width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background:#fff;
-    }
-    button { padding: 10px 14px; border: 0; border-radius: 10px; cursor: pointer; background: var(--green); color: #fff; }
-    button.secondary { background: #eee; color: #222; }
-    table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    th, td { padding: 10px; border-bottom: 1px solid var(--border); }
-    th { background: #f5f9f1; text-align: right; }
-    .muted { color: #666; font-size: 12px; }
-    .actions { display:flex; gap:8px; }
-    .pager { display:flex; gap:8px; align-items:center; justify-content: flex-end; margin-top: 8px; }
-
-    /* 📱 מובייל */
-    @media (max-width: 720px) {
-      html, body {
-        width: 100%;
-        overflow-x: hidden;
-      }
-
-      .wrap {
-        padding: 0 10px;
-      }
-
-      .card {
-        margin: 10px 0;
-        padding: 14px;
-      }
-
-      .row {
-        grid-template-columns: 1fr !important;
-      }
-
-      .row > div {
-        width: 100%;
-      }
-
-      input, select, textarea, button {
-        width: 100% !important;
-        max-width: 100% !important;
-        box-sizing: border-box;
-      }
-
-      /* כפתורי סינון */
-      .row.buttons {
-        display: flex;
-        flex-direction: row;
-        gap: 10px;
-        flex-wrap: wrap;
-      }
-
-      .row.buttons button {
-        flex: 1;
-        font-size: 1rem;
-      }
-
-      /* טבלה רספונסיבית */
-      table,
-      thead,
-      tbody,
-      th,
-      td,
-      tr {
-        display: block;
-        width: 100%;
-      }
-
-      thead {
-        display: none;
-      }
-
-      tbody tr {
-        background: #2a2e38;
-        border-radius: 12px;
-        margin-bottom: 14px;
-        padding: 12px;
-        box-shadow: 0 2px 8px rgba(0,0,0,.15);
-      }
-
-      td {
-        padding: 6px 0;
-      }
-
-      .actions {
-        justify-content: flex-start;
-        gap: 10px;
-      }
-
-      .pager {
-        flex-direction: column;
-        gap: 8px;
-        justify-content: center;
-        align-items: stretch;
-      }
-    }
-  </style>
 
   
   <script defer src="/js/ui.js"></script>
 </head>
 <body class="theme-dark-premium">
 <header class="brandbar">
-  <div class="brandbar-left">
-    <span class="burger" id="burger">&#9776;</span>
-        <button id="notifToggle" class="icon-btn">
+  <span class="brand-title">NEW DELI</span>
+  <div class="brandbar-right">
+    <button id="notifToggle" class="icon-btn">
       <i data-lucide="bell-off"></i>
     </button>
+    <span class="burger" id="burger">&#9776;</span>
   </div>
-  <span class="brand-title">NEW DELI</span>
 </header>
 
 
@@ -258,7 +67,7 @@ input[type="file"] {
   <button type="button" id="fileBtn">בחר קובץ</button>
   <span id="fileName">לא נבחר קובץ</span>
 </div>
-          <div>
+          <div style="margin-top: 20px;">
             <button type="submit">העלה חשבונית</button>
           </div>
         </div>

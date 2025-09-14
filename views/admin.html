@@ -13,108 +13,20 @@
   <link rel="icon" href="/icons/icon-512.png" type="image/png">
 <script src="https://unpkg.com/lucide@latest"></script>
 
-<style>
-  :root{
-    --green:#2b5329; --green-50:#eef7ea; --green-100:#dff0d7;
-    --amber:#e6b800; --red:#c73d3d; --bg:#fbfff6; --border:#dfe8d9;
-    --text:#0a0a0a;
-  }
 
-  /* מודאל */
-  .modal{
-    position:fixed; inset:0; display:none; align-items:center; justify-content:center;
-    background:rgba(0,0,0,.28); padding:16px;
-  }
-  .modal-content{
-    background: #1f2b38; width:min(96vw,980px); max-height:90dvh; overflow:auto;
-    border-radius:18px; padding:18px; box-shadow:0 12px 40px rgba(0,0,0,.22);
-  }
-  .modal-actions{ display:flex; gap:10px; margin-top:10px }
-  .modal-actions .save,.modal-actions .cancel{
-    background:var(--green); color:#fff; border:0; padding:10px 14px;
-    border-radius:12px; cursor:pointer;
-  }
-  .modal-actions .cancel{ background:#b89f00 }
-
-  /* טופס בפרטי משמרת */
-  #editForm{
-    display:grid; grid-template-columns:1fr 1fr; gap:16px;
-  }
-  #editForm > label,#editForm > textarea{ grid-column:1 / -1 }
-  #editForm > input[readonly]{ background:rgb(255 255 255 / 3%); }
-
-  /* כל שדות הטופס – לא לגלוש */
-  #editForm input, #editForm select, #editForm textarea{
-    width:100%; max-width:100%; min-width:0; box-sizing:border-box;
-    padding:10px 14px; font-size:15px;
-    border:1px solid var(--border,#ccc); border-radius:10px;
-  }
-
-  /* גריד של שורות המשימות */
-  #editRows{
-    display:grid; grid-template-columns:1fr 1fr; gap:14px; grid-column:1 / -1;
-  }
-  /* תיקון טייפו שהיה: grid-template-coFlumns -> grid-template-columns */
-  @media (max-width:820px){
-    #editForm{ grid-template-columns:1fr; }
-    #editRows{ grid-template-columns:1fr; }
-  }
-
-  /* כרטיס משימה */
-  .task-card{
-    background:linear-gradient(180deg, var(--card), var(--surface)); border:1px solid var(--border); border-radius:14px;
-    padding:12px; display:flex; gap:10px; align-items:center; justify-content:space-between;
-    flex-wrap:wrap; min-width:0;
-  }
-
-  .task-card .state{
-    width:30px; height:30px; display:grid; place-items:center;
-    border-radius:8px; border:1px solid var(--border);
-  }
-  .task-card.ok .state{ background:#e6f7e0 }
-  /* .task-card.missing .state{ background:#ffe7e7; color:var(--red); border-color:#f1b7b7 } */
-
-  .task-card .name{
-    font-weight:700; color:white; word-break:break-word;
-    flex:1 1 100%; text-align:right; display:flex; flex-direction:column; gap:.5rem; padding: .25rem 0;
-    min-width:0;
-  }
-  .task-card select{
-    flex:1 1 260px; max-width:100%; min-width:0;
-  }
-
-  /* במסכים צרים—הכרטיסים נערמים אנכית כדי למנוע גלישה */
-  @media (max-width:560px){
-    .task-card{ flex-direction:column; align-items:stretch; }
-    .task-card .name{ flex-basis:auto; }
-    .task-card select{ width:100%; }
-  }
-
-  .cat-title{ grid-column:1 / -1; margin:4px 0 0; color:var(--green) }
-
-  textarea{
-    width:100%; padding:10px 14px; font-size:15px;
-    border:1px solid var(--border,#ccc); border-radius:10px;
-    resize:vertical; min-height:80px; box-sizing:border-box;
-  }
-
-  /* כל מיכל כללי בעמוד – ריווח פנימי כדי שלא "ייזלוג" לשוליים בנייד */
-  .container{ padding-inline:12px; }
-</style>
-  
   <script defer src="/js/ui.js"></script>
 
   
 </head>
 <body class="theme-dark-premium">
 <header class="brandbar">
-  <div class="brandbar-left">
-    <span class="burger" id="burger">&#9776;</span>
-        <button id="notifToggle" class="icon-btn">
+  <span class="brand-title">NEW DELI</span>
+  <div class="brandbar-right">
+    <button id="notifToggle" class="icon-btn">
       <i data-lucide="bell-off"></i>
     </button>
+    <span class="burger" id="burger">&#9776;</span>
   </div>
-  <span class="brand-title">NEW DELI</span>
 </header>
 
 
@@ -136,16 +48,15 @@
   <br>
 
   <div class="container">
-    <h1 style="margin-top: 50px;">דף ניהול 🚕</h1>
+    <h1 style="margin-top: 50px;">דף ניהול 👨‍💼</h1>
     <!-- <h1>דף מנהל – משמרות</h1> -->
 
     <div class="admin-controls">
       <input type="date" id="filterDate" />
       <input type="text" id="searchName" placeholder="חפש לפי שם עובד" />
-      <button type="button" onclick="filterShifts()">סנן תאריך</button>
-      <button type="button" onclick="searchByName()">חפש עובד</button>
-      <button type="button" onclick="resetFilters()">נקה סינון</button>
-      <button id="go-back" class="btn btn--primary">חזור אחורה</button>
+      <button type="button" id="admin-control" onclick="filterShifts()">סנן תאריך</button>
+      <button type="button" id="admin-control" onclick="searchByName()">חפש עובד</button>
+      <button type="button" id="admin-control" onclick="resetFilters()">נקה סינון</button>
     </div>
 
     <div id="shiftsContainer"></div>
@@ -177,8 +88,8 @@
         <div id="editRows" class="modal-grid"></div>
 
         <div class="modal-actions" style="margin-top:10px">
-          <button type="button" class="save" onclick="saveEdit()">שמור</button>
-          <button type="button" class="cancel" onclick="closeEdit()">סגור</button>
+          <button type="button" id="admin-control" class="save" onclick="saveEdit()">שמור</button>
+          <button type="button" id="admin-control" class="cancel" onclick="closeEdit()">סגור</button>
         </div>
         <p id="editStatus" class="edit-status"></p>
       </form>

@@ -34,8 +34,10 @@ function renderCheckboxes(listId, tasks) {
     .map(
       (t) => `
       <div class="task-item">
+        <label class="check-label">
         <input type="checkbox" name="${listId}" value="${t}">
         <span class="task-text">${t}</span>
+        </label>
       </div>
     `
     )

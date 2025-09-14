@@ -3,183 +3,199 @@
 <head>
 <meta charset="UTF-8" />
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" href="/icons/icon-512.png" type="image/png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" href="/icons/icon-512.png" type="image/png">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <script src="https://unpkg.com/lucide@latest"></script>
-  <title>מערכת ניהול משמרות • דף הבית</title>
-  <link rel="stylesheet" href="/css/style.css" />
+<title>מערכת ניהול משמרות • דף הבית</title>
+<link rel="stylesheet" href="/css/style.css" />
 <link rel="manifest" href="/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="ניהול משמרות">
-<meta name="theme-color" content="#2b5329">
-  <script defer src="/js/ui.js"></script>
+<script defer src="/js/ui.js"></script>
 </head>
 <style>
-    body {
-      background: linear-gradient(135deg, #e8ffd1, #fffabe);
-font-family: 'Heebo', Arial, sans-serif;
+  /* 🎨 פלטת מונוכרום-ניאון */
+  :root {
+    --bg: #0E0E0E;         /* רקע כללי */
+    --bg-alt: #1C1C1C;     /* רקע משני */
+    --ink: #FFFFFF;        /* טקסט ראשי */
+    --ink-muted: #B8B8B8;  /* טקסט משני */
+    --card: #1C1C1C;       /* רקע כרטיסים */
+    --card-border: #2A2A2A;
+    --btn-primary: #00FFA3;       /* כפתור ראשי - ירוק ניאון */
+    --btn-primary-hover: #00C2FF; /* מעבר לכחול */
+    --btn-secondary: #FFDD00;     /* כפתור משני - זהב */
+    --success: #00FFA3;
+    --error: #FF3B3B;
+    --warning: #FFD600;
+  }
 
-      margin: 0;
-      padding-top: 80px;
-    }
+  body {
+    background: var(--bg);
+    font-family: 'Heebo', Arial, sans-serif;
+    margin: 0;
+    padding-top: 80px;
+    color: var(--ink);
+  }
+.icon-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 8px;
+}
+.icon-btn svg {
+  stroke: currentColor;
+  width: 24px;
+  height: 24px;
+}
 
-    .container {
-      max-width: 960px;
-      margin: auto;
-      padding: 24px;
-      animation: fadeIn 0.8s ease-in-out;
-    }
+  .container {
+    max-width: 960px;
+    margin: auto;
+    padding: 24px;
+    animation: fadeIn 0.8s ease-in-out;
+  }
 
-    h1.app-title {
-      font-size: 2.4rem;
-      color: #2b5329;
-      text-align: center;
-      margin-bottom: 8px;
-    }
+  h1.app-title {
+    font-size: 2.4rem;
+    color: var(--btn-primary);
+    text-align: center;
+    margin-bottom: 8px;
+  }
 
-    .subtitle {
-      color: #496c47;
-      font-size: 1.2rem;
-      text-align: center;
-      margin-bottom: 40px;
-    }
+  .subtitle {
+    color: var(--ink-muted);
+    font-size: 1.2rem;
+    text-align: center;
+    margin-bottom: 40px;
+  }
 
-    .nav-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-    }
+  .nav-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
 
-    .nav-card {
-      background: white;
-      border: 2px solid #d4f4c2;
-      border-left: 10px solid #ffcb05;
-      border-radius: 18px;
-      padding: 24px;
-      text-decoration: none;
-      color: #1f2e1e;
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
+  .nav-card {
+    background: var(--card);
+    border: 2px solid var(--card-border);
+    border-left: 10px solid var(--btn-primary);
+    border-radius: 18px;
+    padding: 24px;
+    text-decoration: none;
+    color: var(--ink);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.6);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-left-color 0.3s;
+  }
 
-    .nav-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
-    }
+  .nav-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.8);
+    border-left-color: var(--btn-primary-hover);
+  }
 
-    .nav-icon {
-      font-size: 30px;
-      margin-left: 10px;
-    }
+  .nav-icon {
+    font-size: 30px;
+    margin-left: 10px;
+  }
 
-    .nav-title {
-      font-weight: 800;
-      font-size: 1.2rem;
-      margin: 6px 0 10px;
-      display: flex;
-      align-items: center;
-    }
+  .nav-title {
+    font-weight: 800;
+    font-size: 1.2rem;
+    margin: 6px 0 10px;
+    display: flex;
+    align-items: center;
+  }
 
-    .nav-desc {
-      font-size: 0.95rem;
-      color: #586e57;
-      line-height: 1.6;
-    }
+  .nav-desc {
+    font-size: 0.95rem;
+    color: var(--ink-muted);
+    line-height: 1.6;
+  }
 
-    .footer-tip {
-      margin-top: 40px;
-      text-align: center;
-      font-size: 0.9rem;
-      color: #6b7d69;
-    }
+  .footer-tip {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--btn-secondary);
+  }
 
-    /* אנימציה */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+  /* אנימציה */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
 </style>
 <body class="theme-dark-premium">
 
 <header class="brandbar">
-  <div class="brandbar-left">
-    <span class="burger" id="burger">&#9776;</span>
-        <button style=":hover{background-color: none;}" id="notifToggle" class="icon-btn">
+  <span class="brand-title">NEW DELI</span>
+  <div class="brandbar-right">
+    <button id="notifToggle" class="icon-btn">
       <i data-lucide="bell-off"></i>
     </button>
+    <span class="burger" id="burger">&#9776;</span>
   </div>
-  <span class="brand-title">NEW DELI</span>
 </header>
 
+<div class="container">
+  <h1 class="app-title">ברוכים הבאים למערכת ניהול משמרות</h1>
+  <p class="subtitle">בחרו פעולה כדי להתחיל 👇</p>
 
+  <div class="nav-grid">
+    <a href="/create" class="nav-card">
+      <div class="nav-title"><span class="nav-icon">🗓️</span> יצירת משמרת</div>
+      <div class="nav-desc">בחרו תאריך, צוות, משימות יומיות/שבועיות/חודשיות – ושמרו הכל בלחיצה אחת.</div>
+    </a>
 
-<nav class="mobile-nav" id="mobileNav">
-  <button id="closeNav" class="close-btn">✖</button>
-  <ul>
-    <li><a href="/"><span class="icon">🏠</span> דף הבית</a></li>
-    <li><a href="/create"><span class="icon">🗓️</span> יצירת משמרת</a></li>
-    <li><a href="/manage"><span class="icon">✅</span> ניהול משמרת</a></li>
-    <li><a href="/admin-login"><span class="icon">📚</span> ארכיון / דשבורד מנהל</a></li>
-    <li><a href="/invoices-page"><span class="icon">🧾</span> חשבוניות</a></li>
-    <li><a href="/suppliers-page"><span class="icon">🏷️</span> ספקים</a></li>
-    <li><a href="/task"><span class="icon">⚒</span> משימות</a></li>
-    <li><a href="/orders-page"><span class="icon">📦</span> הזמנות</a></li>
-    <li><a href="/dispersals-page"><span class="icon">🚕</span> פיזורים</a></li>
-  </ul>
-</nav>
+    <a href="/manage" class="nav-card">
+      <div class="nav-title"><span class="nav-icon">✅</span> ניהול משמרת</div>
+      <div class="nav-desc">סמנו מי ביצע מה ומתי, עם ממשק מעודכן ונוח לאחמ״שים.</div>
+    </a>
 
-  <div class="container">
-    <h1 class="app-title">ברוכים הבאים למערכת ניהול משמרות</h1>
-    <p class="subtitle">בחרו פעולה כדי להתחיל 👇</p>
-<p id="notifStatus"></p>
-    <div class="nav-grid">
-      <a href="/create" class="nav-card">
-        <div class="nav-title"><span class="nav-icon">🗓️</span> יצירת משמרת</div>
-        <div class="nav-desc">בחרו תאריך, צוות, משימות יומיות/שבועיות/חודשיות – ושמרו הכל בלחיצה אחת.</div>
-      </a>
+    <a href="/admin-login" class="nav-card">
+      <div class="nav-title"><span class="nav-icon">📚</span> ארכיון / דשבורד מנהל</div>
+      <div class="nav-desc">צפו בכל המשמרות, סננו לפי שם או תאריך, ערכו ושמרו.</div>
+    </a>
 
-      <a href="/manage" class="nav-card">
-        <div class="nav-title"><span class="nav-icon">✅</span> ניהול משמרת</div>
-        <div class="nav-desc">סמנו מי ביצע מה ומתי, עם ממשק מעודכן ונוח לאחמ״שים.</div>
-      </a>
+    <a href="/task" class="nav-card">
+      <div class="nav-title"><span class="nav-icon">⚒</span> ניהול משימות</div>
+      <div class="nav-desc">הוסיפו, ערכו ומחקו משימות יומיות, שבועיות וחודשיות בקלות.</div>
+    </a>
 
-      <a href="/admin-login" class="nav-card">
-        <div class="nav-title"><span class="nav-icon">📚</span> ארכיון / דשבורד מנהל</div>
-        <div class="nav-desc">צפו בכל המשמרות, סננו לפי שם או תאריך, ערכו ושמרו.</div>
-      </a>
+    <a href="/invoices-page" class="nav-card">
+      <div class="nav-title"><span class="nav-icon">🧾</span> חשבוניות</div>
+      <div class="nav-desc">העלו ושמרו חשבוניות, סננו לפי ספק ותאריך, וצפו בפרטים בקלות.</div>
+    </a>
 
-<a href="/task" class="nav-card">
-  <div class="nav-title"><span class="nav-icon">⚒</span> ניהול משימות</div>
-  <div class="nav-desc">הוסיפו, ערכו ומחקו משימות יומיות, שבועיות וחודשיות בקלות.</div>
-</a>
+    <a href="/suppliers-page" class="nav-card">
+      <div class="nav-title"><span class="nav-icon">🏷️</span> ספקים</div>
+      <div class="nav-desc">הוספה/עריכה של ספקים, ימי פעילות ומוצרים — הכל ללא קוד.</div>
+    </a>
 
+    <a href="/orders-page" class="nav-card">
+      <div class="nav-title"><span class="nav-icon">📦</span> הזמנות</div>
+      <div class="nav-desc">מלאו הזמנות יומיות לפי ספקים ומוצרים, ושמרו למעקב נוח.</div>
+    </a>
 
-<a href="/invoices-page" class="nav-card">
-  <div class="nav-title"><span class="nav-icon">🧾</span> חשבוניות</div>
-  <div class="nav-desc">העלו ושמרו חשבוניות, סננו לפי ספק ותאריך, וצפו בפרטים בקלות.</div>
-</a>
-<a href="/suppliers-page" class="nav-card">
-  <div class="nav-title"><span class="nav-icon">🏷️</span> ספקים</div>
-  <div class="nav-desc">הוספה/עריכה של ספקים, ימי פעילות ומוצרים — הכל ללא קוד.</div>
-</a>
-<a href="/orders-page" class="nav-card">
-  <div class="nav-title"><span class="nav-icon">📦</span> הזמנות</div>
-  <div class="nav-desc">מלאו הזמנות יומיות לפי ספקים ומוצרים, ושמרו למעקב נוח.</div>
-</a>
-
-      <a href="/dispersals-page" class="nav-card">
-  <div class="nav-title"><span class="nav-icon">🚕</span> פיזורים</div>
-  <div class="nav-desc">תעדו נסיעות מונית אחרי משמרת, כולל מחיר, נוסעים ומי שילם.</div>
-</a>
-
-    </div>
-
-    <p class="footer-tip" style="font-size: x-large; font-weight: bold;">💡 שמרו את האתר במסך הבית כדי להשתמש בו כאפליקציה!</p>
+    <a href="/dispersals-page" class="nav-card">
+      <div class="nav-title"><span class="nav-icon">🚕</span> פיזורים</div>
+      <div class="nav-desc">תעדו נסיעות מונית אחרי משמרת, כולל מחיר, נוסעים ומי שילם.</div>
+    </a>
   </div>
-  <script src="/js/global.js"></script>
-<script src="/js/ui-enhance.js" defer></script>
 
+  <p class="footer-tip">💡 שמרו את האתר במסך הבית כדי להשתמש בו כאפליקציה!</p>
+</div>
+
+<script src="/js/global.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    lucide.createIcons();
+  });
+</script>
+<script src="/js/ui-enhance.js" defer></script>
 </body>
 </html>
