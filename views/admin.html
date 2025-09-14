@@ -180,6 +180,8 @@
     }
 
     async function loadShifts(){
+        showSkeletonInShift(); // קודם מציג שלד טעינה
+
       const res = await fetch('/get-all-shifts');
       allShifts = await res.json();
       console.log('Loaded shifts:', allShifts);

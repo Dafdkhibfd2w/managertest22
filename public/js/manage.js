@@ -76,6 +76,7 @@ function updateStatus(shift) {
 loadForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const date = new FormData(loadForm).get("date");
+  showSkeleton();
 
   const res = await fetch(`/api/get-shift?date=${date}`);
   const shift = await res.json();
