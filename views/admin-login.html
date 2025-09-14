@@ -9,10 +9,11 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>כניסת מנהל • NEW DELI</title>
-  <link rel="stylesheet" href="/css/style.css" />
+  
   
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#2b5329">
+
   <style>
     body {
       display: flex;
@@ -96,8 +97,38 @@
   </style>
   <link rel="stylesheet" href="/css/premium.css">
   <script defer src="/js/ui.js"></script>
+
+  <link rel="stylesheet" href="/css/admin-login.css">
 </head>
 <body class="theme-dark-premium">
+<div class="loader" aria-hidden="true"><div class="spinner"></div></div>
+
+<header class="navwrap">
+  <div class="container nav">
+    <div class="brand"><div class="logo"></div><div>Manager Pro</div></div>
+    <nav class="nav-links">
+      <a href="/views/index.html">דשבורד</a>
+      <a href="/views/manage.html">ניהול משמרות</a>
+      <a href="/views/invoices.html">חשבוניות</a>
+      <a href="/views/suppliers.html">ספקים</a>
+      <a href="/views/tasks.html">משימות</a>
+      <a href="/views/admin.html">אדמין</a>
+    </nav>
+    <div class="nav-cta">
+      <button class="btn secondary" onclick="location.href='/views/admin-login.html'">כניסת מנהלים</button>
+      <button class="burger" aria-label="תפריט"></button>
+    </div>
+  </div>
+  <div class="drawer"><div class="sheet">
+    <a href="/views/index.html">דשבורד</a>
+    <a href="/views/manage.html">ניהול משמרות</a>
+    <a href="/views/invoices.html">חשבוניות</a>
+    <a href="/views/suppliers.html">ספקים</a>
+    <a href="/views/tasks.html">משימות</a>
+    <a href="/views/admin.html">אדמין</a>
+  </div></div>
+</header>
+
   <form class="card" method="POST" action="/admin-login">
     <h1>כניסת מנהל</h1>
     <p>הקישו קוד גישה כדי להיכנס למערכת.</p>
@@ -114,6 +145,9 @@
 
   <script src="/js/script.js"></script>
   <script src="/js/global.js"></script>
+<script src="/js/ui-enhance.js" defer></script>
 
+
+<script src="/js/ui.js"></script>
 </body>
 </html>

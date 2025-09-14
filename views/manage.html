@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>NEW DELI • ניהול משמרת</title>
-  <link rel="stylesheet" href="/css/style.css?v=2">
+  
   <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://unpkg.com/lucide@latest"></script>
 
@@ -13,6 +13,9 @@
 <meta name="theme-color" content="#2b5329">
   <link rel="stylesheet" href="/css/premium.css">
   <script defer src="/js/ui.js"></script>
+  
+
+  <link rel="stylesheet" href="/css/manage.css">
 </head>
 <style>
     @media (max-width: 600px) {
@@ -93,6 +96,34 @@
   }
 </style>
 <body class="theme-dark-premium">
+<div class="loader" aria-hidden="true"><div class="spinner"></div></div>
+
+<header class="navwrap">
+  <div class="container nav">
+    <div class="brand"><div class="logo"></div><div>Manager Pro</div></div>
+    <nav class="nav-links">
+      <a href="/views/index.html">דשבורד</a>
+      <a href="/views/manage.html">ניהול משמרות</a>
+      <a href="/views/invoices.html">חשבוניות</a>
+      <a href="/views/suppliers.html">ספקים</a>
+      <a href="/views/tasks.html">משימות</a>
+      <a href="/views/admin.html">אדמין</a>
+    </nav>
+    <div class="nav-cta">
+      <button class="btn secondary" onclick="location.href='/views/admin-login.html'">כניסת מנהלים</button>
+      <button class="burger" aria-label="תפריט"></button>
+    </div>
+  </div>
+  <div class="drawer"><div class="sheet">
+    <a href="/views/index.html">דשבורד</a>
+    <a href="/views/manage.html">ניהול משמרות</a>
+    <a href="/views/invoices.html">חשבוניות</a>
+    <a href="/views/suppliers.html">ספקים</a>
+    <a href="/views/tasks.html">משימות</a>
+    <a href="/views/admin.html">אדמין</a>
+  </div></div>
+</header>
+
 <header class="brandbar">
   <div class="brandbar-left">
     <span class="burger" id="burger">&#9776;</span>
@@ -192,6 +223,9 @@
 
   <script src="/js/manage.js"></script>
   <script src="/js/global.js"></script>
+<script src="/js/ui-enhance.js" defer></script>
 
+
+<script src="/js/ui.js"></script>
 </body>
 </html>
