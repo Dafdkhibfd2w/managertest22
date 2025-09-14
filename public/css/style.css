@@ -191,6 +191,24 @@ h3 { font-size: 1.2rem; color: var(--ink-muted); }
   animation: shimmer 1.5s infinite;
 }
 
+
+lead-chip.default {
+  border: 2px solid var(--card-border);
+  background: rgba(253, 253, 253, 0.19);
+}
+
+/* פתוח */
+.lead-chip.open {
+  border: 2px solid var(--card-border);
+  background: rgba(253, 253, 253, 0.19);
+}
+
+/* סגור */
+.lead-chip.closed {
+  background: rgba(253, 253, 253, 0.19);
+ border: 2px solid rgb(143, 68, 68);
+}
+
 .skeleton-row td {
   padding: 12px;
 }
