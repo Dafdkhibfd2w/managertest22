@@ -88,6 +88,7 @@ loadForm.addEventListener("submit", async (e) => {
     leadChip.textContent = "אחמ״ש: —";
     updateStatus(null);
     leadChip.style.display = "inline-flex";
+    leadChip.style.border = "2px solid red";
     return;
   }
 
@@ -104,6 +105,7 @@ loadForm.addEventListener("submit", async (e) => {
   }
   leadChip.innerHTML = `<span class="dot"></span>אחמ״ש: ${leadName || "—"}`;
   leadChip.style.display = "inline-flex";
+    leadChip.style.border = "2px solid green";
 
   // סטטוס
   updateStatus(shift);
