@@ -1,3 +1,88 @@
+// === Toast core ===
+(function(){
+  const ROOT_ID = 'toast-root';
+
+  function ensureRoot(){
+    let root = document.getElementById(ROOT_ID);
+    if(!root){
+      root = document.createElement('div');
+      root.id = ROOT_ID;
+      document.body.appendChild(root);
+    }
+    return root;
+  }
+
+  function pickIcon(type){
+    switch(type){
+      case 'success': return '✅';
+      case 'info':    return '💡';
+      case 'warn':    return '⚠️';
+      case 'error':   return '⛔';
+      default:        return '🔔';
+    }
+  }
+
+  /**
+   * showToast(message, options?)
+   * @param {string|{title:string,desc?:string}} msg
+   * @param {{type?:'success'|'info'|'warn'|'error',
+   *          duration?:number, icon?:string, onClose?:Function}} opts
+   */
+  window.showToast = function(msg, opts={}){
+    const {
+      type='success',
+      duration=3000,
+      icon=pickIcon(type),
+      onClose
+    } = opts;
+
+    const root = ensureRoot();
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.setAttribute('role','status');
+    toast.setAttribute('aria-live','polite');
+    toast.style.position = 'relative';
+
+    const title = typeof msg === 'string' ? msg : (msg.title || '');
+    const desc  = typeof msg === 'string' ? ''  : (msg.desc  || '');
+
+    toast.innerHTML = `
+      <div class="icon">${icon}</div>
+      <div class="content">
+        <div class="title">${title}</div>
+        ${desc ? `<div class="desc">${desc}</div>` : ``}
+      </div>
+      <button class="close" aria-label="סגירה">✕</button>
+      <div class="bar"><i style="animation-duration:${duration}ms"></i></div>
+    `;
+
+    const close = () => {
+      toast.style.animation = 'toastOut .2s ease both';
+      setTimeout(() => {
+        toast.remove();
+        onClose && onClose();
+      }, 180);
+    };
+
+    toast.querySelector('.close').addEventListener('click', close);
+    // סגירה בלחיצה על הטוסט עצמו (לא חובה – אפשר להסיר)
+    toast.addEventListener('click', (e) => {
+      if(e.target.classList.contains('close')) return;
+      close();
+    });
+
+    root.appendChild(toast);
+
+    const timer = setTimeout(close, duration);
+    // אם העכבר מעל – עצור טיימר; החזר כשמסירים
+    toast.addEventListener('mouseenter', () => clearTimeout(timer));
+    toast.addEventListener('mouseleave', () => setTimeout(close, 800));
+
+    return close; // מאפשר לסגור ידנית מבחוץ
+  };
+})();
+
 const btn = document.getElementById("go-back");
 
 if (btn) {
@@ -37,25 +122,30 @@ function urlBase64ToUint8Array(base64String) {
 }
 
 async function initPush() {
-  const statusEl = document.getElementById("notifStatus");
+  // const statusEl = document.getElementById("notifStatus");
 
   try {
     if (!("serviceWorker" in navigator)) {
-      statusEl.textContent = "❌ הדפדפן לא תומך ב-Service Worker";
+      // statusEl.textContent = "❌ הדפדפן לא תומך ב-Service Worker";
+      showToast('❌ הדפדפן לא תומך ב-Service Worke', { type:'error', icon:'🚫' });
       return;
     }
 
-    statusEl.textContent = "⏳ רושם Service Worker...";
+    // statusEl.textContent = "⏳ רושם Service Worker...";
+ showToast('⏳ רושם Service Worker...', { type:'info', duration:4000 });
     const reg = await navigator.serviceWorker.register("/service-worker.js");
 
-    statusEl.textContent = "📩 מבקש הרשאה...";
+    // statusEl.textContent = "📩 מבקש הרשאה...";
+ showToast('📩 מבקש הרשאה...', { type:'info', duration:4000 });
     const permission = await Notification.requestPermission();
     if (permission !== "granted") {
       statusEl.textContent = "❌ המשתמש סירב להתראות";
       return;
     }
 
-    statusEl.textContent = "🔑 נרשם ל-Push...";
+    // statusEl.textContent = "🔑 נרשם ל-Push...";
+    // showToast('🔑 נרשם ל-Push...');
+ showToast('🔑 נרשם ל-Push...', { type:'info', duration:4000 });
     const subscription = await reg.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(
@@ -68,11 +158,13 @@ async function initPush() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(subscription)
     });
+    showToast('✅ התראות הופעלו בהצלחה!');
 
-    statusEl.textContent = "✅ התראות הופעלו בהצלחה!";
+    // statusEl.textContent = "✅ התראות הופעלו בהצלחה!";
   } catch (err) {
     console.error("שגיאה בהרשמה ל-Push:", err);
-    statusEl.textContent = "❌ שגיאה: " + err.message;
+    showToast("❌ שגיאה: " + err.message, { type:'error', icon:'❌' });
+    // statusEl.textContent = "❌ שגיאה: " + err.message;
   }
 }
 document.addEventListener("DOMContentLoaded", () => {
