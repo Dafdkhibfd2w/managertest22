@@ -762,6 +762,7 @@ th, td {
   font-size: 1rem;
   font-weight: bold;
   transition: 0.2s;
+  margin-top: 10px;
 }
 #addRuntimeNoteBtn:hover {
   filter: brightness(1.1);
