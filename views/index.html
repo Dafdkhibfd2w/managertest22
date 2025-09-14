@@ -8,6 +8,7 @@
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#2b5329">
 <script src="https://unpkg.com/lucide@latest"></script>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="/css/style.css?v=2">
   
@@ -42,13 +43,13 @@
     <li><a href="/dispersals-page"><span class="icon">🚕</span> פיזורים</a></li>
   </ul>
 </nav>
-  <form id="shiftForm" style="max-width: 350px;">
-    <label>תאריך: <input type="date" name="date" required></label><br><br>
+  <form id="shiftForm" style="max-width: 360px;">
+    <label style="max-width: 308px;">:תאריך <input type="date" name="date" required></label><br><br>
 
-    <label>צוות: <input type="text" name="team" placeholder="לדוג׳: יוסי, דנה, רועי" required></label><br><br>
+    <label>:צוות <input type="text" name="team" placeholder="לדוג׳: יוסי, דנה, רועי" required></label><br><br>
 
 
-<label>אחמ״ש הערב:</label>
+<label>:אחמ״ש הערב</label>
 <input type="text" name="manager" placeholder="שם האחמ״ש" required>
 <div class="task-picker">
   <button type="button" class="picker-toggle" data-key="daily" aria-expanded="false">
@@ -76,7 +77,7 @@
 
 
 
-    <label for="editNotes">הערות / משימות מותאמות:</label>
+    <label for="editNotes">:הערות / משימות מותאמות</label>
 <textarea id="editNotes" name="notes" placeholder="משימות מיוחדות, תזכורות, הערות כלליות..."></textarea>
 
 </div>
