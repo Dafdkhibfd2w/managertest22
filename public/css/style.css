@@ -683,6 +683,32 @@ th, td {
 /* סידור בשורה */
 .task-tabs {
   display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin: 12px 0 18px;
+}
+
+.task-tab {
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #ccc;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: all 0.25s ease;
+  user-select: none;
+}
+
+.task-tab:hover {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.task-tab.active {
+  background: linear-gradient(135deg, #00FFA3, #00C2FF);
+  color: #0e0e0e;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0,255,163,0.4);
 }
