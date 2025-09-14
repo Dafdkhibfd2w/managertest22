@@ -774,4 +774,41 @@ th, td {
   padding: 10px 16px;
   font-weight: 600;
   box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}@media (max-width: 768px) {
+  #tbl, #tbl thead, #tbl tbody, #tbl th, #tbl td, #tbl tr {
+    display: block;
+    width: 100%;
+  }
+
+  #tbl thead {
+    display: none; /* להעלים כותרות */
+  }
+
+  #tbl tr {
+    margin-bottom: 14px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 10px;
+    background: rgba(255,255,255,0.02);
+  }
+
+  #tbl td {
+    border: none;
+    padding: 6px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #ddd;
+    font-size: 0.9rem;
+  }
+
+  #tbl td::before {
+    content: attr(data-label); /* נשתמש ב־data-label */
+    font-weight: 600;
+    color: #fff;
+  }
+
+  #tbl td.actions {
+    justify-content: flex-end;
+  }
 }
