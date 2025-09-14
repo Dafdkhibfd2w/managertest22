@@ -21,12 +21,6 @@
     }
   }
 
-  /**
-   * showToast(message, options?)
-   * @param {string|{title:string,desc?:string}} msg
-   * @param {{type?:'success'|'info'|'warn'|'error',
-   *          duration?:number, icon?:string, onClose?:Function}} opts
-   */
   window.showToast = function(msg, opts={}){
     const {
       type='success',
@@ -66,7 +60,6 @@
 
     toast.querySelector('.close').addEventListener('click', close);
 
-    // אפשר לסגור בלחיצה על כל הטוסט (לא חובה)
     toast.addEventListener('click', (e) => {
       if(e.target.classList.contains('close')) return;
       close();
@@ -76,44 +69,34 @@
 
     let timer = setTimeout(close, duration);
 
-    // עצירה של הטיימר כשהעכבר מעל
     toast.addEventListener('mouseenter', () => clearTimeout(timer));
     toast.addEventListener('mouseleave', () => {
       timer = setTimeout(close, 800);
     });
 
-    return close; // מאפשר סגירה ידנית מבחוץ
+    return close;
   };
 })();
 
-
+// ===== ניווט בסיסי =====
 const btn = document.getElementById("go-back");
-
 if (btn) {
-document.getElementById("go-back").addEventListener("click", () => {
-  window.location = '/'
-})
+  btn.addEventListener("click", () => { window.location = '/' });
 }
 
+const burger = document.getElementById("burger");
+const mobileNav = document.getElementById("mobileNav");
+const closeNav = document.getElementById("closeNav");
 
-
-  const burger = document.getElementById("burger");
-  const mobileNav = document.getElementById("mobileNav");
-  const closeNav = document.getElementById("closeNav");
-
-  burger.addEventListener("click", () => {
-    mobileNav.classList.add("active");
-  });
-
-  closeNav.addEventListener("click", () => {
+burger?.addEventListener("click", () => mobileNav.classList.add("active"));
+closeNav?.addEventListener("click", () => mobileNav.classList.remove("active"));
+window.addEventListener("click", (e) => {
+  if (!mobileNav.contains(e.target) && e.target !== burger) {
     mobileNav.classList.remove("active");
-  });
-  // סגירה בלחיצה מחוץ לתפריט
-  window.addEventListener("click", (e) => {
-    if (!mobileNav.contains(e.target) && e.target !== burger) {
-      mobileNav.classList.remove("active");
-    }
-  });
+  }
+});
+
+// ===== Push Notifications =====
 function urlBase64ToUint8Array(base64String) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
@@ -125,32 +108,24 @@ function urlBase64ToUint8Array(base64String) {
   return outputArray;
 }
 
-async function initPush() {
-  // const statusEl = document.getElementById("notifStatus");
+let currentSubscription = null;
 
+async function initPush() {
   try {
     if (!("serviceWorker" in navigator)) {
-      // statusEl.textContent = "❌ הדפדפן לא תומך ב-Service Worker";
-      showToast('❌ הדפדפן לא תומך ב-Service Worke', { type:'error', icon:'🚫' });
+      showToast('❌ הדפדפן לא תומך ב-Service Worker', { type:'error' });
       return;
     }
 
-    // statusEl.textContent = "⏳ רושם Service Worker...";
- showToast('⏳ רושם Service Worker...', { type:'info', duration:4000 });
+    showToast('⏳ רושם Service Worker...', { type:'info', duration:4000 });
     const reg = await navigator.serviceWorker.register("/service-worker.js");
 
-    // statusEl.textContent = "📩 מבקש הרשאה...";
- showToast('📩 מבקש הרשאה...', { type:'info', duration:4000 });
+    showToast('📩 מבקש הרשאה...', { type:'info', duration:4000 });
     const permission = await Notification.requestPermission();
-    if (permission !== "granted") {
-      // statusEl.textContent = "❌ המשתמש סירב להתראות";
-      return;
-    }
+    if (permission !== "granted") return;
 
-    // statusEl.textContent = "🔑 נרשם ל-Push...";
-    // showToast('🔑 נרשם ל-Push...');
- showToast('🔑 נרשם ל-Push...', { type:'info', duration:4000 });
-    const subscription = await reg.pushManager.subscribe({
+    showToast('🔑 נרשם ל-Push...', { type:'info', duration:4000 });
+    currentSubscription = await reg.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(
         "BGEYruudNkeNhSyxPmrvHjnvUFnFe3Ca2KmA6IZU6UJU7_fJvVldk4qd90nNil_i_HRR6dY02I_j8oD6hS-4U0E"
@@ -160,50 +135,75 @@ async function initPush() {
     await fetch("/save-subscription", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(subscription)
+      body: JSON.stringify(currentSubscription)
     });
-    showToast('✅ התראות הופעלו בהצלחה!');
 
-    // statusEl.textContent = "✅ התראות הופעלו בהצלחה!";
+    showToast('✅ התראות הופעלו בהצלחה!');
+    updateBell(true);
+
   } catch (err) {
     console.error("שגיאה בהרשמה ל-Push:", err);
-    showToast("❌ שגיאה: " + err.message, { type:'error', icon:'❌' });
-    // statusEl.textContent = "❌ שגיאה: " + err.message;
+    showToast("❌ שגיאה: " + err.message, { type:'error' });
   }
 }
-document.addEventListener("DOMContentLoaded", () => {
-  lucide.createIcons(); // יחליף את <i data-lucide="bell"> לאייקון אמיתי
-});
+
+async function unsubscribePush() {
+  try {
+    const reg = await navigator.serviceWorker.getRegistration();
+    if (!reg) return;
+    const sub = await reg.pushManager.getSubscription();
+    if (sub) {
+      await sub.unsubscribe();
+      currentSubscription = null;
+      showToast("🔕 התראות כובו", { type:'warn' });
+      updateBell(false);
+    }
+  } catch (err) {
+    console.error("שגיאה בכיבוי:", err);
+    showToast("❌ שגיאה בכיבוי התראות", { type:'error' });
+  }
+}
+
+function updateBell(enabled) {
+  const notifToggle = document.getElementById("notifToggle");
+  if (!notifToggle) return;
+  notifToggle.innerHTML = enabled
+    ? `<i data-lucide="bell"></i>`
+    : `<i data-lucide="bell-off"></i>`;
+  notifToggle.classList.toggle("enabled", enabled);
+  lucide.createIcons();
+}
+
+// ===== Init =====
 document.addEventListener("DOMContentLoaded", () => {
   lucide.createIcons();
 
   const notifToggle = document.getElementById("notifToggle");
 
-  // בדיקה אם כבר יש הרשאה
-  if (Notification.permission === "granted") {
-    notifToggle.innerHTML = `<i data-lucide="bell"></i>`;
-    notifToggle.classList.add("enabled");
-    lucide.createIcons();
-  }
-})
-
 notifToggle?.addEventListener("click", async () => {
-  try {
-    if (Notification.permission === "default") {
-      // עדיין לא ביקשנו -> initPush יפתח בקשה
+  if (Notification.permission === "default") {
+    // רק בפעם הראשונה זה יבקש הרשאה
+    await initPush();
+  } else if (Notification.permission === "granted") {
+    if (currentSubscription) {
+      // קיים מנוי → נכבה
+      await unsubscribePush();
+    } else {
+      // אין מנוי אבל יש הרשאה → נרשום מחדש
       await initPush();
-    } else if (Notification.permission === "denied") {
-      showToast("❌ חסמת התראות. כדי לאפשר שוב, עדכן בהגדרות הדפדפן.", {type:'error'});
-      return;
     }
-
-    if (Notification.permission === "granted") {
-      notifToggle.innerHTML = `<i data-lucide="bell"></i>`;
-      notifToggle.classList.add("enabled");
-      lucide.createIcons();
-    }
-  } catch (err) {
-    console.error("שגיאה בהפעלת התראות:", err);
-    showToast("❌ שגיאה בהפעלת התראות", {type:'error'});
+  } else if (Notification.permission === "denied") {
+    showToast("❌ חסמת התראות. כדי לאפשר שוב, עדכן בהגדרות הדפדפן.", { type: "error" });
   }
+});
+
+  // בדיקה ראשונית: אם כבר קיים subscription
+  navigator.serviceWorker.getRegistration()
+    .then(reg => reg?.pushManager.getSubscription())
+    .then(sub => {
+      if (sub) {
+        currentSubscription = sub;
+        updateBell(true);
+      }
+    });
 });
