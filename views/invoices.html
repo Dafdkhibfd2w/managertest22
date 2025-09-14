@@ -191,14 +191,14 @@
 
       tbody.innerHTML = (data.items || []).map(r => `
         <tr>
-          <td>${escapeHtml(r.shiftDate || '')}</td>
-          <td>${escapeHtml(r.supplier || '')}</td>
-          <td>
+          <td data-label="תאריך">${escapeHtml(r.shiftDate || '')}</td>
+          <td data-label="ספק">${escapeHtml(r.supplier || '')}</td>
+          <td data-label="חשבונית">
             <a href="${r.url}" target="_blank" style="color: white;" title="${escapeHtml(r.originalName || '')}">
               צפייה בקובץ
             </a>
           </td>
-          <td class="actions">
+          <td data-label="פעולות" class="actions">
             <button onclick="delInvoice('${r._id}')" class="secondary">מחק</button>
           </td>
         </tr>
