@@ -707,7 +707,7 @@ th, td {
 }
 
 .task-tab.active {
-  background: linear-gradient(135deg, #00FFA3, #00C2FF);
+  background: rgba(255,255,255,0.1);
   color: #0e0e0e;
   border: none;
   box-shadow: 0 4px 12px rgba(0,255,163,0.4);
