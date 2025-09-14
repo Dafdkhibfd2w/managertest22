@@ -194,6 +194,9 @@ h3 { font-size: 1.2rem; color: var(--ink-muted); }
 
 lead-chip.default {
   border: 2px solid var(--card-border);
+   max-width: 100px;
+ border-radius: 13px;
+ padding: 6px;
   background: rgba(253, 253, 253, 0.19);
 }
 
@@ -201,12 +204,18 @@ lead-chip.default {
 .lead-chip.open {
   border: 2px solid var(--card-border);
   background: rgba(253, 253, 253, 0.19);
+   max-width: 100px;
+ border-radius: 13px;
+ padding: 6px;
 }
 
 /* סגור */
 .lead-chip.closed {
   background: rgba(253, 253, 253, 0.19);
  border: 2px solid rgb(143, 68, 68);
+ max-width: 100px;
+ border-radius: 13px;
+ padding: 6px;
 }
 
 .skeleton-row td {
