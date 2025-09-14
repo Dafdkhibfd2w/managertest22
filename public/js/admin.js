@@ -8,7 +8,26 @@ const searchInput = document.getElementById("searchInput");
 const shiftsList = document.getElementById("shiftsList");
 
 let shifts = [];
+function showSkeletonInShift() {
+  const shiftSection = document.getElementById("shiftSection");
+  shiftSection.style.display = "block";
 
+  const updateForm = document.getElementById("updateForm");
+  updateForm.innerHTML = `
+    <div class="skeleton skeleton-line" style="width: 70%;"></div>
+    <div class="skeleton skeleton-line" style="width: 90%;"></div>
+    <div class="skeleton skeleton-line" style="width: 60%;"></div>
+  `;
+
+  document.getElementById("runtimeNotesList").innerHTML = `
+    <li class="skeleton skeleton-line" style="width: 80%;"></li>
+    <li class="skeleton skeleton-line" style="width: 60%;"></li>
+  `;
+
+  document.getElementById("managerNote").innerHTML = `
+    <div class="skeleton skeleton-line" style="width: 50%;"></div>
+  `;
+}
 // ---------- טעינת משמרת לפי תאריך ----------
 loadForm.addEventListener("submit", async (e) => {
   e.preventDefault();
