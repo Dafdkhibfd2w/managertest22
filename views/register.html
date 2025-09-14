@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>הרשמה</title>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=2"> <!-- קישור ל־CSS ששלחת -->
+  <style>
+    .register-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-left: 5px solid var(--btn-primary);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin: 50px auto;
+      max-width: 420px;
+      box-shadow: var(--shadow-1);
+      animation: fadeIn .5s ease;
+    }
+
+    .register-card h1 {
+      font-size: 1.6rem;
+      margin-bottom: 24px;
+      color: var(--btn-primary);
+      text-align: center;
+    }
+
+    .register-card form {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .register-card label {
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .register-card input,
+    .register-card select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      background: var(--bg-alt);
+      color: var(--ink);
+      font-size: 1rem;
+      transition: border .2s, box-shadow .2s;
+    }
+
+    .register-card input:focus,
+    .register-card select:focus {
+      border-color: var(--btn-primary);
+      box-shadow: 0 0 0 2px rgba(0,255,163,.3);
+      outline: none;
+    }
+
+    .register-card button {
+      background: var(--btn-primary);
+      color: #0E0E0E;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: var(--shadow-1);
+      transition: all .25s ease;
+    }
+
+    .register-card button:hover {
+      background: var(--btn-primary-hover);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-2);
+    }
+
+    #status {
+      margin-top: 14px;
+      text-align: center;
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="register-card">
+    <h1>הרשמה</h1>
+    <form id="registerForm">
+      <div>
+        <label>שם:</label>
+        <input type="text" name="name" required>
+      </div>
+      <div>
+        <label>תפקיד:</label>
+        <select name="role">
+          <option value="worker">עובד</option>
+          <option value="manager">אחמ״ש</option>
+          <option value="admin">מנהל</option>
+        </select>
+      </div>
+      <button type="submit">שמור</button>
+    </form>
+    <p id="status"></p>
+  </div>
+
+  <script>
+    const form = document.getElementById("registerForm");
+    const status = document.getElementById("status");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const data = Object.fromEntries(fd.entries());
+
+      status.textContent = "שומר...";
+
+      try {
+        const res = await fetch("/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        const out = await res.json();
+        status.textContent = out.ok ? "✅ נשמר בהצלחה" : "❌ " + out.message;
+        if (out.ok) {
+          window.location.href = '/'; // שולח ישר ל־"/"
+        }
+      } catch (err) {
+        status.textContent = "❌ שגיאה: " + err.message;
+      }
+    });
+  </script>
+</body>
+</html>

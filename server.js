@@ -107,6 +107,35 @@ const Shift = mongoose.model('Shift', ShiftSchema);
 
 // ===== Helpers =====
 const ADMIN_PIN = process.env.ADMIN_PIN || '1111';
+function requireLogin(req, res, next) {
+  if (req.cookies && req.cookies.user) {
+    try {
+      req.user = JSON.parse(req.cookies.user); // שיהיה לך user זמין ב־req
+      return next();
+    } catch {
+      res.clearCookie("user");
+      return res.redirect("/login");
+    }
+  }
+  return res.redirect("/login");
+}
+function requireUser(req, res, next) {
+  const cookie = req.cookies.user;
+  if (!cookie) return res.status(401).json({ ok:false, message:"חייב להתחבר" });
+
+  try {
+    const parsed = JSON.parse(cookie);
+    if (!parsed.name) {
+      return res.status(400).json({ ok:false, message:"משתמש לא תקין (אין שם)" });
+    }
+    req.user = parsed;
+    next();
+  } catch {
+    return res.status(400).json({ ok:false, message:"קוקי לא תקין" });
+  }
+}
+
+
 
 function requireAdmin(req, res, next) {
   if (req.cookies && req.cookies.adminAuth === 'yes') return next();
@@ -155,22 +184,22 @@ function weekdayIndexFromDateStr(yyyy_mm_dd) {
 }
 
 // ===== Views =====
-app.get('/create', (req, res) => {
+app.get('/create',requireLogin, (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
-app.get('/', (req, res) => {
+app.get('/', requireLogin, (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'home.html'));
 });
-app.get('/manage', (req, res) => {
+app.get('/manage',requireLogin, (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'manage.html'));
 });
-app.get('/dispersals-page', (req, res) => {
+app.get('/dispersals-page',requireLogin, (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'dispersals.html'));
 });
-app.get('/orders-page', (req, res) => {               // << דף ההזמנות
+app.get('/orders-page',requireLogin, (req, res) => {               // << דף ההזמנות
   res.sendFile(path.join(__dirname, 'views', 'orders.html'));
 });
-app.get('/invoices-page', (req, res) => {
+app.get('/invoices-page',requireLogin, (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'invoices.html'));
 });
 app.get('/test', (req, res) => {
@@ -178,10 +207,10 @@ app.get('/test', (req, res) => {
 });
 
 
-app.get('/task', (req, res) => {
+app.get('/task', requireLogin,(req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'tasks.html'));
 });
-app.get('/suppliers-page', (req, res) => {
+app.get('/suppliers-page', requireLogin,(req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'suppliers.html'));
 });
 app.get('/manifest.json', (req, res) => {
@@ -633,32 +662,39 @@ app.get('/orders', async (req, res) => {
     res.status(500).json({ ok:false, message:'שגיאת שרת' });
   }
 });
-
-
-
-// POST /orders  body: { date, blocks, notes }
-app.post('/orders', async (req, res) => {
+app.post('/orders', requireUser, async (req, res) => {
   try {
     const { date, blocks, notes } = req.body || {};
     if (!date || !Array.isArray(blocks)) {
       return res.status(400).json({ ok:false, message:'חסר date/blocks' });
     }
 
-    const cleanBlocks = blocks.map(b => ({
+    const cleanBlocks = (blocks || []).map(b => ({
       supplierId: b.supplierId,
       supplier:   b.supplier,
-      items: (b.items || []).map(it => ({
-        name: it.name,
-        unit: it.unit || '',
-        currentQty: Number(it.currentQty || 0),
-        toOrderQty: Number(it.toOrderQty || 0),
-        notes: String(it.notes || '')
-      }))
+      items: (Array.isArray(b.items) ? b.items : []).map(it => ({
+        name: (it && it.name) ? String(it.name).trim() : "",
+        unit: (it && it.unit) ? String(it.unit).trim() : "",
+        currentQty: it && it.currentQty ? Number(it.currentQty) : 0,
+        toOrderQty: it && it.toOrderQty ? Number(it.toOrderQty) : 0,
+        notes: it && it.notes ? String(it.notes).trim() : ""
+      })).filter(x => x.name)
     }));
 
     const saved = await DailyOrder.findOneAndUpdate(
       { date },
-      { $set: { blocks: cleanBlocks, notes: notes || '' } },
+      { 
+        $set: { 
+          blocks: cleanBlocks, 
+          notes: notes || '',
+          updatedAt: new Date(),
+          updatedBy: req.user.name   // 🟢 שמור גם מי עדכן
+        },
+        $setOnInsert: {
+          createdBy: req.user.name,  // 🟢 מי יצר לראשונה
+          createdAt: new Date()
+        }
+      },
       { new: true, upsert: true }
     );
 
@@ -668,6 +704,7 @@ app.post('/orders', async (req, res) => {
     res.status(500).json({ ok:false, message:'שגיאה בשמירה' });
   }
 });
+
 // בונה blocks לפי ספקים פעילים של היום (א׳=0 ... ש׳=6)
 async function buildBlocksFromSuppliers(dateStr) {
   const [y,m,d] = dateStr.split('-').map(Number);
@@ -991,6 +1028,50 @@ app.post("/send-notification", async (req, res) => {
 });
 
 
+const User = require('./models/user');
+
+app.get("/login", (req, res) => {
+  res.sendFile(path.join(__dirname, "views", "register.html"));
+});
+app.post("/logout", (req, res) => {
+  res.clearCookie("user", { sameSite: "lax" });
+  res.json({ ok: true, message: "התנתקת בהצלחה" });
+});
+app.get("/logout", (req, res) => {
+  res.clearCookie("user", { sameSite: "lax" });
+  res.redirect("/login"); // אחרי לוגאאוט מחזיר לעמוד התחברות
+});
+app.post("/login", async (req, res) => {
+  const { name, role } = req.body;
+  if (!name) return res.json({ ok: false, message: "חובה שם" });
+
+  const user = await User.findOneAndUpdate(
+    { name },
+    { $set: { name, role } },
+    { upsert: true, new: true }
+  );
+
+  res.cookie("user", JSON.stringify({ name: user.name, role: user.role }), {
+    httpOnly: false,
+    sameSite: "lax",
+    maxAge: 1000 * 60 * 60 * 24 * 7
+  });
+
+  res.json({ ok: true, user });
+});
+
+
+app.get("/user", (req, res) => {
+  if (req.cookies && req.cookies.user) {
+    try {
+      const user = JSON.parse(req.cookies.user);
+      return res.json({ ok: true, user });
+    } catch {
+      return res.json({ ok: false });
+    }
+  }
+  res.json({ ok: false });
+});
 // הוספת נקודות לעובד
 app.post("/points/add", async (req, res) => {
   try {

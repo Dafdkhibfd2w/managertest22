@@ -236,3 +236,4 @@ document.addEventListener("DOMContentLoaded", async () => {
   const data = await fetchWithLoader("/api/get-shifts");
   console.log("Loaded:", data);
 });
+

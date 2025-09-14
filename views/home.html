@@ -114,6 +114,13 @@
 
 </style>
 <body class="theme-dark-premium">
+  <div id="globalLoader">
+  <div class="spinner"></div>
+  <p>טוען נתונים...</p>
+</div>
+
+<!-- התוכן שלך -->
+<div id="pageContent" style="display:none">
 <header class="brandbar">
   <span class="brand-title">NEW DELI</span>
   <div class="brandbar-right">
@@ -121,6 +128,7 @@
       <i data-lucide="bell-off"></i>
     </button>
     <span class="burger" id="burger">&#9776;</span>
+    <!-- <button id="logoutBtn" style="background: none;" class="icon-btn" title="התנתק">🚪</button> -->
   </div>
 </header>
 <nav class="mobile-nav" id="mobileNav">
@@ -134,10 +142,11 @@
     <li><a href="/suppliers-page"><span class="icon">🏷️</span> ספקים</a></li>
     <li><a href="/orders-page"><span class="icon">📦</span> הזמנות</a></li>
     <li><a href="/dispersals-page"><span class="icon">🚕</span> פיזורים</a></li>
+    <li><a href="/logout"><span class="icon">🚪</span> התנתקות</a></li>
   </ul>
 </nav>
 <div class="container">
-  <h1 class="app-title">ברוכים הבאים למערכת ניהול משמרות</h1>
+  <h1 class="app-title" id="user">ברוכים הבאים למערכת ניהול משמרות</h1>
   <p class="subtitle">בחרו פעולה כדי להתחיל 👇</p>
 
   <div class="nav-grid">
@@ -205,5 +214,34 @@
   });
   
 </script>
+<script>
+  const cookies = document.cookie.split(";").reduce((acc, c) => {
+    const [k,v] = c.trim().split("=");
+    acc[k] = decodeURIComponent(v);
+    return acc;
+  }, {});
+  
+  if (cookies.user) {
+    const user = JSON.parse(cookies.user);
+    console.log("מחובר כ:", user.name, "תפקיד:", user.role);
+  }
+
+
+  async function loadUser() {
+  try {
+    const res = await fetch("/user");
+    const data = await res.json();
+    if (data.ok && data.user) {
+      document.getElementById("user").textContent =
+        `ברוכים הבאים ${data.user.name} למערכת ניהול משמרות`
+    }
+  } catch (err) {
+    console.error("שגיאה בשליפת משתמש:", err);
+  }
+}
+
+loadUser();
+</script>
+</div>
 </body>
 </html>

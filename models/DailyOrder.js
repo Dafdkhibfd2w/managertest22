@@ -17,7 +17,9 @@ const SupplierBlockSchema = new mongoose.Schema({
 const DailyOrderSchema = new mongoose.Schema({
   date:        { type: String, required: true, unique: true }, // YYYY-MM-DD
   blocks:      [SupplierBlockSchema],                          // קבוצות לפי ספק
-  notes:       { type: String, default: '' }
+  notes:       { type: String, default: '' },
+    createdBy:   { type: String, default: '' },  // שם המשתמש שיצר
+
 }, { timestamps: true });
 
 module.exports = mongoose.model('DailyOrder', DailyOrderSchema);

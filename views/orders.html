@@ -16,6 +16,14 @@
   <script defer src="/js/ui.js"></script>
   
 </head>
+<body>
+    <div id="globalLoader">
+  <div class="spinner"></div>
+  <p>טוען נתונים...</p>
+</div>
+
+<!-- התוכן שלך -->
+<div id="pageContent" style="display:none">
 <header class="brandbar">
   <span class="brand-title">NEW DELI</span>
   <div class="brandbar-right">
@@ -218,6 +226,21 @@ document.getElementById('dateInput').addEventListener('change', updateWeekdayHin
   </script>
   <script src="/js/global.js"></script>
 <script src="/js/ui-enhance.js" defer></script>
+<script>
+    async function loadUser() {
+  try {
+    const res = await fetch("/user");
+    const data = await res.json();
+    if (data.ok && data.user) {
+console.log(data.user.name)
+    }
+  } catch (err) {
+    console.error("שגיאה בשליפת משתמש:", err);
+  }
+}
 
+loadUser();
+</script>
+</div>
 </body>
 </html>
