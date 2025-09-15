@@ -535,13 +535,6 @@ margin: 30px auto;
   margin-top: 9px;
 }
 
-.man{
-      background-color: var(--btn-primary);
-    color: #0E0E0E;
-    border-radius: 14px;
-    margin-left: 5px;
-    text-align: center;
-}
 
 /* =========================
    RESPONSIVE
