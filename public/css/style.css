@@ -791,15 +791,15 @@ margin: 30px auto;
 
 /* צבעים מותאמים לכל צ’יפ */
 #leadChip {
-  background: linear-gradient(135deg, #4CAF50, #2E7D32);
-  color: #fff;
+  background: linear-gradient(135deg, #00ffa3, #00e0ff);
+  color: #000;
 }
 #status {
-  background: linear-gradient(135deg, #03A9F4, #0277BD);
-  color: #fff;
+  background: linear-gradient(135deg, #00ffa3, #00e0ff);
+  color: #000;
 }
 #createdByChip {
-  background: linear-gradient(135deg, #FFD54F, #FFA000);
+  background: linear-gradient(135deg, #00ffa3, #00e0ff);
   color: #000;
 }
 
