@@ -535,31 +535,40 @@ margin: 30px auto;
   margin-top: 9px;
 }
 .category-block {
-  margin-bottom: 10px;
-  border: 1px solid #2a2a2a;
+  margin-bottom: 8px;
   border-radius: 8px;
+  background: #1e1e1e;
   overflow: hidden;
 }
 
+/* כותרת */
 .category-header {
-  background: #1f1f1f;
-  padding: 10px;
+  padding: 12px;
   cursor: pointer;
   font-weight: bold;
+  background: #2a2a2a;
+  transition: background 0.2s;
+}
+.category-header:hover {
+  background: #333;
 }
 
+/* קונטיינר המשימות */
 .tasks-container {
-  background: #262626;
-  padding: 10px;
-  overflow: hidden;
   max-height: 0;
-  transition: max-height 0.3s ease, padding 0.3s ease;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+  padding: 0 12px;
 }
 
+/* כשהוא פתוח */
 .tasks-container.open {
-  max-height: 1000px; /* מספיק גבוה כדי להכיל משימות */
-  padding: 10px;
+  max-height: 1000px; /* מספיק מקום לכל המשימות */
+  opacity: 1;
+  padding: 12px;
 }
+
 
 /* =========================
    RESPONSIVE
