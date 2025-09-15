@@ -472,70 +472,64 @@ function renderRuntimeNotes(listEl, notes) {
       renderRuntimeNotes(runtimeList, shift?.runtimeNotes);
     }
 
-    // הוספת הערה
     addBtn?.addEventListener('click', async () => {
-      if (!dateInput?.value) return alert('בחר תאריך משמרת קודם');
-      const text = (noteText?.value || '').trim();
-      if (!text) return noteText.focus();
+  if (!dateInput?.value) return alert('בחר תאריך משמרת קודם');
+  const text = (noteText?.value || '').trim();
+  if (!text) return noteText.focus();
 
-      const res = await fetch('/api/add-runtime-note', {
-        method: 'POST',
-        headers: { 'Content-Type':'application/json' },
-        body: JSON.stringify({
-          date: dateInput.value,
-          text,
-          author: managerInput?.value || 'אחמ״ש'
-        })
-      });
-
-      const data = await res.json();
-      if (!data.ok) return alert(data.message || 'שגיאה');
-
-      // הוספה ל־DOM
-      const li = document.createElement('li');
-      li.className = 'exec-row';
-      li.innerHTML = `
-        <span class="task-name">${text}</span>
-        <span class="who-time"><small>${new Date().toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}</small></span>
-        <button class="note-del-btn" style="color:black" title="מחיקה">🗑️</button>
-      `;
-      li.querySelector('.note-del-btn').addEventListener('click', () => li.remove());
-      runtimeList.appendChild(li);
-
-      noteText.value = '';
-      noteText.focus();
-    });
-
-    // מחיקת הערה
-    runtimeList?.addEventListener('click', async (e) => {
-      const btn = e.target.closest('.note-del-btn');
-      if (!btn) return;
-
-      const li   = btn.closest('li.exec-row');
-      const date = dateInput?.value;
-      if (!li || !date) return;
-
-      const noteId = li.getAttribute('data-note-id');
-      const index  = li.getAttribute('data-index');
-
-      if (!confirm('למחוק את ההערה?')) return;
-
-      const res = await fetch('/api/delete-runtime-note', {
-        method: 'POST',
-        headers: { 'Content-Type':'application/json' },
-        body: JSON.stringify({
-          date,
-          noteId: noteId || undefined,
-          index: noteId ? undefined : Number(index)
-        })
-      });
-
-      const data = await res.json();
-      if (!data.ok) { alert(data.message || 'שגיאה במחיקה'); return; }
-      renderRuntimeNotes(runtimeList, data.runtimeNotes);
-    });
-
-    dateInput?.addEventListener('change', loadRuntimeNotes);
-    if (dateInput?.value) loadRuntimeNotes();
+  const res = await fetch('/api/add-runtime-note', {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json' },
+    body: JSON.stringify({
+      date: dateInput.value,
+      text,
+      author: managerInput?.value || 'אחמ״ש'
+    })
   });
-})();
+
+  const data = await res.json();
+  if (!data.ok) return alert(data.message || 'שגיאה');
+
+  // טען מחדש מהשרת במקום appendChild
+  await loadRuntimeNotes();
+
+  noteText.value = '';
+  noteText.focus();
+});
+
+
+// מחיקת הערה
+runtimeList?.addEventListener('click', async (e) => {
+  const btn = e.target.closest('.note-del-btn');
+  if (!btn) return;
+
+  const li   = btn.closest('li.exec-row');
+  const date = dateInput?.value;
+  if (!li || !date) return;
+
+  const noteId = li.getAttribute('data-note-id');
+  const index  = li.getAttribute('data-index');
+
+  if (!confirm('למחוק את ההערה?')) return;
+
+  const res = await fetch('/api/delete-runtime-note', {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json' },
+    body: JSON.stringify({
+      date,
+      noteId: noteId || undefined,
+      index: noteId ? undefined : Number(index)
+    })
+  });
+
+  const data = await res.json();
+  if (!data.ok) { 
+    alert(data.message || 'שגיאה במחיקה'); 
+    return; 
+  }
+
+  // במקום לרנדר מהתשובה – נטען מחדש מהשרת
+  await loadRuntimeNotes();
+});
+
+})})();
