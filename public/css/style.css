@@ -202,20 +202,12 @@ lead-chip.default {
 
 /* פתוח */
 .lead-chip.open {
-  border: 2px solid var(--card-border);
-  background: rgba(253, 253, 253, 0.19);
-   max-width: 100px;
- border-radius: 13px;
- padding: 6px;
+
 }
 
 /* סגור */
 .lead-chip.closed {
-  background: rgba(253, 253, 253, 0.19);
- border: 2px solid rgb(143, 68, 68);
- max-width: 100px;
- border-radius: 13px;
- padding: 6px;
+
 }
 
 .skeleton-row td {
@@ -760,6 +752,55 @@ margin: 30px auto;
   margin: 30px auto;
       max-width: 600px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+.manage_btn {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.lead-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #f0f0f0;
+  border: 1px solid rgba(255,255,255,0.15);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  transition: all 0.2s ease;
+}
+
+.lead-chip .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  background-color: currentColor;
+}
+
+.lead-chip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+}
+
+/* צבעים מותאמים לכל צ’יפ */
+#leadChip {
+  background: linear-gradient(135deg, #4CAF50, #2E7D32);
+  color: #fff;
+}
+#status {
+  background: linear-gradient(135deg, #03A9F4, #0277BD);
+  color: #fff;
+}
+#createdByChip {
+  background: linear-gradient(135deg, #FFD54F, #FFA000);
+  color: #000;
 }
 
 /* כותרות */
