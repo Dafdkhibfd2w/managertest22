@@ -168,33 +168,38 @@ createdByChip.style.border = "2px solid #444488";
    UI – טאבים + רינדור קטגוריה
    ========================= */
 function renderTabs() {
-  const tabsDiv = document.getElementById("tabs");
-  tabsDiv.innerHTML = categories.map(cat => `
-    <div class="task-tab ${cat.key === activeCategory ? "active" : ""}" 
-         onclick="renderCategory('${cat.key}')">
-      ${cat.name}
+  const categoriesDiv = document.getElementById("categories");
+  categoriesDiv.innerHTML = categories.map(cat => `
+    <div class="category-block" id="cat-${cat.key}">
+      <div class="category-header" onclick="renderCategory('${cat.key}')">
+        ${cat.name}
+      </div>
+      <div class="tasks-container" id="tasks-${cat.key}" style="display:none;"></div>
     </div>
   `).join("");
 }
 
 window.renderCategory = function(categoryKey) {
-  activeCategory = categoryKey;
-  renderTabs();
+  // קודם כל נסגור את כל השאר
+  categories.forEach(cat => {
+    document.getElementById(`tasks-${cat.key}`).style.display = "none";
+  });
 
-  const tasksContainer = document.getElementById("tasksContainer");
-  tasksContainer.innerHTML = ""; // 🟢 נקה כל מה שהיה קודם
+  const container = document.getElementById(`tasks-${categoryKey}`);
+  container.style.display = "block";
+  container.innerHTML = "";
 
   const list = shiftData?.tasks?.[categoryKey] || [];
   if (!list.length) {
-    tasksContainer.innerHTML = `<p>אין משימות בקטגוריה הזו.</p>`;
+    container.innerHTML = `<p>אין משימות בקטגוריה הזו.</p>`;
     return;
   }
 
   const teamArray = Array.isArray(shiftData.team)
     ? shiftData.team
-    : typeof shiftData.team === "string"
-      ? shiftData.team.split(",").map(n => n.trim()).filter(Boolean)
-      : [];
+    : (typeof shiftData.team === "string"
+        ? shiftData.team.split(",").map(n => n.trim()).filter(Boolean)
+        : []);
 
   list.forEach((task, index) => {
     const exec = getExecForTask(shiftData, categoryKey, task);
@@ -203,9 +208,9 @@ window.renderCategory = function(categoryKey) {
     ).join("");
 
     const taskId = `${categoryKey}-${index}`;
-    tasksContainer.innerHTML += `
-      <div class="task-block accordion" id="task-${taskId}">
-        <div class="task-header" onclick="toggleTask('${taskId}')">${task}</div>
+    container.innerHTML += `
+      <div class="task-block" id="task-${taskId}">
+        <div class="task-header">${task}</div>
         <div class="task-body" data-category="${categoryKey}" data-task="${task}">
           <label>בוצע על ידי:
             <select class="fld-worker">
@@ -217,16 +222,9 @@ window.renderCategory = function(categoryKey) {
         </div>
       </div>
     `;
-
-    // מאזין לשינוי
-    const bodyEl = document.getElementById(`task-${taskId}`).querySelector('.task-body');
-    const sel = bodyEl.querySelector('.fld-worker');
-    sel.addEventListener('change', () => {
-      upsertLocalExecution(categoryKey, task, sel.value.trim());
-      bodyEl.classList.add('dirty');
-    });
   });
 };
+
 function toggleTask(id) {
   const block = document.getElementById(`task-${id}`);
   block.classList.toggle("open");
