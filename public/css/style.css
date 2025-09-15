@@ -570,7 +570,7 @@ margin: 30px auto;
   h1 { font-size: 1.5rem; }
   .brand-title { font-size: 1.1rem; }
   #btn-area, .form-actions { flex-direction: column; }
-  button, .btn { width: 100%; }
+  /* button, .btn { width: 100%; } */
 }
 /* עיצוב תיבת סימון */
 .styled-checkbox {
@@ -624,7 +624,9 @@ margin: 30px auto;
   .responsive-table thead {
     display: none; /* מעלים את השמות */
   }
-
+  input {
+    max-width: 289px;
+  }
   .responsive-table, 
   .responsive-table tbody, 
   .responsive-table tr, 
