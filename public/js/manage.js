@@ -174,7 +174,7 @@ function renderTabs() {
       <div class="category-header" onclick="renderCategory('${cat.key}')">
         ${cat.name}
       </div>
-      <div class="tasks-container" id="tasks-${cat.key}" style="display:none;"></div>
+      <div class="tasks-container" id="tasks-${cat.key}"></div>
     </div>
   `).join("");
 }
