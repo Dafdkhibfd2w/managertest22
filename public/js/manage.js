@@ -111,10 +111,7 @@ loadForm.addEventListener("submit", async (e) => {
 
       leadChip.style.display = "inline-flex";
     leadChip.style.border = "2px solid #8f4444";
-    leadChip.style.maxWidth = "100px";
-    leadChip.style.borderRadius = "14px";
-    leadChip.style.padding = "6px";
-    leadChip.style.backgroundColor = "##e5666630";
+
     return;
   }
 
@@ -132,10 +129,7 @@ loadForm.addEventListener("submit", async (e) => {
   leadChip.innerHTML = `<span class="dot"></span>אחמ״ש: ${leadName || "—"}`;
   leadChip.style.display = "inline-flex";
     leadChip.style.border = "2px solid #27af59";
-    leadChip.style.maxWidth = "100px";
-    leadChip.style.borderRadius = "14px";
-    leadChip.style.padding = "6px";
-    leadChip.style.backgroundColor = "#fdfdfd30";
+
   // סטטוס
   updateStatus(shift);
 if (shift.createdBy) {
@@ -145,10 +139,7 @@ if (shift.createdBy) {
 }
 createdByChip.style.display = "inline-flex";
 createdByChip.style.border = "2px solid #444488";
-createdByChip.style.maxWidth = "140px";
-createdByChip.style.borderRadius = "14px";
-createdByChip.style.padding = "6px";
-createdByChip.style.backgroundColor = "#fdfdfd30";
+
   // הערות אחמ״ש
   const noteBox = document.getElementById("managerNoteSection");
   const noteText = document.getElementById("managerNote");

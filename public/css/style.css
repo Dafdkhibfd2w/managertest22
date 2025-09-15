@@ -523,6 +523,12 @@ margin: 30px auto;
     max-width: 330px;
   padding: 20px;
 }
+.leadChip{
+    max-width: 100px;
+    border-radius: 14px;
+    padding: 6px;
+    background-color: #e5666630;
+}
 .highlight-strong {
   background: rgba(0, 255, 163, 0.18);
   border: 1px solid var(--btn-primary-hover);
