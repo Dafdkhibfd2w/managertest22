@@ -311,7 +311,7 @@ form label {
 } */
 
 input, select, textarea {
-  width: 100%; padding: 12px 14px;
+  width: 97%; padding: 12px 14px;
   border: 1px solid var(--card-border);
   border-radius: 10px;
   background: var(--bg-alt);
