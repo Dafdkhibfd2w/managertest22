@@ -371,15 +371,16 @@ app.post('/save-shift', requireUser, async (req, res) => {
 await Shift.findOneAndUpdate(
   { date: payload.date },
   {
-    $set: payload,
+    $set: { ...payload},  // 🟢 תמיד נשמר מי עדכן
     $setOnInsert: {
-      executions: { daily: [], weekly: [], monthly: [] }, // <- היה xecutions
-      scores: {}, // יווצר במסמך חדש,
-      createdBy: req.user.name
+      executions: { daily: [], weekly: [], monthly: [] },
+      scores: {},
+      createdBy: req.user.name                       // 🟢 רק ביצירה ראשונה
     }
   },
   { upsert: true, new: true }
 );
+
     res.json({ status: 'ok', message: 'המשמרת נשמרה בהצלחה!' });
   } catch (e) {
     console.error('save-shift error:', e);
