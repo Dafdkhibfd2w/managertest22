@@ -834,7 +834,18 @@ app.get('/suppliers', async (req, res) => {
     res.status(500).json({ ok:false, suppliers: [] });
   }
 });
-
+app.post('/migrate-add-runtimeNotes', async (req, res) => {
+  try {
+    const r = await Shift.updateMany(
+      { runtimeNotes: { $exists: false } },
+      { $set: { runtimeNotes: [] } }
+    );
+    res.json({ ok:true, modified: r.modifiedCount });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ ok:false });
+  }
+});
 app.post('/suppliers', async (req, res) => {
   try {
     const { name, phone, days, items, active } = req.body || {};
