@@ -24,7 +24,7 @@ function showSkeleton() {
   shiftSection.style.display = "block";
 
   // לא מוחקים את updateForm, רק ממלאים את tasksContainer
-  const tasksContainer = document.getElementById("tasksContainer");
+  const tasksContainer = document.getElementById("categories");
   tasksContainer.innerHTML = `
     <div class="skeleton skeleton-line" style="width: 70%;"></div>
     <div class="skeleton skeleton-line" style="width: 90%;"></div>
