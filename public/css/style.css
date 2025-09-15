@@ -624,9 +624,7 @@ margin: 30px auto;
   .responsive-table thead {
     display: none; /* מעלים את השמות */
   }
-  input {
-    max-width: 289px;
-  }
+
   .responsive-table, 
   .responsive-table tbody, 
   .responsive-table tr, 
