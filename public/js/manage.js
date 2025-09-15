@@ -178,15 +178,22 @@ function renderTabs() {
     </div>
   `).join("");
 }
-
 window.renderCategory = function(categoryKey) {
-  // קודם כל נסגור את כל השאר
+  const container = document.getElementById(`tasks-${categoryKey}`);
+
+  // אם כבר פתוח – נסגור
+  if (container.classList.contains("open")) {
+    container.classList.remove("open");
+    return;
+  }
+
+  // נסגור את כל השאר
   categories.forEach(cat => {
-    document.getElementById(`tasks-${cat.key}`).style.display = "none";
+    document.getElementById(`tasks-${cat.key}`).classList.remove("open");
   });
 
-  const container = document.getElementById(`tasks-${categoryKey}`);
-  container.style.display = "block";
+  // נפתח את הנוכחי
+  container.classList.add("open");
   container.innerHTML = "";
 
   const list = shiftData?.tasks?.[categoryKey] || [];
@@ -224,6 +231,7 @@ window.renderCategory = function(categoryKey) {
     `;
   });
 };
+
 
 function toggleTask(id) {
   const block = document.getElementById(`task-${id}`);

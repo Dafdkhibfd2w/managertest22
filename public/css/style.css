@@ -551,8 +551,15 @@ margin: 30px auto;
 .tasks-container {
   background: #262626;
   padding: 10px;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s ease, padding 0.3s ease;
 }
 
+.tasks-container.open {
+  max-height: 1000px; /* מספיק גבוה כדי להכיל משימות */
+  padding: 10px;
+}
 
 /* =========================
    RESPONSIVE
