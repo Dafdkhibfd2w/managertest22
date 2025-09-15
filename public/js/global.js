@@ -260,7 +260,7 @@ async function fetchWithLoader(url, opts) {
 // שימוש:
 document.addEventListener("DOMContentLoaded", async () => {
   // נגיד כאן אתה קורא ל־DB
-  const data = await fetchWithLoader("/api/get-shifts");
+  const data = await fetchWithLoader("/api/get-shift");
   console.log("Loaded:", data);
 });
 
