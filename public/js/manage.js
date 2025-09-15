@@ -21,11 +21,11 @@ const categories = [
   { name: "משימות חודשיות", key: "monthly" }
 ];
 function showSkeleton() {
-  const shiftSection = document.getElementById("shiftSection");
   shiftSection.style.display = "block";
 
-  const updateForm = document.getElementById("updateForm");
-  updateForm.innerHTML = `
+  // לא מוחקים את updateForm, רק ממלאים את tasksContainer
+  const tasksContainer = document.getElementById("tasksContainer");
+  tasksContainer.innerHTML = `
     <div class="skeleton skeleton-line" style="width: 70%;"></div>
     <div class="skeleton skeleton-line" style="width: 90%;"></div>
     <div class="skeleton skeleton-line" style="width: 60%;"></div>
@@ -40,6 +40,7 @@ function showSkeleton() {
     <div class="skeleton skeleton-line" style="width: 50%;"></div>
   `;
 }
+
 let shiftData = null;
 let activeCategory = "daily";
 
