@@ -309,9 +309,11 @@ form label {
   direction: rtl; 
   unicode-bidi: bidi-override;
 } */
-
+input[type="date"] {
+  width: 97%;
+}
 input, select, textarea {
-  width: 97%; padding: 12px 14px;
+  width: 100%; padding: 12px 14px;
   border: 1px solid var(--card-border);
   border-radius: 10px;
   background: var(--bg-alt);
