@@ -167,21 +167,25 @@ createdByChip.style.border = "2px solid #444488";
    UI – טאבים + רינדור קטגוריה
    ========================= */
 function renderTabs() {
-  let tabsHTML = `<div class="task-tabs">`;
-  categories.forEach((cat) => {
-    tabsHTML += `<div class="task-tab ${cat.key === activeCategory ? "active" : ""}" onclick="renderCategory('${cat.key}')">${cat.name}</div>`;
-  });
-  tabsHTML += `</div>`;
-  updateForm.innerHTML = tabsHTML;
+  const tabsDiv = document.getElementById("tabs");
+  tabsDiv.innerHTML = categories.map(cat => `
+    <div class="task-tab ${cat.key === activeCategory ? "active" : ""}" 
+         onclick="renderCategory('${cat.key}')">
+      ${cat.name}
+    </div>
+  `).join("");
 }
 
 window.renderCategory = function(categoryKey) {
   activeCategory = categoryKey;
   renderTabs();
 
+  const tasksContainer = document.getElementById("tasksContainer");
+  tasksContainer.innerHTML = ""; // 🟢 נקה כל מה שהיה קודם
+
   const list = shiftData?.tasks?.[categoryKey] || [];
   if (!list.length) {
-    updateForm.innerHTML += `<p>אין משימות בקטגוריה הזו.</p>`;
+    tasksContainer.innerHTML = `<p>אין משימות בקטגוריה הזו.</p>`;
     return;
   }
 
@@ -193,17 +197,14 @@ window.renderCategory = function(categoryKey) {
 
   list.forEach((task, index) => {
     const exec = getExecForTask(shiftData, categoryKey, task);
-
     const teamOptions = teamArray.map(n =>
       `<option value="${n}" ${exec?.worker === n ? "selected" : ""}>${n}</option>`
     ).join("");
 
     const taskId = `${categoryKey}-${index}`;
-    updateForm.innerHTML += `
+    tasksContainer.innerHTML += `
       <div class="task-block accordion" id="task-${taskId}">
-        <div class="task-header" onclick="toggleTask('${taskId}')">
-          ${task}
-        </div>
+        <div class="task-header" onclick="toggleTask('${taskId}')">${task}</div>
         <div class="task-body" data-category="${categoryKey}" data-task="${task}">
           <label>בוצע על ידי:
             <select class="fld-worker">
@@ -216,7 +217,7 @@ window.renderCategory = function(categoryKey) {
       </div>
     `;
 
-    // האזנה לשינויים
+    // מאזין לשינוי
     const bodyEl = document.getElementById(`task-${taskId}`).querySelector('.task-body');
     const sel = bodyEl.querySelector('.fld-worker');
     sel.addEventListener('change', () => {
@@ -225,7 +226,6 @@ window.renderCategory = function(categoryKey) {
     });
   });
 };
-
 function toggleTask(id) {
   const block = document.getElementById(`task-${id}`);
   block.classList.toggle("open");
