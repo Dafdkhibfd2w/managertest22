@@ -473,6 +473,7 @@ async function loadRuntimeNotes() {
   if (!dateInput?.value || !runtimeList) return;
   try {
     const shift = await fetchShiftByDate(dateInput.value);
+    console.log("SHIFT מהשרת:", shift);  // ⬅️ חשוב לראות
     renderRuntimeNotes(runtimeList, shift?.runtimeNotes);
   } catch (err) {
     console.error("שגיאה בטעינת הערות:", err);
