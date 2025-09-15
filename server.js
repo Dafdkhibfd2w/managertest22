@@ -18,6 +18,7 @@ const Supplier   = require('./models/Supplier');
 const Task = require("./models/Task");
 const DailyOrder = require('./models/DailyOrder');
 const Invoice    = require('./models/Invoice'); // ודא נתיב נכון אצלך
+const Shift = require('./models/Shift');
 
 // ===== Utils =====
 function isAllowedMime(m) {
@@ -63,47 +64,47 @@ app.use(async (req, res, next) => {
 
 
 // ===== Schemas for Shifts (כמו אצלך) =====
-const ExecutionSchema = new mongoose.Schema({
-  task:   { type: String, required: true },
-  worker: { type: String, default: '' },
-  time:   { type: String, default: '' },
-}, { _id: false });
+// const ExecutionSchema = new mongoose.Schema({
+//   task:   { type: String, required: true },
+//   worker: { type: String, default: '' },
+//   time:   { type: String, default: '' },
+// }, { _id: false });
 
-const RuntimeNoteSchema = new mongoose.Schema({
-  id:     { type: String, required: true },
-  text:   { type: String, required: true },
-  author: { type: String, default: 'אחמ״ש' },
-  time:   { type: Date,   default: Date.now }
-}, { _id: false });
+// const RuntimeNoteSchema = new mongoose.Schema({
+//   id:     { type: String, required: true },
+//   text:   { type: String, required: true },
+//   author: { type: String, default: 'אחמ״ש' },
+//   time:   { type: Date,   default: Date.now }
+// }, { _id: false });
 
-const ShiftSchema = new mongoose.Schema({
-  date:   { type: String, required: true, unique: true }, // YYYY-MM-DD
-  manager:{ type: String, default: '' },
-  team:   { type: [String], default: [] },
-scores: {
-  type: Map,
-  of: Number,
-  default: () => new Map()
-},
-  tasks: {
-    daily:   { type: [String], default: [] },
-    weekly:  { type: [String], default: [] },
-    monthly: { type: [String], default: [] },
-  },
+// const ShiftSchema = new mongoose.Schema({
+//   date:   { type: String, required: true, unique: true }, // YYYY-MM-DD
+//   manager:{ type: String, default: '' },
+//   team:   { type: [String], default: [] },
+// scores: {
+//   type: Map,
+//   of: Number,
+//   default: () => new Map()
+// },
+//   tasks: {
+//     daily:   { type: [String], default: [] },
+//     weekly:  { type: [String], default: [] },
+//     monthly: { type: [String], default: [] },
+//   },
 
-  executions: {
-    daily:   { type: [ExecutionSchema], default: [] },
-    weekly:  { type: [ExecutionSchema], default: [] },
-    monthly: { type: [ExecutionSchema], default: [] },
-  },
+//   executions: {
+//     daily:   { type: [ExecutionSchema], default: [] },
+//     weekly:  { type: [ExecutionSchema], default: [] },
+//     monthly: { type: [ExecutionSchema], default: [] },
+//   },
 
-  notes:         { type: String, default: '' },
-  runtimeNotes:  { type: [RuntimeNoteSchema], default: [] },
-  closed:        { type: Boolean, default: false },
-  closedAt:      { type: Date, default: null },
-}, { timestamps: true });
+//   notes:         { type: String, default: '' },
+//   runtimeNotes:  { type: [RuntimeNoteSchema], default: [] },
+//   closed:        { type: Boolean, default: false },
+//   closedAt:      { type: Date, default: null },
+// }, { timestamps: true });
 
-const Shift = mongoose.model('Shift', ShiftSchema);
+// const Shift = mongoose.model('Shift', ShiftSchema);
 
 // ===== Helpers =====
 const ADMIN_PIN = process.env.ADMIN_PIN || '1111';
