@@ -213,7 +213,34 @@ function showLoader() {
   document.getElementById("globalLoader").style.display = "flex";
   document.getElementById("pageContent").style.display = "none";
 }
+  const cookies = document.cookie.split(";").reduce((acc, c) => {
+    const [k,v] = c.trim().split("=");
+    acc[k] = decodeURIComponent(v);
+    return acc;
+  }, {});
+  
+  if (cookies.user) {
+    const user = JSON.parse(cookies.user);
+    console.log("מחובר כ:", user.name, "תפקיד:", user.role);
+  }
 
+
+  async function loadUser() {
+  try {
+    const res = await fetch("/user");
+    const data = await res.json();
+    if (data.ok && data.user) {
+      if (document.getElementById("user")) {
+      document.getElementById("user").textContent =
+        `ברוכים הבאים ${data.user.name} למערכת ניהול משמרות`
+      }
+    }
+  } catch (err) {
+    console.error("שגיאה בשליפת משתמש:", err);
+  }
+}
+
+loadUser();
 function hideLoader() {
   document.getElementById("globalLoader").style.display = "none";
   document.getElementById("pageContent").style.display = "block";

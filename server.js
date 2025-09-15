@@ -110,7 +110,7 @@ const ADMIN_PIN = process.env.ADMIN_PIN || '1111';
 function requireLogin(req, res, next) {
   if (req.cookies && req.cookies.user) {
     try {
-      req.user = JSON.parse(req.cookies.user); // שיהיה לך user זמין ב־req
+      req.user = JSON.parse(req.cookies.user);
       return next();
     } catch {
       res.clearCookie("user");
@@ -119,6 +119,7 @@ function requireLogin(req, res, next) {
   }
   return res.redirect("/login");
 }
+
 function requireUser(req, res, next) {
   const cookie = req.cookies.user;
   if (!cookie) return res.status(401).json({ ok:false, message:"חייב להתחבר" });
@@ -257,7 +258,7 @@ function uploadToCloudinary(buffer, opts = {}) {
 }
 
 // ===== API: חשבוניות =====
-app.post('/upload-invoice', upload.single('file'), async (req, res) => {
+app.post('/upload-invoice', requireUser, upload.single('file'), async (req, res) => {
   try {
     const date = (req.body?.date || '').trim();
     const supplier = (req.body?.supplier || '').trim();
@@ -290,7 +291,7 @@ app.post('/upload-invoice', upload.single('file'), async (req, res) => {
       width:       result.width,
       height:      result.height,
       originalName:f.originalname,
-      uploadedBy:  'אחמ״ש'
+  uploadedBy:  req.user?.name || "system"   // 🟢 המשתמש המחובר
     });
 
     res.json({ ok:true, message:'החשבונית הועלתה בהצלחה', invoice: row });
@@ -362,7 +363,7 @@ app.get('/get-shift', async (req, res) => {
     res.status(500).json(null);
   }
 });
-app.post('/save-shift', async (req, res) => {
+app.post('/save-shift', requireUser, async (req, res) => {
   try {
     const payload = { ...req.body };
     payload.team = normalizeTeam(payload.team);
@@ -373,7 +374,8 @@ await Shift.findOneAndUpdate(
     $set: payload,
     $setOnInsert: {
       executions: { daily: [], weekly: [], monthly: [] }, // <- היה xecutions
-      scores: {} // יווצר במסמך חדש
+      scores: {}, // יווצר במסמך חדש,
+      createdBy: req.user.name
     }
   },
   { upsert: true, new: true }
@@ -586,7 +588,7 @@ app.post('/delete-runtime-note', async (req, res) => {
   }
 });
 
-app.post('/finalize-shift', async (req, res) => {
+app.post('/finalize-shift', requireUser, async (req, res) => {
   try {
     const { date, manager, team, executions } = req.body || {};
     if (!date) return res.status(400).json({ ok: false, message: 'date חובה.' });
@@ -598,7 +600,8 @@ app.post('/finalize-shift', async (req, res) => {
         manager: manager || '',
         team: normalizeTeam(team),
         tasks: { daily: [], weekly: [], monthly: [] },
-        executions: { daily: [], weekly: [], monthly: [] }
+        executions: { daily: [], weekly: [], monthly: [] },
+        createdBy: req.user.name  // 🟢 מי יצר אם חדש
       });
     } else {
       if (manager !== undefined) shift.manager = manager;
@@ -610,6 +613,7 @@ app.post('/finalize-shift', async (req, res) => {
 
     shift.closed  = true;
     shift.closedAt = new Date();
+    shift.closedBy = req.user.name; 
 
     await shift.save();
     return res.json({ ok: true, message: 'המשמרת נסגרה בהצלחה.', shift });

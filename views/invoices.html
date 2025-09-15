@@ -112,6 +112,7 @@
               <th>תאריך</th>
               <th>ספק</th>
               <th>חשבונית</th>
+              <th>העלה</th>
               <th style="width:160px">פעולות</th>
             </tr>
           </thead>
@@ -205,6 +206,7 @@
               צפייה בקובץ
             </a>
           </td>
+          <td data-label="העלה">${escapeHtml(r.uploadedBy || '')}</td>
           <td class="actions">
             <button onclick="delInvoice('${r._id}')" class="secondary">מחק</button>
           </td>

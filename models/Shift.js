@@ -37,11 +37,12 @@ scores: {
     weekly:  { type: [ExecutionSchema], default: [] },
     monthly: { type: [ExecutionSchema], default: [] },
   },
-
+createdBy: { type: String, default: "" },
   notes:         { type: String, default: "" },
   runtimeNotes:  { type: [RuntimeNoteSchema], default: [] },
   closed:        { type: Boolean, default: false },
   closedAt:      { type: Date, default: null },
+  closedBy:  { type: String, default: "" }, // 🟢 מי סגר
 }, { timestamps: true });
 
 module.exports = mongoose.model("Shift", ShiftSchema);
