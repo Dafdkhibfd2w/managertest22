@@ -9,7 +9,8 @@
   <link rel="icon" href="/icons/icon-512.png" type="image/png">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#2b5329">
-  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
 </head>
 
 <body class="theme-dark-premium">
@@ -52,8 +53,8 @@
     <h1>ניהול משימות המשמרת</h1>
 
     <form id="loadForm">
-      <label>בחר תאריך משמרת:</label>
-      <input type="date" name="date" required>
+      <label id="shiftDate">בחר תאריך משמרת:</label>
+      <input id="shiftDate" type="date" name="date" required>
       <button type="submit" class="btn btn--primary">טען משמרת</button>
       <button id="go-back" class="btn btn--primary">חזור אחורה</button>
       <div class="manage_btn" style="display: flex;justify-content: center;">
@@ -121,7 +122,15 @@
     </div>
   </div>
   <script src="/js/global.js"></script>
-
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    flatpickr("#shiftDate", {
+      dateFormat: "Y-m-d",
+      locale: "he", // עברית
+      allowInput: true
+    });
+  });
+</script>
   <script src="/js/manage.js" defer></script>
 
 </div>
