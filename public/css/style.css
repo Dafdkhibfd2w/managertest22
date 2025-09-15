@@ -311,6 +311,7 @@ form label {
 } */
 input[type="date"] {
   width: 97%;
+  margin-right: 5px;
 }
 input, select, textarea {
   width: 100%; padding: 12px 14px;
