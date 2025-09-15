@@ -434,7 +434,7 @@ function buildFinalizeSummaryHTML(shift) {
       '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
     }[m]));
   }
-function renderRuntimeNotes(listEl, notes) {
+window.renderRuntimeNotes = function(listEl, notes) {
   const arr = Array.isArray(notes) ? notes : [];
 
   if (!arr.length) {
