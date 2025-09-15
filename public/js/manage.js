@@ -431,13 +431,15 @@ function buildFinalizeSummaryHTML(shift) {
       '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
     }[m]));
   }
-
 function renderRuntimeNotes(listEl, notes) {
   const arr = Array.isArray(notes) ? notes : [];
-  listEl.innerHTML = ""; // נקה הכל קודם
 
   if (!arr.length) {
-    listEl.innerHTML = '<li class="exec-row"><span class="task-name">אין הערות</span></li>';
+    listEl.innerHTML = `
+      <li class="exec-row">
+        <span class="task-name">אין הערות</span>
+      </li>
+    `;
     return;
   }
 
@@ -453,6 +455,7 @@ function renderRuntimeNotes(listEl, notes) {
 }
 
 
+
   async function fetchShiftByDate(date) {
     const res = await fetch(`/api/get-shift?date=${encodeURIComponent(date)}`);
     if (!res.ok) return null;
@@ -466,11 +469,20 @@ function renderRuntimeNotes(listEl, notes) {
     const addBtn       = document.getElementById('addRuntimeNoteBtn');
     const managerInput = document.querySelector('input[name="manager"], #manager');
 
-    async function loadRuntimeNotes() {
-      if (!dateInput?.value || !runtimeList) return;
-      const shift = await fetchShiftByDate(dateInput.value);
-      renderRuntimeNotes(runtimeList, shift?.runtimeNotes);
-    }
+async function loadRuntimeNotes() {
+  if (!dateInput?.value || !runtimeList) return;
+  try {
+    const shift = await fetchShiftByDate(dateInput.value);
+    renderRuntimeNotes(runtimeList, shift?.runtimeNotes);
+  } catch (err) {
+    console.error("שגיאה בטעינת הערות:", err);
+    runtimeList.innerHTML = `
+      <li class="exec-row">
+        <span class="task-name">שגיאה בטעינת הערות</span>
+      </li>
+    `;
+  }
+}
 
     addBtn?.addEventListener('click', async () => {
   if (!dateInput?.value) return alert('בחר תאריך משמרת קודם');
@@ -490,15 +502,10 @@ function renderRuntimeNotes(listEl, notes) {
   const data = await res.json();
   if (!data.ok) return alert(data.message || 'שגיאה');
 
-  // טען מחדש מהשרת במקום appendChild
-  await loadRuntimeNotes();
-
   noteText.value = '';
-  noteText.focus();
+  await loadRuntimeNotes();
 });
 
-
-// מחיקת הערה
 runtimeList?.addEventListener('click', async (e) => {
   const btn = e.target.closest('.note-del-btn');
   if (!btn) return;
@@ -523,12 +530,7 @@ runtimeList?.addEventListener('click', async (e) => {
   });
 
   const data = await res.json();
-  if (!data.ok) { 
-    alert(data.message || 'שגיאה במחיקה'); 
-    return; 
-  }
-
-  // במקום לרנדר מהתשובה – נטען מחדש מהשרת
+  if (!data.ok) { alert(data.message || 'שגיאה במחיקה'); return; }
   await loadRuntimeNotes();
 });
 
