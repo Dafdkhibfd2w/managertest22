@@ -164,7 +164,10 @@ createdByChip.style.border = "2px solid #444488";
   // שמור נתונים לרינדור
   shiftData = shift;
   updateForm.dataset.date = date;
-
+renderRuntimeNotes(
+  document.getElementById("runtimeNotesList"),
+  shift.runtimeNotes || []
+);
   renderTabs();
   // renderCategory("daily");
 
