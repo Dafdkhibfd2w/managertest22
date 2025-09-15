@@ -272,7 +272,8 @@ async function saveSingleTask(btn) {
     const result = await res.json();
     if (!res.ok) throw new Error(result.message || "שגיאת שרת");
 
-    btn.textContent = result.message || "נשמר ✔";
+    // btn.textContent = result.message || "נשמר ✔";
+    showToast("נשמר ✔");
     body.classList.remove('dirty');
   } catch (err) {
     console.error(err);
@@ -317,7 +318,8 @@ saveBtn.addEventListener("click", async () => {
   });
   updateForm.querySelectorAll('.task-body.dirty').forEach(el => el.classList.remove('dirty'));
 
-  saveStatus.textContent = result.message || "נשמר.";
+  // saveStatus.textContent = result.message || "נשמר.";
+    showToast("נשמר ✔");
 });
 
 /* =========================
