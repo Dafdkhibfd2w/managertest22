@@ -39,6 +39,13 @@ function showSkeleton() {
   document.getElementById("managerNote").innerHTML = `
     <div class="skeleton skeleton-line" style="width: 50%;"></div>
   `;
+  if(leadChip) {
+      leadChip.innerHTML = `
+    <div class="skeleton skeleton-line" style="width: 70%;"></div>
+    <div class="skeleton skeleton-line" style="width: 90%;"></div>
+    <div class="skeleton skeleton-line" style="width: 60%;"></div>
+  `;
+  }
 }
 
 let shiftData = null;
