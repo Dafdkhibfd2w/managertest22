@@ -39,12 +39,14 @@ function showSkeleton() {
   document.getElementById("managerNote").innerHTML = `
     <div class="skeleton skeleton-line" style="width: 50%;"></div>
   `;
-if (leadChip) {
-  leadChip.innerHTML = `
-    <span class="skeleton skeleton-dot"></span>
-    <span class="skeleton skeleton-line" style="width: 50px; height: 10px;"></span>
-  `;
-}
+  document.querySelectorAll(".lead-chip").forEach(chip => {
+    if (chip) {
+      chip.innerHTML = `
+        <span class="skeleton skeleton-dot"></span>
+        <span class="skeleton skeleton-line" style="width: 50px; height: 10px;"></span>
+      `;
+    }
+  });
 
 }
 
