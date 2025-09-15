@@ -157,7 +157,7 @@ createdByChip.style.border = "2px solid #444488";
   updateForm.dataset.date = date;
 
   renderTabs();
-  renderCategory("daily");
+  // renderCategory("daily");
 
   shiftSection.style.display = "block";
   saveBtn.style.display = "inline-block";
