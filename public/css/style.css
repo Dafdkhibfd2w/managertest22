@@ -523,7 +523,6 @@ margin: 30px auto;
     max-width: 330px;
   padding: 20px;
 }
-
 .highlight-strong {
   background: rgba(0, 255, 163, 0.18);
   border: 1px solid var(--btn-primary-hover);
@@ -534,6 +533,14 @@ margin: 30px auto;
 
 #admin-control {
   margin-top: 9px;
+}
+
+#man{
+      background-color: var(--btn-primary);
+    color: #0E0E0E;
+    border-radius: 14px;
+    margin-left: 5px;
+    text-align: center;
 }
 
 /* =========================
