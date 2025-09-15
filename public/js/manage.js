@@ -13,7 +13,7 @@ const finalizeModal   = document.getElementById("finalizeModal");
 const finalizeSummary = document.getElementById("finalizeSummary");
 const confirmFinalize = document.getElementById("confirmFinalize");
 const cancelFinalize  = document.getElementById("cancelFinalize");
-
+const createdByChip = document.getElementById("createdByChip");
 // ===== consts
 const categories = [
   { name: "משימות יומיות", key: "daily" },
@@ -138,7 +138,17 @@ loadForm.addEventListener("submit", async (e) => {
     leadChip.style.backgroundColor = "#fdfdfd30";
   // סטטוס
   updateStatus(shift);
-
+if (shift.createdBy) {
+  createdByChip.innerHTML = `<span class="dot"></span>נוצר ע״י: ${shift.createdBy}`;
+} else {
+  createdByChip.innerHTML = `<span class="dot"></span>נוצר ע״י: —`;
+}
+createdByChip.style.display = "inline-flex";
+createdByChip.style.border = "2px solid #444488";
+createdByChip.style.maxWidth = "140px";
+createdByChip.style.borderRadius = "14px";
+createdByChip.style.padding = "6px";
+createdByChip.style.backgroundColor = "#fdfdfd30";
   // הערות אחמ״ש
   const noteBox = document.getElementById("managerNoteSection");
   const noteText = document.getElementById("managerNote");
