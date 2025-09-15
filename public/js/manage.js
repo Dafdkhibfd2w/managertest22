@@ -432,20 +432,26 @@ function buildFinalizeSummaryHTML(shift) {
     }[m]));
   }
 
-  function renderRuntimeNotes(listEl, notes) {
-    const arr = Array.isArray(notes) ? notes : [];
-    listEl.innerHTML = arr.length
-      ? arr.map((n, i) => `
-          <li class="exec-row" data-note-id="${n.id || ''}" data-index="${i}">
-            <span class="task-name">${escapeHtml(n.text)}</span>
-            <span class="who-time">
-              <small>${new Date(n.time).toLocaleString('he-IL')}</small>
-            </span>
-            <button class="note-del-btn" style='color: black' title="מחיקה">🗑️</button>
-          </li>
-        `).join('')
-      : '<li class="exec-row"><span class="task-name">אין הערות</span></li>';
+function renderRuntimeNotes(listEl, notes) {
+  const arr = Array.isArray(notes) ? notes : [];
+  listEl.innerHTML = ""; // נקה הכל קודם
+
+  if (!arr.length) {
+    listEl.innerHTML = '<li class="exec-row"><span class="task-name">אין הערות</span></li>';
+    return;
   }
+
+  listEl.innerHTML = arr.map((n, i) => `
+    <li class="exec-row" data-note-id="${n.id || ''}" data-index="${i}">
+      <span class="task-name">${escapeHtml(n.text)}</span>
+      <span class="who-time">
+        <small>${new Date(n.time).toLocaleString('he-IL')}</small>
+      </span>
+      <button class="note-del-btn" style='color: black' title="מחיקה">🗑️</button>
+    </li>
+  `).join('');
+}
+
 
   async function fetchShiftByDate(date) {
     const res = await fetch(`/api/get-shift?date=${encodeURIComponent(date)}`);
