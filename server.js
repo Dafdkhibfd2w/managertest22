@@ -375,6 +375,7 @@ await Shift.findOneAndUpdate(
     $set: { ...payload},  // 🟢 תמיד נשמר מי עדכן
     $setOnInsert: {
       executions: { daily: [], weekly: [], monthly: [] },
+        runtimeNotes: [],   // ⬅️ ככה תמיד יהיה השדה
       scores: {},
       createdBy: req.user.name                       // 🟢 רק ביצירה ראשונה
     }
@@ -602,6 +603,7 @@ app.post('/finalize-shift', requireUser, async (req, res) => {
         manager: manager || '',
         team: normalizeTeam(team),
         tasks: { daily: [], weekly: [], monthly: [] },
+          runtimeNotes: [],   // ⬅️ ככה תמיד יהיה השדה
         executions: { daily: [], weekly: [], monthly: [] },
         createdBy: req.user.name  // 🟢 מי יצר אם חדש
       });

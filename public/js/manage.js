@@ -31,14 +31,14 @@ function showSkeleton() {
     <div class="skeleton skeleton-line" style="width: 60%;"></div>
   `;
 
-  // document.getElementById("runtimeNotesList").innerHTML = `
-  //   <li class="skeleton skeleton-line" style="width: 80%;"></li>
-  //   <li class="skeleton skeleton-line" style="width: 60%;"></li>
-  // `;
+  document.getElementById("runtimeNotesList").innerHTML = `
+    <li class="skeleton skeleton-line" style="width: 80%;"></li>
+    <li class="skeleton skeleton-line" style="width: 60%;"></li>
+  `;
 
-  // document.getElementById("managerNote").innerHTML = `
-  //   <div class="skeleton skeleton-line" style="width: 50%;"></div>
-  // `;
+  document.getElementById("managerNote").innerHTML = `
+    <div class="skeleton skeleton-line" style="width: 50%;"></div>
+  `;
   document.querySelectorAll(".lead-chip").forEach(chip => {
     if (chip) {
       chip.innerHTML = `
