@@ -167,7 +167,7 @@ const res = await fetch("/save-shift", {
 });
 
   const result = await res.json();
-  document.getElementById("status").textContent = result.message || "נשמר";
+  showToast(result.message || "נשמר");
 
   // איפוס → נטען שוב מהשרת
   e.target.reset();

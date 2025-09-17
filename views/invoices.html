@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#2b5329">
 <link rel="icon" href="/icons/icon-512.png" type="image/png">
 <script src="https://unpkg.com/lucide@latest"></script>
-<script defer src="/js/ui.js"></script>
+
 </head>
 <body class="theme-dark-premium">
   <div id="globalLoader">
@@ -166,7 +166,7 @@ async function uploadInvoice() {
       const fd = new FormData(uploadForm);
       try {
         const csrf = await getCsrf();
-const res = await fetch('/upload-invoice', { 
+const res = await fetch('/api/upload-invoice', { 
   method:'POST',
   credentials:'include',
   headers:{ 
