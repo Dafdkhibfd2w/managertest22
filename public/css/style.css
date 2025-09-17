@@ -308,10 +308,11 @@ form label {
   direction: rtl; 
   unicode-bidi: bidi-override;
 } */
-/* input[type="date"] {
-  width: 97%;
-  margin-right: 5px;
-} */
+input[type="date"] {
+  appearance: none;        /* מבטל עיצוב דיפולטיבי */
+  -webkit-appearance: none; /* לאייפון/ספארי */
+  -moz-appearance: none;   /* לפיירפוקס */
+}
 input, select, textarea {
   width: 100%; padding: 12px 14px;
   border: 1px solid var(--card-border);
