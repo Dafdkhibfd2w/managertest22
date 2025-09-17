@@ -278,12 +278,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
  // הפעלה/כיבוי Dark/Light Mode
+
 const toggleBtn = document.getElementById('themeToggle');
-toggleBtn.textContent = "🌙 / ☀️";
-toggleBtn.style.position = "fixed";
-toggleBtn.style.bottom = "20px";
-toggleBtn.style.left = "20px";
-toggleBtn.style.zIndex = "10000";
+if (toggleBtn) {
+  toggleBtn.textContent = "🌙 / ☀️";
+  toggleBtn.style.position = "fixed";
+  toggleBtn.style.bottom = "20px";
+  toggleBtn.style.left = "20px";
+  toggleBtn.style.zIndex = "10000";
+   
+
+}
+
 
 // בדיקה אם יש מצב שמור
 if (localStorage.getItem('theme') === 'light') {
@@ -301,7 +307,9 @@ document.getElementById('themeToggle')?.addEventListener('click', () => {
     document.body.classList.contains('light') ? 'light' : 'dark'
   );
 });
-  document.getElementById("notifToggle").addEventListener("click", () => {
+
+
+  document.getElementById("notifToggle")?.addEventListener("click", () => {
     const bell = document.getElementById("notifIcon");
     bell.style.animation = "bellShake 0.6s ease";
     setTimeout(() => bell.style.animation = "", 600);
@@ -317,4 +325,60 @@ document.getElementById('themeToggle')?.addEventListener('click', () => {
   } catch {
     window.location.href = "/login";
   }
+});
+// כפתור Logout
+document.getElementById("logoutBtn")?.addEventListener("click", async (e) => {
+  e.preventDefault();
+  const res = await fetch("/logout", { method: "POST" });
+  const data = await res.json();
+  if (data.ok) {
+    window.location.href = "/login";
+  }
+});
+document.addEventListener("DOMContentLoaded", () => {
+  // נרמל מסלול (מוריד / בסוף) ומטפל בשורש
+  const normalize = p => {
+    if (!p) return "/";
+    p = p.replace(/\/+$/,"");
+    return p === "" ? "/" : p;
+  };
+  const path = normalize(window.location.pathname);
+
+  // פונקציה שמפעילה Active על קבוצת לינקים (header/bottom)
+  function activate(containerSelector){
+    const links = Array.from(document.querySelectorAll(containerSelector + " .nav-item"));
+    if (!links.length) return;
+
+    // ננקה Active קודם
+    links.forEach(a => a.classList.remove("active"));
+
+    let best = null, bestLen = -1;
+
+    links.forEach(a => {
+      const raw = a.getAttribute("href") || "/";
+      const href = normalize(raw);
+
+      // בית מסומן רק כשאנחנו בשורש
+      if (href === "/") {
+        if (path === "/") { best = a; bestLen = 1; }
+        return;
+      }
+
+      // התאמה: שווה בדיוק או פריפיקס עם / (כדי ש-/pro לא יסמן /profile)
+      if (path === href || path.startsWith(href + "/") || path.startsWith(href + "?")) {
+        if (href.length > bestLen) { best = a; bestLen = href.length; }
+      }
+    });
+
+    // אם לא נמצא כלום ועדיין אנחנו בשורש
+    if (!best && path === "/") {
+      best = links.find(a => normalize(a.getAttribute("href")) === "/");
+    }
+
+    if (best) best.classList.add("active");
+  }
+
+  // הפעלה לשני האיזורים (אם קיימים)
+  activate(".brandbar");
+  activate(".bottom-nav");
 });

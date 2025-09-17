@@ -120,7 +120,7 @@ function isAllowedMime(m) {
 }
 
 app.use(cors({
-  origin: ['http://localhost:3000','https://your-domain.com'],
+  origin: ['http://localhost:3000','https://closemanages.vercel.app'],
   credentials: true
 }));
 
@@ -458,6 +458,65 @@ app.delete('/invoice/:id', async (req, res) => {
   }
 });
 
+// ===== View: Profile page =====
+app.get("/profile", requireLogin, (req, res) => {
+  res.sendFile(path.join(__dirname, "views", "profile.html"));
+});
+
+// ===== API: Profile Data =====
+app.get("/profile-data", requireLogin, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-passwordHash");
+    if (!user) return res.status(404).json({ ok: false, message: "משתמש לא נמצא" });
+
+    res.json({ ok: true, user });
+  } catch (err) {
+    console.error("profile error:", err);
+    res.status(500).json({ ok: false, message: "שגיאה בשרת" });
+  }
+});
+app.get("/profile-edit", requireLogin, (req, res) => {
+  res.sendFile(path.join(__dirname, "views", "profile-edit.html"));
+});
+
+// ===== API: Update Profile =====
+
+// API לעדכון פרופיל עם העלאת תמונה
+app.post("/profile-update", requireLogin, upload.single("avatar"), async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const update = {};
+
+    if (username) update.username = username.trim().toLowerCase();
+    if (password) {
+      update.passwordHash = await bcrypt.hash(password, 12);
+    }
+
+    // אם עלה קובץ -> נעלה ל-Cloudinary
+    if (req.file) {
+      const folder = `users/${req.user.id}/avatar`;
+      const result = await new Promise((resolve, reject) => {
+        cloudinary.uploader.upload_stream(
+          { folder, resource_type: "image" },
+          (err, res) => (err ? reject(err) : resolve(res))
+        ).end(req.file.buffer);
+      });
+
+      update.avatarUrl = result.secure_url;
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { $set: update },
+      { new: true }
+    ).select("-passwordHash");
+
+    res.json({ ok: true, user });
+  } catch (err) {
+    console.error("profile-update error:", err);
+    res.status(500).json({ ok: false, message: "שגיאה בעדכון" });
+  }
+});
 
 
 // ===== API: משמרות =====
@@ -524,6 +583,7 @@ app.post('/update-shift', async (req, res) => {
     res.status(500).json({ message: 'שגיאת שרת' });
   }
 });
+
 app.post('/update-single-task', async (req, res) => {
   try {
     const { date, category, task, worker, time } = req.body || {};

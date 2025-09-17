@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>עריכת פרופיל</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/profile.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    
+    body {
+      font-family: "Heebo", sans-serif;
+      background: #0e0e0e;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .edit-card {
+      background: #1c1c1c;
+      padding: 24px;
+      border-radius: 14px;
+      box-shadow: 0 8px 28px rgba(0,0,0,.6);
+      width: 100%;
+      max-width: 420px;
+    }
+    h2 {
+      margin-bottom: 20px;
+      text-align: center;
+      color: #00ffa3;
+    }
+    label {
+      display: block;
+      margin-top: 12px;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #333;
+      background: #111;
+      color: #fff;
+      font-size: 1rem;
+    }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      background: #00ffa3;
+      transition: background .2s;
+    }
+    button:hover { background: #00c2ff; }
+  </style>
+</head>
+<body>
+  <div class="edit-card">
+    <h2>עריכת פרופיל</h2>
+    <form id="editForm">
+      <label for="username">שם משתמש</label>
+      <input type="text" id="username" name="username" required>
+
+      <label for="password">סיסמה חדשה</label>
+      <input type="password" id="password" name="password">
+
+<label for="avatar">תמונת פרופיל</label>
+<input type="file" id="avatar" name="avatar" accept="image/*">
+
+      <button type="submit">שמור שינויים</button>
+  <button id="backBtn" class="btn-secondary">חזור אחורה</button>
+    </form>
+  </div>
+  <script src="/js/global.js"></script>
+  <script>
+    async function getCsrf() {
+  const res = await fetch("/csrf-token", { credentials: "include" });
+  const data = await res.json();
+  return data.csrfToken;
+}
+    async function loadProfile() {
+      const res = await fetch("/profile-data");
+      const data = await res.json();
+      if (data.ok && data.user) {
+        document.getElementById("username").value = data.user.username;
+        if (data.user.avatarUrl) {
+          document.getElementById("avatarUrl").value = data.user.avatarUrl;
+        }
+      }
+    }
+
+    loadProfile();
+
+document.getElementById("editForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const formData = new FormData();
+  formData.append("username", document.getElementById("username").value.trim());
+  formData.append("password", document.getElementById("password").value.trim());
+  if (document.getElementById("avatar").files[0]) {
+    formData.append("avatar", document.getElementById("avatar").files[0]);
+  }
+
+  const res = await fetch("/profile-update", {
+    method: "POST",
+    headers: {"CSRF-TOKEN": await getCsrf()},
+    body: formData
+  });
+
+  const data = await res.json();
+  if (data.ok) {
+    showToast("עודכן בהצלחה");
+    window.location.href = "/profile";
+  } else {
+    showToast('error', {type: 'error'});
+    // alert("❌ " + (data.message || "שגיאה בעדכון"));
+  }
+});
+
+  </script>
+</body>
+</html>
