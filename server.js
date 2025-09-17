@@ -50,19 +50,23 @@ app.post('/upload-invoice', requireUser, upload.single('file'), async (req, res)
     if (!date || !supplier || !f) {
       return res.status(400).json({ ok:false, message:'חסר date / supplier / קובץ' });
     }
-const fileType = require("file-type");
 
-async function detectFileType(buffer) {
-  if (fileType.fileTypeFromBuffer) {
-    // גרסה חדשה (v17+)
-    return await fileType.fileTypeFromBuffer(buffer);
-  }
-  if (fileType.fromBuffer) {
-    // גרסה ישנה (v16-)
-    return await fileType.fromBuffer(buffer);
-  }
-  throw new Error("❌ file-type לא נתמך בגרסה הזאת");
-}
+    const fileType = require("file-type");
+
+    async function detectFileType(buffer) {
+      if (fileType.fileTypeFromBuffer) {
+        // גרסה חדשה (v17+)
+        return await fileType.fileTypeFromBuffer(buffer);
+      }
+      if (fileType.fromBuffer) {
+        // גרסה ישנה (v16-)
+        return await fileType.fromBuffer(buffer);
+      }
+      throw new Error("❌ file-type לא נתמך בגרסה הזאת");
+    }
+
+    // 🟢 כאן היה חסר – לקרוא לפונקציה
+    const type = await detectFileType(f.buffer);
 
     if (!type || !isAllowedMime(type.mime)) {
       return res.status(400).json({ ok:false, message:'קובץ לא מאומת' });
@@ -104,6 +108,7 @@ async function detectFileType(buffer) {
     res.status(500).json({ ok:false, message:'שגיאה בהעלאת חשבונית' });
   }
 });
+
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
