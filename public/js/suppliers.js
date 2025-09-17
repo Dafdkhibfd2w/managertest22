@@ -111,13 +111,13 @@ async function getCsrf() {
     function renderTable(){
       tblBody.innerHTML = currentList.map(s => `
         <tr>
-          <td>${escapeHtml(s.name)}</td>
-          <td>${escapeHtml(s.phone) || 'לא הוזן'}</td>
-          <td>${(s.days||[]).map(dayLabel).join(', ')}</td>
-          <td>${(s.items||[]).map(it => escapeHtml(it.name)).join(', ')}</td>
-          <td style="">
+          <td data-label="שם">${escapeHtml(s.name)}</td>
+          <td data-label="טלפון">${escapeHtml(s.phone) || 'לא הוזן'}</td>
+          <td data-label="ימים">${(s.days||[]).map(dayLabel).join(', ')}</td>
+          <td data-label="מוצרים">${(s.items||[]).map(it => escapeHtml(it.name)).join(', ')}</td>
+          <td class="actions">
             <button style="width:100px;" class="secondary editBtn" data-id="${s._id}">ערוך</button>
-            <button style="width:100px; margin-top:5px;" class="danger delBtn" data-id="${s._id}">מחק</button>
+            <button style="width:100px;" class="danger delBtn" data-id="${s._id}">מחק</button>
           </td>
         </tr>
       `).join('');

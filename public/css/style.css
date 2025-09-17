@@ -350,13 +350,37 @@ button:not(#notifToggle):hover, .btn:hover {
 .btn-secondary { background: var(--btn-secondary); color: #000; }
 .btn-danger { background: var(--error); color: #fff; }
 
+@keyframes bellShake {
+  0%, 100% { transform: rotate(0); }
+  20% { transform: rotate(-15deg); }
+  40% { transform: rotate(15deg); }
+  60% { transform: rotate(-10deg); }
+  80% { transform: rotate(10deg); }
+}
 
+#notifToggle:active #notifIcon {
+  animation: bellShake 0.6s ease;
+}
 .brandbar {
   direction: ltr;     /* טקסט ותוכן יוזרמו משמאל לימין */
   text-align: left;   /* מיושרים לשמאל */
 }
+.actions {
+  display: flex;
+  flex-direction: column; /* כדי שיהיו אחד מתחת לשני */
+  gap: 8px;              /* הרווח ביניהם (שנה ל-10px/12px לפי מה שמתאים) */
+}
+@media (max-width: 600px) {
+  .actions {
+    flex-direction: row;   /* אחד לצד השני */
+    justify-content: center; /* למרכז אם רוצים */
+    gap: 12px;             /* רווח רוחבי */
+  }
 
-
+  .actions button {
+    flex: 1; /* כל כפתור ייקח רוחב שווה */
+  }
+}
 /* =========================
    TASK PICKER
    ========================= */

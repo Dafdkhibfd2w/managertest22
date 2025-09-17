@@ -296,3 +296,8 @@ document.getElementById('themeToggle')?.addEventListener('click', () => {
     document.body.classList.contains('light') ? 'light' : 'dark'
   );
 });
+  document.getElementById("notifToggle").addEventListener("click", () => {
+    const bell = document.getElementById("notifIcon");
+    bell.style.animation = "bellShake 0.6s ease";
+    setTimeout(() => bell.style.animation = "", 600);
+  });
