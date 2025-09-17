@@ -141,7 +141,7 @@ async function initPush() {
         "BGEYruudNkeNhSyxPmrvHjnvUFnFe3Ca2KmA6IZU6UJU7_fJvVldk4qd90nNil_i_HRR6dY02I_j8oD6hS-4U0E"
       )
     });
-
+console.log(currentSubscription)
     await fetch("/save-subscription", {
       method: "POST",
       headers: { "Content-Type": "application/json", "CSRF-Token": await getCsrf() },

@@ -1153,17 +1153,19 @@ webpush.setVapidDetails(
   privateVapidKey
 );
 // app.use(express.json());
-
-const subscriptions = [];
+let subscriptions = []; // לא const
 
 app.post("/save-subscription", (req, res) => {
-  console.log("Got subscription:", req.body);
   if (!req.body || !req.body.endpoint) {
     return res.status(400).json({ ok: false, error: "No subscription" });
   }
+  // מחיקה של כפולים
+  subscriptions = subscriptions.filter(s => s.endpoint !== req.body.endpoint);
   subscriptions.push(req.body);
+  console.log("✅ Subscription saved:", req.body.endpoint);
   res.json({ ok: true });
 });
+
 app.post("/send-notification", async (req, res) => {
   const message = req.body.message || "התראה חדשה";
   const payload = JSON.stringify({
@@ -1171,8 +1173,7 @@ app.post("/send-notification", async (req, res) => {
     body: message
   });
 
-  let sent = 0;
-  let failed = 0;
+  let sent = 0, failed = 0;
 
   for (const sub of subscriptions) {
     try {
@@ -1181,22 +1182,17 @@ app.post("/send-notification", async (req, res) => {
     } catch (err) {
       failed++;
       if (err.statusCode === 410 || err.statusCode === 404) {
-        console.log("⚠️ Subscription פג תוקף → מוחקים אותו:", sub.endpoint);
-        // אם אתה שומר אותם ב־DB:
-        // await Subscription.deleteOne({ endpoint: sub.endpoint });
-        // ואם זה במערך בזיכרון:
+        console.log("⚠️ Subscription expired:", sub.endpoint);
         subscriptions = subscriptions.filter(s => s.endpoint !== sub.endpoint);
       } else {
-        console.error("❌ שגיאה בשליחת התראה:", err);
+        console.error("❌ Error sending push:", err);
       }
     }
   }
 
-  res.json({
-    ok: true,
-    message: `נשלח בהצלחה ל-${sent}, נכשל ל-${failed}`
-  });
+  res.json({ ok: true, message: `נשלח בהצלחה ל-${sent}, נכשל ל-${failed}` });
 });
+
 
 
 const User = require('./models/user');

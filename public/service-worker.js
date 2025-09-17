@@ -7,3 +7,10 @@ self.addEventListener("push", function (event) {
     })
   );
 });
+
+self.addEventListener("notificationclick", function (event) {
+  event.notification.close();
+  event.waitUntil(
+    clients.openWindow("/") // אפשר לשנות ל־/home או כל דף שאתה רוצה
+  );
+});
