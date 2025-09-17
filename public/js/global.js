@@ -306,3 +306,15 @@ document.getElementById('themeToggle')?.addEventListener('click', () => {
     bell.style.animation = "bellShake 0.6s ease";
     setTimeout(() => bell.style.animation = "", 600);
   });
+
+  document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const res = await fetch("/user");
+    const data = await res.json();
+    if (!data.ok || !data.user) {
+      window.location.href = "/login"; // 🛑 לא מחובר → לוגין
+    }
+  } catch {
+    window.location.href = "/login";
+  }
+});

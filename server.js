@@ -310,6 +310,19 @@ function upsertExecutions(targetExec, incomingExec) {
     });
   });
 }
+function requireLoginPage(req, res, next) {
+  if (req.cookies && req.cookies.user) {
+    try {
+      JSON.parse(req.cookies.user); // רק לוודא שזה תקין
+      return next();
+    } catch {
+      res.clearCookie("user");
+    }
+  }
+  // 🛑 לא מחובר → שולח אותו לעמוד לוגין
+  return res.redirect("/login");
+}
+
 function alignExecutionsByTasks(shift, executions) {
   const out = { daily: [], weekly: [], monthly: [] };
   ['daily', 'weekly', 'monthly'].forEach(cat => {
@@ -334,19 +347,19 @@ function weekdayIndexFromDateStr(yyyy_mm_dd) {
 app.get('/create',requireAuth('manager'), (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
-app.get('/', requireLogin, (req, res) => {
+app.get('/', requireLoginPage, (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'home.html'));
 });
-app.get('/manage',requireLogin, (req, res) => {
+app.get('/manage',requireLoginPage, (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'manage.html'));
 });
-app.get('/dispersals-page',requireLogin, (req, res) => {
+app.get('/dispersals-page',requireLoginPage, (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'dispersals.html'));
 });
-app.get('/orders-page',requireLogin, (req, res) => {               // << דף ההזמנות
+app.get('/orders-page',requireLoginPage, (req, res) => {               // << דף ההזמנות
   res.sendFile(path.join(__dirname, 'views', 'orders.html'));
 });
-app.get('/invoices-page',requireLogin, (req, res) => {
+app.get('/invoices-page',requireLoginPage, (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'invoices.html'));
 });
 app.get('/test', (req, res) => {
