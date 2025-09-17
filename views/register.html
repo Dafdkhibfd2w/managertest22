@@ -146,8 +146,12 @@
 </form>
 
   <script>
-      const tokenRes = await fetch("/csrf-token", { credentials: "include" });
-const { csrfToken } = await tokenRes.json();
+    async function getCsrf() {
+  const res = await fetch("/csrf-token", { credentials: "include" });
+  const data = await res.json();
+  return data.csrfToken;
+}
+
     const tabs = document.querySelectorAll(".auth-tab");
     const forms = {
       login: document.getElementById("loginForm"),
@@ -172,12 +176,11 @@ const { csrfToken } = await tokenRes.json();
 
     const username = document.getElementById("loginUsername").value.trim();
     const password = document.getElementById("loginPassword").value.trim();
-const tokenRes = await fetch("/csrf-token", { credentials: "include" });
-const { csrfToken } = await tokenRes.json();
+
     const res = await fetch('/login', {
       method: 'POST',
       credentials: "include",
-      headers: { 'Content-Type': 'application/json',"CSRF-Token": csrfToken },
+      headers: { 'Content-Type': 'application/json',"CSRF-Token": await getCsrf() },
       body: JSON.stringify({ username, password })
     });
 
@@ -198,12 +201,11 @@ const { csrfToken } = await tokenRes.json();
     const username = document.getElementById("registerUsername").value.trim();
     const password = document.getElementById("registerPassword").value.trim();
     const role     = document.getElementById("registerRole").value;
-const tokenRes = await fetch("/csrf-token", { credentials: "include" });
-const { csrfToken } = await tokenRes.json();
+
     const res = await fetch('/register', {
       method: 'POST',
       credentials: "include",
-      headers: { 'Content-Type': 'application/json',"CSRF-Token": csrfToken },
+      headers: { 'Content-Type': 'application/json',"CSRF-Token": await getCsrf() },
       body: JSON.stringify({ username, password, role })
     });
 
