@@ -279,7 +279,6 @@ const res = await fetch('/upload-invoice', {
     fileBtn.addEventListener("click", () => {
       document.getElementById('fileInput').click();
     })
-    fileBtn.addEventListener('click', () => fileInput.click());
     fileInput.addEventListener('change', () => {
       fileName.textContent = fileInput.files.length ? fileInput.files[0].name : 'לא נבחר קובץ';
     });
