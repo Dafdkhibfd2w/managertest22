@@ -1,3 +1,9 @@
+
+async function getCsrf() {
+  const res = await fetch("/csrf-token", { credentials: "include" });
+  const data = await res.json();
+  return data.csrfToken;
+}
 (function(){
   const ROOT_ID = 'toast-root';
 
@@ -133,7 +139,7 @@ async function initPush() {
 
     await fetch("/save-subscription", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "CSRF-Token": await getCsrf() },
       body: JSON.stringify(currentSubscription)
     });
 
@@ -164,18 +170,20 @@ async function unsubscribePush() {
 }
 
 function updateBell(enabled) {
-  const notifToggle = document.getElementById("notifToggle");
-  if (!notifToggle) return;
-  notifToggle.innerHTML = enabled
-    ? `<i data-lucide="bell"></i>`
-    : `<i data-lucide="bell-off"></i>`;
-  notifToggle.classList.toggle("enabled", enabled);
-  lucide.createIcons();
+  const notifIcon = document.getElementById("notifIcon");
+  if (!notifIcon) return;
+  if (enabled) {
+    notifIcon.classList.remove("fa-bell-slash");
+    notifIcon.classList.add("fa-bell");
+  } else {
+    notifIcon.classList.remove("fa-bell");
+    notifIcon.classList.add("fa-bell-slash");
+  }
 }
+
 
 // ===== Init =====
 document.addEventListener("DOMContentLoaded", () => {
-  lucide.createIcons();
 
   const notifToggle = document.getElementById("notifToggle");
 
@@ -232,7 +240,7 @@ function showLoader() {
     if (data.ok && data.user) {
       if (document.getElementById("user")) {
       document.getElementById("user").textContent =
-        `ברוכים הבאים ${data.user.name} ${data.user.role} למערכת ניהול משמרות`
+        `ברוכים הבאים ${data.user.name} למערכת ניהול משמרות`
       }
     }
   } catch (err) {

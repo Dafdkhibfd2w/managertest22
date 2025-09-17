@@ -8,14 +8,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="icon" href="/icons/icon-512.png" type="image/png">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
-<script src="https://unpkg.com/lucide@latest"></script>
+
 <title>מערכת ניהול משמרות • דף הבית</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 <link rel="stylesheet" href="/css/style.css" />
 <link rel="manifest" href="/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="ניהול משמרות">
-
+<meta name="mobile-web-app-capable" content="yes">
 </head>
 <style>
   /* 🎨 פלטת מונוכרום-ניאון */
@@ -125,7 +126,8 @@
   <span class="brand-title">NEW DELI</span>
   <div class="brandbar-right">
     <button id="notifToggle" class="icon-btn">
-      <i data-lucide="bell-off"></i>
+      <!-- <i id="notifIcon" style="font-size: 20px;" class="fa-solid fa-bell"></i> -->
+<i id="notifIcon" style="font-size: 20px;" class="fa-solid fa-bell"></i>
     </button>
     <span class="burger" id="burger">&#9776;</span>
 <button id="themeToggle" class="icon-btn">🌙/☀️</button>
@@ -202,18 +204,8 @@
   });
 </script> -->
 
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    lucide.createIcons();
-  });
-</script>
 <script src="/js/global.js"></script>
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    lucide.createIcons();
-  });
-  
-</script>
+
 <!-- <script>
   const cookies = document.cookie.split(";").reduce((acc, c) => {
     const [k,v] = c.trim().split("=");

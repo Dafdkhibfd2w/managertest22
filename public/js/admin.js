@@ -1,5 +1,4 @@
 let allShifts = [];
-let csrfToken = null;
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, m => ({
     '&':'&amp;',
@@ -10,10 +9,10 @@ function escapeHtml(s) {
   }[m]));
 }
 // 🟢 טוען CSRF Token פעם אחת בתחילת הטעינה
-async function loadCsrf() {
+async function getCsrf() {
   const res = await fetch("/csrf-token", { credentials: "include" });
   const data = await res.json();
-  csrfToken = data.csrfToken;
+  return data.csrfToken;
 }
 
 function normalizeTeam(team) {
@@ -192,7 +191,7 @@ async function saveEdit() {
   await fetch("/admin-update-shift", {
     method: "POST",
     credentials: "include",
-    headers: { "Content-Type": "application/json", "CSRF-Token": csrfToken },
+    headers: { "Content-Type": "application/json", "CSRF-Token": await getCsrf() },
     body: JSON.stringify({ date, manager, team: teamStr, notes })
   });
 
@@ -222,7 +221,7 @@ async function saveEdit() {
   const res = await fetch("/update-shift", {
     method: "POST",
     credentials: "include",
-    headers: { "Content-Type": "application/json", "CSRF-Token": csrfToken },
+    headers: { "Content-Type": "application/json", "CSRF-Token": await getCsrf() },
     body: JSON.stringify({ date, executions })
   });
 
@@ -237,7 +236,6 @@ async function saveEdit() {
 
 
 document.addEventListener("DOMContentLoaded", async () => {
-  await loadCsrf();
   await loadShifts();
 
   document.getElementById("btnFilterDate")?.addEventListener("click", filterShifts);
@@ -252,16 +250,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     e.preventDefault();
     const notifMessage = document.getElementById("notifMessage").value;
     const notifStatus = document.getElementById("notifStatus");
-    notifStatus.textContent = "⏳ שולח...";
+    // notifStatus.textContent = "⏳ שולח...";
+    showToast('⏳ שולח...');
 
     const res = await fetch("/send-notification", {
       method: "POST",
       credentials: "include",
-      headers: { "Content-Type": "application/json", "CSRF-Token": csrfToken },
+      headers: { "Content-Type": "application/json", "CSRF-Token": await getCsrf() },
       body: JSON.stringify({ message: notifMessage })
     });
 
     const data = await res.json();
-    notifStatus.textContent = data.ok ? "✅ נשלח בהצלחה!" : "❌ שגיאה בשליחה";
+    // notifStatus.textContent = data.ok ? "✅ נשלח בהצלחה!" : "❌ שגיאה בשליחה";
+    showToast(data.ok ? "נשלח בהצלחה!" : "שגיאה בשליחה");
+
   });
 });

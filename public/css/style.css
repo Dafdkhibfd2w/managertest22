@@ -350,6 +350,13 @@ button:not(#notifToggle):hover, .btn:hover {
 .btn-secondary { background: var(--btn-secondary); color: #000; }
 .btn-danger { background: var(--error); color: #fff; }
 
+
+.brandbar {
+  direction: ltr;     /* טקסט ותוכן יוזרמו משמאל לימין */
+  text-align: left;   /* מיושרים לשמאל */
+}
+
+
 /* =========================
    TASK PICKER
    ========================= */

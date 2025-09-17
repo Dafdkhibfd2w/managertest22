@@ -1151,7 +1151,6 @@ app.post("/save-subscription", (req, res) => {
   subscriptions.push(req.body);
   res.json({ ok: true });
 });
-// שליחת הודעה
 app.post("/send-notification", async (req, res) => {
   const message = req.body.message || "התראה חדשה";
   const payload = JSON.stringify({
@@ -1159,15 +1158,31 @@ app.post("/send-notification", async (req, res) => {
     body: message
   });
 
-  try {
-    await Promise.all(
-      subscriptions.map(sub => webpush.sendNotification(sub, payload))
-    );
-    res.json({ ok: true, message: "נשלח בהצלחה" });
-  } catch (err) {
-    console.error("שגיאה בשליחת התראה:", err);
-    res.status(500).json({ ok: false, error: err.message });
+  let sent = 0;
+  let failed = 0;
+
+  for (const sub of subscriptions) {
+    try {
+      await webpush.sendNotification(sub, payload);
+      sent++;
+    } catch (err) {
+      failed++;
+      if (err.statusCode === 410 || err.statusCode === 404) {
+        console.log("⚠️ Subscription פג תוקף → מוחקים אותו:", sub.endpoint);
+        // אם אתה שומר אותם ב־DB:
+        // await Subscription.deleteOne({ endpoint: sub.endpoint });
+        // ואם זה במערך בזיכרון:
+        subscriptions = subscriptions.filter(s => s.endpoint !== sub.endpoint);
+      } else {
+        console.error("❌ שגיאה בשליחת התראה:", err);
+      }
+    }
   }
+
+  res.json({
+    ok: true,
+    message: `נשלח בהצלחה ל-${sent}, נכשל ל-${failed}`
+  });
 });
 
 
