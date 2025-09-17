@@ -166,7 +166,7 @@ async function uploadInvoice() {
       const fd = new FormData(uploadForm);
       try {
         const csrf = await getCsrf();
-const res = await fetch('/api/upload-invoice', { 
+const res = await fetch('/upload-invoice', { 
   method:'POST',
   credentials:'include',
   headers:{ 
