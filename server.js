@@ -153,10 +153,14 @@ app.use((req, res, next) => {
 // מומלץ לשים ב-.env: MONGO_URI=mongodb+srv://user:pass@cluster/dbName
 const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://aviel:aviel998898@cluster0.3po9ias.mongodb.net/';
 
-connectMongoose().then(() => {
-  console.log("✅ Mongo connected");
-}).catch(err => {
-  console.error("❌ DB error:", err);
+app.use(async (req, res, next) => {
+  try {
+    await connectMongoose();
+    return next();
+  } catch (e) {
+    console.error('❌ DB connect failed', e);
+    return res.status(503).json({ ok: false, message: 'Database not ready', error: e.message });
+  }
 });
 
 
@@ -1338,7 +1342,10 @@ app.delete('/dispersals/:id', async (req, res) => {
     res.status(500).json({ ok:false });
   }
 });
-
+app.use((err, req, res, next) => {
+  console.error("🔥 Express Error:", err);
+  res.status(500).json({ ok:false, message: "Server error", error: err.message });
+});
 // ===== Start server =====
 // app.listen(PORT, () => console.log(`🚀 Server listening on :${PORT}`));ss
 if (process.env.VERCEL) {
