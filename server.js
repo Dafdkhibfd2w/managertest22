@@ -9,8 +9,7 @@ const mongoose      = require('mongoose');
 const multer        = require('multer');
 const { v2: cloudinary } = require('cloudinary');
 const { connectMongoose } = require('./db');
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 8 * 1024 * 1024 } });
-const CLOUD_FOLDER = process.env.CLOUDINARY_FOLDER || 'invoices';
+const bcrypt = require('bcrypt');
 
 // ===== Models =====
 const Dispersal  = require('./models/Dispersal');
@@ -19,7 +18,18 @@ const Task = require("./models/Task");
 const DailyOrder = require('./models/DailyOrder');
 const Invoice    = require('./models/Invoice'); // ודא נתיב נכון אצלך
 const Shift = require('./models/Shift');
+const helmet        = require('helmet');
+const rateLimit     = require('express-rate-limit');
+const hpp           = require('hpp');
+const cors          = require('cors');
+const { z }         = require('zod');
+const csrf          = require('csurf');
+const FileType      = require('file-type');
 
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 100 * 1024 * 1024 } });
+const CLOUD_FOLDER = process.env.CLOUDINARY_FOLDER || 'invoices';
+const SECRET = process.env.JWT_SECRET || "supersecret";
+const isProd = process.env.NODE_ENV === 'production';
 // ===== Utils =====
 function isAllowedMime(m) {
   return ['image/jpeg','image/png','image/webp','application/pdf'].includes(m);
@@ -28,14 +38,105 @@ function isAllowedMime(m) {
 // ===== App =====
 const app  = express();
 const PORT = process.env.PORT || 3000;
+app.use(cookieParser());
 
 // ===== Middlewares =====
+app.post('/upload-invoice', requireUser, upload.single('file'), async (req, res) => {
+  try {
+    const date = (req.body?.date || '').trim();
+    const supplier = (req.body?.supplier || '').trim();
+    const f = req.file;
+
+    if (!date || !supplier || !f) {
+      return res.status(400).json({ ok:false, message:'חסר date / supplier / קובץ' });
+    }
+const { fileTypeFromBuffer } = require("file-type");
+const type = await fileTypeFromBuffer(f.buffer);
+    if (!type || !isAllowedMime(type.mime)) {
+      return res.status(400).json({ ok:false, message:'קובץ לא מאומת' });
+    }
+
+    const folder = `${CLOUD_FOLDER}/shifts/${date}/${encodeURIComponent(supplier)}`;
+
+    // 🟢 העלאה ל-Cloudinary עם הבטחה
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder, resource_type: 'auto' },
+        (err, res) => {
+          if (err) return reject(err);
+          resolve(res);
+        }
+      );
+      stream.end(f.buffer);
+    });
+
+    // 🟢 יצירת הרשומה במסד
+    const row = await Invoice.create({
+      shiftDate:   date,
+      supplier,
+      url:         result.secure_url,
+      publicId:    result.public_id,
+      resourceType:result.resource_type,
+      format:      result.format,
+      bytes:       result.bytes,
+      width:       result.width,
+      height:      result.height,
+      originalName:f.originalname,
+      uploadedBy:  req.user?.name || "system"
+    });
+
+    res.json({ ok:true, message:'החשבונית הועלתה בהצלחה', invoice: row });
+
+  } catch (e) {
+    console.error('upload-invoice error:', e);
+    res.status(500).json({ ok:false, message:'שגיאה בהעלאת חשבונית' });
+  }
+});
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
-app.use(cookieParser());
+app.set('trust proxy', 1);
+app.disable('x-powered-by');
+function isAllowedMime(m) {
+  return ['image/jpeg','image/png','image/webp','application/pdf'].includes(m);
+}
 
+app.use(cors({
+  origin: ['http://localhost:3000','https://your-domain.com'],
+  credentials: true
+}));
+
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'same-site' },
+  contentSecurityPolicy: {
+    useDefaults: true,
+    directives: {
+      "img-src": ["'self'", "data:", "blob:", "*.cloudinary.com"],
+      "script-src": ["'self'", "'unsafe-inline'"],
+      "connect-src": ["'self'"]
+    }
+  }
+}));
+
+app.use(hpp());
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false
+});
+const apiLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 200,
+});
+app.use(['/login','/register'], authLimiter);
+app.use(['/orders','/invoices','/suppliers'], apiLimiter);
 // ===== Cloudinary =====
+
+
+
+
 ;['CLOUDINARY_CLOUD_NAME','CLOUDINARY_API_KEY','CLOUDINARY_API_SECRET'].forEach(k => {
   if (!process.env[k]) console.error(`❌ Missing ${k} in .env`);
 });
@@ -61,6 +162,8 @@ app.use(async (req, res, next) => {
     return res.status(503).json({ ok: false, message: 'Database not ready', error: e.message });
   }
 });
+
+
 
 
 // ===== Schemas for Shifts (כמו אצלך) =====
@@ -121,15 +224,30 @@ function requireLogin(req, res, next) {
   return res.redirect("/login");
 }
 
+function requireAuth(role) {
+  return (req,res,next) => {
+    const token = req.cookies.token;
+    if (!token) return res.status(401).json({ ok:false, message:"לא מחובר" });
+
+    try {
+      const decoded = jwt.verify(token, SECRET);
+      req.user = decoded;
+      if (role && req.user.role !== role) {
+        return res.status(403).sendFile(path.join(__dirname, "views", "unauthorized.html"));
+      }
+      next();
+    } catch (e) {
+      return res.status(401).json({ ok:false, message:"טוקן לא תקין" });
+    }
+  };
+}
+
 function requireUser(req, res, next) {
   const cookie = req.cookies.user;
   if (!cookie) return res.status(401).json({ ok:false, message:"חייב להתחבר" });
-
   try {
     const parsed = JSON.parse(cookie);
-    if (!parsed.name) {
-      return res.status(400).json({ ok:false, message:"משתמש לא תקין (אין שם)" });
-    }
+    if (!parsed.name) return res.status(400).json({ ok:false, message:"משתמש לא תקין" });
     req.user = parsed;
     next();
   } catch {
@@ -137,12 +255,22 @@ function requireUser(req, res, next) {
   }
 }
 
+const csrfProtection = csrf({
+  cookie: {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: isProd
+  }
+});
+app.use(csrfProtection);
+
+// החזרת הטוקן ל-Frontend
+app.get("/csrf-token", (req, res) => {
+  res.json({ csrfToken: req.csrfToken() });
+});
 
 
-function requireAdmin(req, res, next) {
-  if (req.cookies && req.cookies.adminAuth === 'yes') return next();
-  return res.redirect('/admin-login');
-}
+
 function normalizeTeam(team) {
   if (Array.isArray(team)) return team.map(n => String(n).trim()).filter(Boolean);
   if (typeof team === 'string') return team.split(',').map(n => n.trim()).filter(Boolean);
@@ -186,7 +314,7 @@ function weekdayIndexFromDateStr(yyyy_mm_dd) {
 }
 
 // ===== Views =====
-app.get('/create',requireLogin, (req, res) => {
+app.get('/create',requireAuth('manager'), (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 app.get('/', requireLogin, (req, res) => {
@@ -209,48 +337,48 @@ app.get('/test', (req, res) => {
 });
 
 
-app.get('/task', requireLogin,(req, res) => {
+app.get('/task', requireAuth('manager'),(req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'tasks.html'));
 });
-app.get('/suppliers-page', requireLogin,(req, res) => {
+app.get('/suppliers-page', requireAuth('manager'),(req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'suppliers.html'));
 });
 app.get('/manifest.json', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'manifest.json'));
 });
 // ===== Admin auth pages =====
-app.get('/admin-login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'admin-login.html'));
-});
-app.post('/admin-login', (req, res) => {
-  const { pin } = req.body || {};
-  if (pin === ADMIN_PIN) {
-    res.cookie('adminAuth', 'yes', {
-      httpOnly: true, sameSite: 'lax', maxAge: 1000 * 60 * 60 * 8
-    });
-    return res.redirect('/admin');
-  }
-  return res.status(401).send(`
-    <meta charset="utf-8">
-    <div style="font-family:system-ui;direction:rtl;padding:20px">
-      <h3>קוד שגוי</h3>
-      <p>נסה שוב.</p>
-      <a href="/admin-login">חזרה</a>
-    </div>
-  `);
-});
+// app.get('/admin-login', (req, res) => {
+//   res.sendFile(path.join(__dirname, 'views', 'admin-login.html'));
+// });
+// app.post('/admin-login', (req, res) => {
+//   const { pin } = req.body || {};
+//   if (pin === ADMIN_PIN) {
+//     res.cookie('adminAuth', 'yes', {
+//       httpOnly: true, sameSite: 'lax', maxAge: 1000 * 60 * 60 * 8
+//     });
+//     return res.redirect('/admin');
+//   }
+//   return res.status(401).send(`
+//     <meta charset="utf-8">
+//     <div style="font-family:system-ui;direction:rtl;padding:20px">
+//       <h3>קוד שגוי</h3>
+//       <p>נסה שוב.</p>
+//       <a href="/admin">חזרה</a>
+//     </div>
+//   `);
+// });
 app.post('/admin-logout', (req, res) => {
   res.clearCookie('adminAuth', { sameSite: 'lax' });
   res.redirect('/admin-login');
 });
-app.get('/admin', requireAdmin, (req, res) => {
+app.get('/admin', requireAuth('manager'), (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'admin.html'));
 });
 
 // ===== Cloudinary helper =====
-function uploadToCloudinary(buffer, opts = {}) {
+function uploadToCloudinary(buffer, options) {
   return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(opts, (err, result) => {
+    const stream = cloudinary.uploader.upload_stream(options, (err, result) => {
       if (err) return reject(err);
       resolve(result);
     });
@@ -259,48 +387,7 @@ function uploadToCloudinary(buffer, opts = {}) {
 }
 
 // ===== API: חשבוניות =====
-app.post('/upload-invoice', requireUser, upload.single('file'), async (req, res) => {
-  try {
-    const date = (req.body?.date || '').trim();
-    const supplier = (req.body?.supplier || '').trim();
-    const f = req.file;
 
-    if (!date || !supplier || !f) {
-      return res.status(400).json({ ok:false, message:'חסר date / supplier / קובץ' });
-    }
-    if (!isAllowedMime(f.mimetype)) {
-      return res.status(400).json({ ok:false, message:'סוג קובץ לא נתמך' });
-    }
-
-    const folder = `${CLOUD_FOLDER}/shifts/${date}/${encodeURIComponent(supplier)}`;
-    const result = await uploadToCloudinary(f.buffer, {
-      folder,
-      resource_type: 'auto',
-      filename_override: f.originalname,
-      use_filename: true,
-      unique_filename: true
-    });
-
-    const row = await Invoice.create({
-      shiftDate:   date,
-      supplier,
-      url:         result.secure_url,
-      publicId:    result.public_id,
-      resourceType:result.resource_type,
-      format:      result.format,
-      bytes:       result.bytes,
-      width:       result.width,
-      height:      result.height,
-      originalName:f.originalname,
-  uploadedBy:  req.user?.name || "system"   // 🟢 המשתמש המחובר
-    });
-
-    res.json({ ok:true, message:'החשבונית הועלתה בהצלחה', invoice: row });
-  } catch (e) {
-    console.error('upload-invoice error:', e);
-    res.status(500).json({ ok:false, message:'שגיאה בהעלאת חשבונית' });
-  }
-});
 
 // GET /invoices?date=YYYY-MM-DD&supplier=שם&skip=0&limit=20
 app.get('/invoices', async (req, res) => {
@@ -882,6 +969,26 @@ app.post("/tasks", async (req, res) => {
     res.json({ ok: false, message: "שגיאה בשמירה" });
   }
 });
+app.put("/tasks/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, category } = req.body;
+
+    const updated = await Task.findByIdAndUpdate(
+      id,
+      { $set: { name, category } },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ ok: false, message: "משימה לא נמצאה" });
+    }
+
+    res.json({ ok: true, task: updated });
+  } catch (err) {
+    res.status(500).json({ ok: false, message: "שגיאה בעדכון משימה" });
+  }
+});
 
 // מחיקת משימה
 app.delete("/tasks/:id", async (req, res) => {
@@ -1049,6 +1156,8 @@ app.post("/send-notification", async (req, res) => {
 
 const User = require('./models/user');
 
+const jwt = require('jsonwebtoken');
+
 app.get("/login", (req, res) => {
   res.sendFile(path.join(__dirname, "views", "register.html"));
 });
@@ -1060,24 +1169,74 @@ app.get("/logout", (req, res) => {
   res.clearCookie("user", { sameSite: "lax" });
   res.redirect("/login"); // אחרי לוגאאוט מחזיר לעמוד התחברות
 });
-app.post("/login", async (req, res) => {
-  const { name, role } = req.body;
-  if (!name) return res.json({ ok: false, message: "חובה שם" });
-
-  const user = await User.findOneAndUpdate(
-    { name },
-    { $set: { name, role } },
-    { upsert: true, new: true }
-  );
-
-  res.cookie("user", JSON.stringify({ name: user.name, role: user.role }), {
-    httpOnly: false,
-    sameSite: "lax",
-    maxAge: 1000 * 60 * 60 * 24 * 7
-  });
-
-  res.json({ ok: true, user });
+const loginSchema = z.object({
+  username: z.string().min(3).max(30),
+  password: z.string().min(6).max(128)
 });
+const registerSchema = loginSchema.extend({
+  role: z.enum(['user','manager','admin']).optional()
+});
+app.post('/register', async (req, res) => {
+  try {
+    const parsed = registerSchema.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ ok:false, message:"קלט לא תקין" });
+
+    let { username, password, role } = parsed.data;
+    username = username.trim().toLowerCase();
+
+    const existing = await User.findOne({ username });
+    if (existing) return res.status(400).json({ ok:false, message:"שם משתמש כבר תפוס" });
+
+    const hash = await bcrypt.hash(password, 12);
+    const user = await User.create({ username, passwordHash: hash, role: role || 'user' });
+
+    res.json({ ok:true, message:"נרשמת בהצלחה!", user:{ username:user.username, role:user.role } });
+  } catch (err) {
+    console.error("register error:", err);
+    res.status(500).json({ ok:false, message:"שגיאה בהרשמה" });
+  }
+});
+
+app.post('/login', async (req, res) => {
+  try {
+    const parsed = loginSchema.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ ok:false, message:"קלט לא תקין" });
+
+    let { username, password } = parsed.data;
+    username = username.trim().toLowerCase();
+
+    const user = await User.findOne({ username });
+    if (!user) return res.status(400).json({ ok:false, message:"שם משתמש או סיסמה שגויים" });
+
+    const valid = await bcrypt.compare(password, user.passwordHash);
+    if (!valid) return res.status(400).json({ ok:false, message:"שם משתמש או סיסמה שגויים" });
+
+    const token = jwt.sign({ id:user._id, role:user.role }, SECRET, { expiresIn:"7d" });
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: isProd,
+      maxAge: 1000 * 60 * 60 * 24 * 7
+    });
+
+    res.cookie("user", JSON.stringify({
+      id: user._id,
+      name: user.username,
+      role: user.role
+    }), {
+      sameSite: 'lax',
+      secure: isProd,
+      maxAge: 1000 * 60 * 60 * 24 * 7
+    });
+
+    res.json({ ok:true, message:"מחובר בהצלחה!", user:{ username:user.username, role:user.role } });
+  } catch (err) {
+    console.error("Login error:", err);
+    res.status(500).json({ ok:false, message:"שגיאת שרת בלוגין" });
+  }
+});
+
 
 
 app.get("/user", (req, res) => {
@@ -1192,11 +1351,7 @@ if (process.env.VERCEL) {
   app.listen(PORT, () => console.log(`🚀 Server listening on :${PORT}`));
 }
 
-// === DEBUG MIDDLEWARE (מדפיס כל בקשה שמגיעה ל-Express) ===
-app.use((req, res, next) => {
-  console.log(`[EXPRESS] ${process.env.VERCEL ? 'VERCEL' : 'LOCAL'} ${req.method} ${req.url}`);
-  next();
-});
+
 
 // === DEBUG: /ping מחזיר JSON ===
 app.get('/ping', (req, res) => {

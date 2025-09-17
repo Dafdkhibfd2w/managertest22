@@ -17,6 +17,11 @@ const defaultTasks = {
     "ניקוי יסודי של המטבח",
   ],
 };
+async function getCsrf() {
+  const res = await fetch("/csrf-token", { credentials: "include" });
+  const data = await res.json();
+  return data.csrfToken;
+}
 
 // ================== Render Checkboxes ==================
 function renderCheckboxes(listId, tasks) {
@@ -47,7 +52,7 @@ function renderCheckboxes(listId, tasks) {
 // ================== Fetch tasks מהשרת ==================
 async function loadTasksForShift() {
   try {
-    const res = await fetch("/api/tasks");
+    const res = await fetch("/tasks");
     const tasks = await res.json();
 
     const daily = tasks.filter(t => t.category === "daily").map(t => t.name);
@@ -103,15 +108,17 @@ addManagerBtn?.addEventListener('click', async () => {
   const text = (managerNoteText?.value || '').trim();
   if (!text) return managerNoteText.focus();
 
-  const res = await fetch('/api/add-manager-note', {
-    method: 'POST',
-    headers: { 'Content-Type':'application/json' },
-    body: JSON.stringify({
-      date,
-      text,
-      author: managerInput?.value || 'מנהל'
-    })
-  });
+const csrf = await getCsrf();
+const res = await fetch('/api/add-manager-note', {
+  method: 'POST',
+  credentials: "include",
+  headers: {
+    'Content-Type':'application/json',
+    "CSRF-Token": csrf
+  },
+  body: JSON.stringify({ date, text, author: managerInput?.value || 'מנהל' })
+});
+
 
   const data = await res.json();
   if (!data.ok) return alert(data.message || 'שגיאה');
@@ -148,11 +155,16 @@ document.getElementById("shiftForm").addEventListener("submit", async (e) => {
     notes: formData.get("notes") || "",
   };
 
-  const res = await fetch("/api/save-shift", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
+const csrf = await getCsrf();
+const res = await fetch("/save-shift", {
+  method: "POST",
+  credentials: "include",
+  headers: {
+    "Content-Type": "application/json",
+    "CSRF-Token": csrf
+  },
+  body: JSON.stringify(data),
+});
 
   const result = await res.json();
   document.getElementById("status").textContent = result.message || "נשמר";

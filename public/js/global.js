@@ -87,7 +87,6 @@ if (btn) {
 const burger = document.getElementById("burger");
 const mobileNav = document.getElementById("mobileNav");
 const closeNav = document.getElementById("closeNav");
-
 burger?.addEventListener("click", () => mobileNav.classList.add("active"));
 closeNav?.addEventListener("click", () => mobileNav.classList.remove("active"));
 window.addEventListener("click", (e) => {
@@ -210,8 +209,9 @@ notifToggle?.addEventListener("click", async () => {
 
 
 function showLoader() {
-  document.getElementById("globalLoader").style.display = "flex";
-  document.getElementById("pageContent").style.display = "none";
+  if (document.getElementById("globalLoader")) {document.getElementById("globalLoader").style.display = "flex";};
+  if (document.getElementById("pageContent")) {document.getElementById("pageContent").style.display = "none";};
+
 }
   const cookies = document.cookie.split(";").reduce((acc, c) => {
     const [k,v] = c.trim().split("=");
@@ -232,7 +232,7 @@ function showLoader() {
     if (data.ok && data.user) {
       if (document.getElementById("user")) {
       document.getElementById("user").textContent =
-        `ברוכים הבאים ${data.user.name} למערכת ניהול משמרות`
+        `ברוכים הבאים ${data.user.name} ${data.user.role} למערכת ניהול משמרות`
       }
     }
   } catch (err) {
@@ -242,8 +242,8 @@ function showLoader() {
 
 loadUser();
 function hideLoader() {
-  document.getElementById("globalLoader").style.display = "none";
-  document.getElementById("pageContent").style.display = "block";
+  if (document.getElementById("globalLoader")) {document.getElementById("globalLoader").style.display = "none";}
+  if (document.getElementById("pageContent")) {document.getElementById("pageContent").style.display = "block";}
 }
 
 // דוגמה: עטיפה סביב fetch
@@ -260,7 +260,31 @@ async function fetchWithLoader(url, opts) {
 // שימוש:
 document.addEventListener("DOMContentLoaded", async () => {
   // נגיד כאן אתה קורא ל־DB
-  const data = await fetchWithLoader("/api/get-shift");
+  const data = await fetchWithLoader("/get-shift");
   console.log("Loaded:", data);
 });
 
+ // הפעלה/כיבוי Dark/Light Mode
+const toggleBtn = document.getElementById('themeToggle');
+toggleBtn.textContent = "🌙 / ☀️";
+toggleBtn.style.position = "fixed";
+toggleBtn.style.bottom = "20px";
+toggleBtn.style.left = "20px";
+toggleBtn.style.zIndex = "10000";
+
+// בדיקה אם יש מצב שמור
+if (localStorage.getItem('theme') === 'light') {
+  document.body.classList.add('light');
+} else {
+  document.body.classList.add('dark');
+}
+
+document.getElementById('themeToggle')?.addEventListener('click', () => {
+  document.body.classList.toggle('light');
+  document.body.classList.toggle('dark');
+
+  localStorage.setItem(
+    'theme',
+    document.body.classList.contains('light') ? 'light' : 'dark'
+  );
+});

@@ -1,409 +1,101 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-<meta charset="UTF-8" />
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
-
-
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>NEW DELI • דף מנהל</title>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css?v=2" />
   <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#2b5329">
+  <meta name="theme-color" content="#2b5329">
   <link rel="icon" href="/icons/icon-512.png" type="image/png">
-<script src="https://unpkg.com/lucide@latest"></script>
-
-
-  <script defer src="/js/ui.js"></script>
-
-  
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script defer src="/js/admin.js"></script>
+  <script defer src="/js/global.js"></script>
 </head>
 
 <body class="theme-dark-premium">
-<div id="globalLoader">
-  <div class="spinner"></div>
-  <p>טוען נתונים...</p>
-</div>
-
-<!-- התוכן שלך -->
-<div id="pageContent" style="display:none">
-<header class="brandbar">
-  <span class="brand-title">NEW DELI</span>
-  <div class="brandbar-right">
-    <button id="notifToggle" class="icon-btn">
-      <i data-lucide="bell-off"></i>
-    </button>
-    <span class="burger" id="burger">&#9776;</span>
+  <div id="globalLoader">
+    <div class="spinner"></div>
+    <p>טוען נתונים...</p>
   </div>
-</header>
 
+  <div id="pageContent" style="display:none">
+    <header class="brandbar">
+      <span class="brand-title">NEW DELI</span>
+      <div class="brandbar-right">
+        <button id="notifToggle" class="icon-btn">
+          <i data-lucide="bell-off"></i>
+        </button>
+        <span class="burger" id="burger">&#9776;</span>
+        <button id="themeToggle" class="icon-btn">🌙/☀️</button>
+      </div>
+    </header>
 
+    <nav class="mobile-nav" id="mobileNav">
+      <button id="closeNav" class="close-btn">✖</button>
+      <ul>
+        <li><a href="/"><span class="icon">🏠</span> דף הבית</a></li>
+        <li><a href="/create"><span class="icon">🗓️</span> יצירת משמרת</a></li>
+        <li><a href="/manage"><span class="icon">✅</span> ניהול משמרת</a></li>
+        <li><a href="/admin"><span class="icon">📚</span> ארכיון / דשבורד מנהל</a></li>
+        <li><a href="/invoices-page"><span class="icon">🧾</span> חשבוניות</a></li>
+        <li><a href="/suppliers-page"><span class="icon">🏷️</span> ספקים</a></li>
+        <li><a href="/orders-page"><span class="icon">📦</span> הזמנות</a></li>
+        <li><a href="/dispersals-page"><span class="icon">🚕</span> פיזורים</a></li>
+    <li><a href="/logout"><span class="icon">🚪</span> התנתקות</a></li>
+      </ul>
+    </nav>
 
-<nav class="mobile-nav" id="mobileNav">
-  <button id="closeNav" class="close-btn">✖</button>
-  <ul>
-    <li><a href="/"><span class="icon">🏠</span> דף הבית</a></li>
-    <li><a href="/create"><span class="icon">🗓️</span> יצירת משמרת</a></li>
-    <li><a href="/manage"><span class="icon">✅</span> ניהול משמרת</a></li>
-    <li><a href="/admin-login"><span class="icon">📚</span> ארכיון / דשבורד מנהל</a></li>
-    <li><a href="/invoices-page"><span class="icon">🧾</span> חשבוניות</a></li>
-    <li><a href="/suppliers-page"><span class="icon">🏷️</span> ספקים</a></li>
-    <li><a href="/orders-page"><span class="icon">📦</span> הזמנות</a></li>
-    <li><a href="/dispersals-page"><span class="icon">🚕</span> פיזורים</a></li>
-  </ul>
-</nav>
-  <br>
-  <br>
+    <div class="container" style="max-width: 800px;">
+      <h1 style="margin-top: 50px;">דף ניהול 👨‍💼</h1>
 
-  <div class="container" style="max-width: 800px;">
-    <h1 style="margin-top: 50px;">דף ניהול 👨‍💼</h1>
-    <!-- <h1>דף מנהל – משמרות</h1> -->
+      <div class="admin-controls" style="margin: auto; max-width: 75%;">
+        <input type="date" id="filterDate" />
+        <input type="text" id="searchName" placeholder="חפש לפי שם עובד" />
+        <button type="button" id="btnFilterDate">סנן תאריך</button>
+        <button type="button" id="btnSearchName">חפש עובד</button>
+        <button type="button" id="btnResetFilters">נקה סינון</button>
+      </div>
 
-    <div class="admin-controls" style="margin: auto; max-width: 75%;">
-      <input type="date" id="filterDate" />
-      <input type="text" id="searchName" placeholder="חפש לפי שם עובד" />
-      <button type="button" id="admin-control" onclick="filterShifts()">סנן תאריך</button>
-      <button type="button" id="admin-control" onclick="searchByName()">חפש עובד</button>
-      <button type="button" id="admin-control" onclick="resetFilters()">נקה סינון</button>
+      <div id="shiftsContainer"></div>
     </div>
 
-    <div id="shiftsContainer"></div>
-  </div>
+    <!-- מודאל עריכה -->
+    <div id="editModal" class="modal" aria-hidden="true">
+      <div class="modal-content" role="dialog" aria-modal="true">
+        <h2>פרטי משמרת</h2>
+        <form id="editForm">
+          <label>תאריך:</label>
+          <input type="text" id="editDate" readonly>
+          <label>אחמ״ש הערב:</label>
+          <input type="text" id="editManager">
+          <label>צוות:</label>
+          <input type="text" id="editTeam" placeholder="יוסי, דנה, רועי">
+          <label>הערות כלליות:</label>
+          <textarea id="editNotes"></textarea>
+          <section class="card" style="margin-top:12px">
+            <h3>הערות במהלך המשמרת</h3>
+            <ul id="runtimeNotesListAdmin" class="exec-list"></ul>
+          </section>
+          <div id="editRows" class="modal-grid"></div>
+          <div class="modal-actions" style="margin-top:10px">
+            <button type="button" id="btnSaveEdit" class="save">שמור</button>
+            <button type="button" id="btnCloseEdit" class="cancel">סגור</button>
+          </div>
+          <p id="editStatus" class="edit-status"></p>
+        </form>
+      </div>
+    </div>
 
-  <!-- מודאל: הצגה / עריכה -->
-  <div id="editModal" class="modal" aria-hidden="true">
-    <div class="modal-content" role="dialog" aria-modal="true">
-      <h2>פרטי משמרת</h2>
-
-      <form id="editForm">
-
-        <label>תאריך (לקריאה):</label>
-        <input type="text" id="editDate" readonly>
-
-        <label>אחמ״ש הערב (אופציונלי):</label>
-        <input type="text" id="editManager" placeholder="שם האחמ״ש">
-
-        <label>צוות (מופרד בפסיקים):</label>
-        <input type="text" id="editTeam" placeholder="יוסי, דנה, רועי">
-
-        <!-- תיבת הערות -->
-        <label for="editNotes">הערות כלליות:</label>
-        <textarea id="editNotes" name="notes" placeholder="הערות או משימות מותאמות אישית..."></textarea>
-        <section class="card" style="margin-top:12px">
-          <h3>הערות במהלך המשמרת</h3>
-          <ul id="runtimeNotesListAdmin" class="exec-list"></ul>
-        </section>
-
-        <div id="editRows" class="modal-grid"></div>
-
-        <div class="modal-actions" style="margin-top:10px">
-          <button type="button" id="admin-control" class="save" onclick="saveEdit()">שמור</button>
-          <button type="button" id="admin-control" class="cancel" onclick="closeEdit()">סגור</button>
-        </div>
-        <p id="editStatus" class="edit-status"></p>
+    <div class="card">
+      <h2>שליחת התראה</h2>
+      <form id="notifForm">
+        <input type="text" id="notifMessage" placeholder="כתוב הודעה..." required />
+        <button type="submit">📢 שלח התראה</button>
       </form>
+      <p id="notifStatus"></p>
     </div>
   </div>
-  <script>
-
-    let allShifts = [];
-
-    const CATS = [
-      { key: "daily",   title: "משימות יומיות" },
-      { key: "weekly",  title: "משימות שבועיות" },
-      { key: "monthly", title: "משימות חודשיות" },
-    ];
-
-    function normalizeTeam(team){
-      if(Array.isArray(team)) return team;
-      if(typeof team==='string') return team.split(',').map(s=>s.trim()).filter(Boolean);
-      return [];
-    }
-    function getDayName(dateStr){
-      const days=["ראשון","שני","שלישי","רביעי","חמישי","שישי","שבת"];
-      const d = new Date(dateStr);
-      return isNaN(d) ? "" : days[d.getDay()];
-    }
-    function chip(text){ return `<div class="chip"><span class="dot"></span>${text}</div>`; }
-
-    function buildTeamSelect(name, teamArr, selected){
-      const opts = ['<option value="">בחר עובד</option>']
-        .concat(teamArr.map(n=>`<option value="${n}" ${selected===n?'selected':''}>${n}</option>`));
-      return `<select name="${name}">${opts.join('')}</select>`;
-    }
-    function rowState(workerValue){
-      return (workerValue) ? "ok" : "missing";
-    }
-    function attachRowListeners(card){
-      const sel = card.querySelector('select');
-      const update = ()=>{
-        card.classList.remove('ok','missing');
-        card.classList.add(rowState(sel.value.trim()));
-      };
-      sel.addEventListener('change', update);
-      update();
-    }
-    function renderAdminEditRows(shift){
-      const wrap = document.getElementById('editRows');
-      wrap.innerHTML = "";
-
-      const teamArr = normalizeTeam(shift.team);
-      const tasks = shift.tasks || { daily:[], weekly:[], monthly:[] };
-      const execs = shift.executions || { daily:[], weekly:[], monthly:[] };
-
-      const CATS = [
-        { key: "daily",   title: "משימות יומיות" },
-        { key: "weekly",  title: "משימות שבועיות" },
-        { key: "monthly", title: "משימות חודשיות" },
-      ];
-
-      CATS.forEach(cat=>{
-        const list = Array.isArray(tasks[cat.key]) ? tasks[cat.key] : [];
-        if(!list.length) return;
-
-        // כותרת קטגוריה
-        const title = document.createElement('h3');
-        title.className = 'cat-title';
-        title.textContent = cat.title;
-        wrap.appendChild(title);
-
-        list.forEach((task,i)=>{
-          const ex = (execs[cat.key] || []).find(e=>e.task===task) || {};
-          const card = document.createElement('div');
-          card.className = 'task-card';
-
-          // תבנית כרטיס
-          card.innerHTML = `
-            <div class="name">${task}</div>
-            <div>
-              <select name="worker-${cat.key}-${i}">
-                <option value="">בחר עובד</option>
-                ${teamArr.map(n => `<option value="${n}" ${ex.worker===n?'selected':''}>${n}</option>`).join('')}
-              </select>
-            </div>
-            <input type="hidden" name="task-${cat.key}-${i}" value="${task}">
-          `;
-          wrap.appendChild(card);
-          attachRowListeners(card); // חיווי ok/missing
-        });
-      });
-    }
-
-    async function loadShifts(){
-
-      const res = await fetch('/get-all-shifts');
-      allShifts = await res.json();
-      console.log('Loaded shifts:', allShifts);
-      renderShifts(allShifts);
-    }
-
-    function renderShifts(shifts) {
-      const container = document.getElementById('shiftsContainer');
-      container.innerHTML = '';
-
-      shifts.forEach(shift => {
-        const dayName = getDayName(shift.date);
-        const teamArr = normalizeTeam(shift.team);
-        const leadName = shift.manager ?? (teamArr[0] || '');
-        const closed = shift.closed ? 'סגור' : 'פתוח';
-
-        const card = document.createElement('div');
-        card.className = 'highlight';
-
-        card.innerHTML = `
-          <div class="meta">
-            ${chip(`${shift.date}${dayName ? ` (${dayName})` : ''}`)}
-            ${chip(`צוות: ${teamArr.length ? teamArr.join(', ') : '—'}`)}
-            ${chip(`אחמ״ש: ${leadName || '—'}`)}
-            ${chip(`סטטוס: ${closed}`)}
-            ${shift.closedAt ? chip(`נסגר: ${new Date(shift.closedAt).toLocaleString('he-IL')}`) : ''}
-          </div>
-          <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
-            <button class="edit-btn" type="button" onclick="openEdit('${shift.date}')">
-              הצג / ערוך
-            </button>
-          </div>
-        `;
-
-        container.appendChild(card);
-      });
-    }
-
-    function filterShifts(){
-      const date = document.getElementById('filterDate').value;
-      if(!date) return renderShifts(allShifts);
-      renderShifts(allShifts.filter(s=>s.date===date));
-    }
-    function searchByName(){
-      const name = document.getElementById('searchName').value.trim();
-      if(!name) return renderShifts(allShifts);
-      const filtered = allShifts.filter(s=>normalizeTeam(s.team).some(m=>m.includes(name)));
-      renderShifts(filtered);
-    }
-    function resetFilters(){
-      document.getElementById('filterDate').value='';
-      document.getElementById('searchName').value='';
-      renderShifts(allShifts);
-    }
-
-    // --- NEW: עזר קטן לאבטחה בצד לקוח (לרינדור טקסטים) ---
-    function escapeHtml(s){ 
-      return String(s).replace(/[&<>"']/g, m=>({ 
-        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' 
-      }[m])); 
-    } // NEW
-
-    // --- NEW: רנדר הערות במהלך המשמרת במודאל ---
-    function renderAdminRuntimeNotes(shift) { // NEW
-      const listEl = document.getElementById('runtimeNotesListAdmin');
-      if (!listEl) return;
-
-      const arr = Array.isArray(shift?.runtimeNotes) ? shift.runtimeNotes : [];
-      listEl.innerHTML = arr.length
-        ? arr.map(n => `
-            <li class="exec-row">
-              <span class="task-name">${escapeHtml(n.text)}</span>
-              <span class="who-time">
-              </span>
-            </li>
-          `).join('')
-        : '<li class="exec-row"><span class="task-name">אין הערות</span></li>';
-    } // NEW
-
-    async function openEdit(date){
-      const res = await fetch(`/get-shift?date=${date}`);
-      const shift = await res.json();
-      if(!shift) return;
-
-      const teamArr = normalizeTeam(shift.team);
-      const leadName = shift.manager ?? (teamArr[0] || '');
-      const dayName = getDayName(shift.date);
-
-      document.getElementById('editDate').value = shift.date;
-      document.getElementById('editManager').value = leadName || '';
-      document.getElementById('editTeam').value = teamArr.join(', ');
-
-      renderAdminEditRows(shift);
-      document.getElementById('editNotes').value = shift.notes || '';
-
-      // --- NEW: ודא שתמיד יש מערך, ואז רנדר את ההערות בזמן המשמרת ---
-      if (!Array.isArray(shift.runtimeNotes)) shift.runtimeNotes = []; // NEW
-      renderAdminRuntimeNotes(shift); // NEW
-
-      const modal = document.getElementById('editModal');
-      modal.style.display = 'flex';
-      modal.setAttribute('aria-hidden', 'false');
-
-      modal.onclick = (e)=>{ if(e.target===modal) closeEdit(); };
-      document.addEventListener('keydown', escCloseOnce);
-    }
-
-    function escCloseOnce(e){
-      if(e.key==='Escape'){ closeEdit(); document.removeEventListener('keydown', escCloseOnce); }
-    }
-
-    function closeEdit(){
-      const modal = document.getElementById('editModal');
-      modal.style.display = 'none';
-      modal.setAttribute('aria-hidden', 'true');
-    }
-
-    async function saveEdit() {
-      const date    = document.getElementById('editDate').value;
-      const manager = document.getElementById('editManager').value.trim();
-      const teamStr = document.getElementById('editTeam').value.trim();
-      const notes = document.getElementById('editNotes').value.trim();
-
-      // 1) שמירת צוות/אחמ״ש + הערות כלליות
-      await fetch('/admin-update-shift', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date, manager, team: teamStr, notes })
-      });
-
-      // 2) איסוף ושמירת ביצועים
-      const form = document.getElementById('editForm');
-      const data = new FormData(form);
-      const executions = { daily: [], weekly: [], monthly: [] };
-      const byIdx = {};
-
-      for (const [k, v] of data.entries()) {
-        const m = k.match(/(task|worker)-(daily|weekly|monthly)-(\d+)/);
-        if (!m) continue;
-        const [, field, cat, i] = m;
-        byIdx[cat] = byIdx[cat] || {};
-        byIdx[cat][i] = byIdx[cat][i] || { task: "", worker: "" };
-        if (field === 'task')   byIdx[cat][i].task = v;
-        if (field === 'worker') byIdx[cat][i].worker = v;
-      }
-      ["daily","weekly","monthly"].forEach(cat => {
-        if (!byIdx[cat]) return;
-        executions[cat] = Object.values(byIdx[cat]).map(e => ({
-          task: e.task,
-          worker: (e.worker || "").trim(),
-        }));
-      });
-
-      const res = await fetch('/update-shift', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date, executions })
-      });
-      const result = await res.json();
-
-      const status = document.getElementById('editStatus');
-      if (res.ok) {
-        status.textContent = result?.message || 'נשמר בהצלחה ✅';
-        await loadShifts(); // לרענן את הכרטיסים
-      } else {
-        status.textContent = result?.message || 'שגיאה בשמירה';
-        status.style.color = 'crimson';
-      }
-    }
-
-    window.filterShifts = filterShifts;
-    window.searchByName = searchByName;
-    window.resetFilters = resetFilters;
-    window.openEdit = openEdit;
-    window.closeEdit = closeEdit;
-    window.saveEdit = saveEdit;
-
-    window.onload = loadShifts;
-  </script>
-  <div class="card" id="test">
-  <h2>שליחת התראה</h2>
-  <form id="notifForm">
-    <input type="text" id="notifMessage" placeholder="כתוב הודעה להתראה..." required />
-    <button type="submit">📢 שלח התראה</button>
-  </form>
-  <p id="notifStatus"></p>
-</div>
-
-<script>
-  const notifForm = document.getElementById("notifForm");
-  const notifMessage = document.getElementById("notifMessage");
-  const notifStatus = document.getElementById("notifStatus");
-
-  notifForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    notifStatus.textContent = "⏳ שולח...";
-    try {
-      const res = await fetch("/send-notification", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: notifMessage.value })
-      });
-      const data = await res.json();
-      notifStatus.textContent = data.ok ? "✅ נשלח בהצלחה!" : "❌ שגיאה בשליחה";
-      notifForm.reset();
-    } catch (err) {
-      notifStatus.textContent = "❌ שגיאה: " + err.message;
-    }
-  });
-</script>
-
-  <script src="/js/global.js"></script>
-<script src="/js/ui-enhance.js" defer></script>
-</div>
 </body>
 </html>

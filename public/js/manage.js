@@ -7,7 +7,11 @@ const finalizeBtn   = document.getElementById("finalizeBtn");
 const saveStatus    = document.getElementById("saveStatus");
 const leadChip      = document.getElementById("leadChip");
 const statusEl      = document.getElementById("status");
-
+async function getCsrf() {
+  const res = await fetch("/csrf-token", { credentials: "include" });
+  const data = await res.json();
+  return data.csrfToken;
+}
 // finalize modal refs
 const finalizeModal   = document.getElementById("finalizeModal");
 const finalizeSummary = document.getElementById("finalizeSummary");
@@ -107,7 +111,7 @@ loadForm.addEventListener("submit", async (e) => {
   const date = new FormData(loadForm).get("date");
   showSkeleton();
 
-  const res = await fetch(`/api/get-shift?date=${date}`);
+  const res = await fetch(`/get-shift?date=${date}`, { credentials: "include" });
   const shift = await res.json();
 
   if (!shift) {
@@ -181,15 +185,24 @@ renderRuntimeNotes(
    ========================= */
 function renderTabs() {
   const categoriesDiv = document.getElementById("categories");
+
   categoriesDiv.innerHTML = categories.map(cat => `
     <div class="category-block" id="cat-${cat.key}">
-      <div class="category-header" onclick="renderCategory('${cat.key}')">
+      <div class="category-header" data-key="${cat.key}">
         ${cat.name}
       </div>
       <div class="tasks-container" id="tasks-${cat.key}"></div>
     </div>
   `).join("");
+
+  document.querySelectorAll(".category-header").forEach(header => {
+    header.addEventListener("click", () => {
+      const key = header.dataset.key; // עכשיו זה קיים
+      renderCategory(key);
+    });
+  });
 }
+
 window.renderCategory = function(categoryKey) {
   const container = document.getElementById(`tasks-${categoryKey}`);
 
@@ -237,12 +250,20 @@ window.renderCategory = function(categoryKey) {
               ${teamOptions}
             </select>
           </label>
-          <button type="button" class="save-single" onclick="saveSingleTask(this)">שמור</button>
+          <button type="button" class="save-single" data-taskid="${taskId}">שמור</button>
         </div>
       </div>
     `;
   });
+
+  // חיבור מאזינים לכל הכפתורים שזה עתה נוצרו
+  container.querySelectorAll(".save-single").forEach(btn => {
+    btn.addEventListener("click", () => {
+      saveSingleTask(btn); 
+    });
+  });
 };
+
 
 
 function toggleTask(id) {
@@ -267,9 +288,14 @@ async function saveSingleTask(btn) {
   btn.textContent = "שומר...";
 
   try {
-    const res = await fetch("/api/update-single-task", {
+    const csrf = await getCsrf();
+    const res = await fetch("/update-single-task", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+  credentials: "include",
+  headers: {
+    'Content-Type':'application/json',
+    "CSRF-Token": csrf
+  },
       body: JSON.stringify({ date, category, task, worker })
     });
     const result = await res.json();
@@ -306,10 +332,14 @@ saveBtn.addEventListener("click", async () => {
     saveStatus.textContent = "לא סומנו ביצועים לשמירה.";
     return;
   }
-
-  const res = await fetch("/api/update-shift", {
+const csrf = await getCsrf();
+  const res = await fetch("/update-shift", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+      credentials: "include",
+  headers: {
+    'Content-Type':'application/json',
+    "CSRF-Token": csrf
+  },
     body: JSON.stringify({ date, executions })
   });
 
@@ -354,15 +384,22 @@ confirmFinalize?.addEventListener("click", async () => {
   btn.disabled = true; btn.textContent = "סוגר...";
 
   try {
-    const res = await fetch("/api/finalize-shift", {
+const csrf = await getCsrf();
+
+    const res = await fetch("/finalize-shift", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+  credentials: "include",
+  headers: {
+    'Content-Type':'application/json',
+    "CSRF-Token": csrf
+  },
       body: JSON.stringify(payload)
     });
     const result = await res.json();
     if (!res.ok) throw new Error(result.message || "שגיאת שרת");
 
-    document.getElementById("finalizeStatus").textContent = result.message || "המשמרת נסגרה בהצלחה.";
+    showToast("המשמרת נסגרה בהצלחה.")
+    // document.getElementById("finalizeStatus").textContent = result.message || "המשמרת נסגרה בהצלחה.";
     updateForm.querySelectorAll("select,input[type='time'],button.save-single").forEach(el => el.disabled = true);
     saveBtn.disabled = true;
     updateStatus({ closed: true }); // עדכון סטטוס לסגור
@@ -460,7 +497,7 @@ window.renderRuntimeNotes = function(listEl, notes) {
 
 
   async function fetchShiftByDate(date) {
-    const res = await fetch(`/api/get-shift?date=${encodeURIComponent(date)}`);
+    const res = await fetch(`/get-shift?date=${encodeURIComponent(date)}`, { credentials: "include" });
     if (!res.ok) return null;
     return res.json();
   }
@@ -492,10 +529,15 @@ async function loadRuntimeNotes() {
   if (!dateInput?.value) return alert('בחר תאריך משמרת קודם');
   const text = (noteText?.value || '').trim();
   if (!text) return noteText.focus();
+const csrf = await getCsrf();
 
-  const res = await fetch('/api/add-runtime-note', {
+  const res = await fetch('/add-runtime-note', {
     method: 'POST',
-    headers: { 'Content-Type':'application/json' },
+  credentials: "include",
+  headers: {
+    'Content-Type':'application/json',
+    "CSRF-Token": csrf
+  },
     body: JSON.stringify({
       date: dateInput.value,
       text,
@@ -507,6 +549,7 @@ async function loadRuntimeNotes() {
   if (!data.ok) return alert(data.message || 'שגיאה');
 
   noteText.value = '';
+  showToast("הערה הוספה")
   await loadRuntimeNotes();
 });
 
@@ -522,10 +565,15 @@ runtimeList?.addEventListener('click', async (e) => {
   const index  = li.getAttribute('data-index');
 
   if (!confirm('למחוק את ההערה?')) return;
+const csrf = await getCsrf();
 
-  const res = await fetch('/api/delete-runtime-note', {
+  const res = await fetch('/delete-runtime-note', {
     method: 'POST',
-    headers: { 'Content-Type':'application/json' },
+  credentials: "include",
+  headers: {
+    'Content-Type':'application/json',
+    "CSRF-Token": csrf
+  },
     body: JSON.stringify({
       date,
       noteId: noteId || undefined,
@@ -535,6 +583,7 @@ runtimeList?.addEventListener('click', async (e) => {
 
   const data = await res.json();
   if (!data.ok) { alert(data.message || 'שגיאה במחיקה'); return; }
+  showToast("הערה הוספה")
   await loadRuntimeNotes();
 });
 

@@ -309,10 +309,10 @@ form label {
   direction: rtl; 
   unicode-bidi: bidi-override;
 } */
-input[type="date"] {
+/* input[type="date"] {
   width: 97%;
   margin-right: 5px;
-}
+} */
 input, select, textarea {
   width: 100%; padding: 12px 14px;
   border: 1px solid var(--card-border);
@@ -938,4 +938,31 @@ margin: 30px auto;
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+/* =========================
+   THEME TOGGLE: LIGHT MODE
+   ========================= */
+body.light {
+  --bg: #f9f9f9;
+  --bg-alt: #ffffff;
+  --ink: #111111;
+  --ink-muted: #444444;
+
+  --card: #ffffff;
+  --card-border: #dddddd;
+
+  --btn-primary: #2ecc71;        /* ירוק רך */
+  --btn-primary-hover: #27ae60;  /* ירוק כהה יותר */
+  --btn-secondary: #f39c12;      /* כתום זהוב */
+  --error: #e74c3c;
+  --success: #27ae60;
+  --warning: #f1c40f;
+
+  --toast-bg: #ffffff;
+  --toast-ink:#111;
+  --toast-muted:#555;
+  --toast-accent:#2ecc71;
+  --toast-accent-2:#27ae60;
+  --toast-danger:#e74c3c;
+  --toast-warn:#f39c12;
 }

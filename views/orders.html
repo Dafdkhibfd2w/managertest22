@@ -3,83 +3,70 @@
 <head>
 <meta charset="UTF-8" />
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
-
-
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>NEW DELI • הזמנות יומיות</title>
-  <link rel="icon" href="/icons/icon-512.png" type="image/png">
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>NEW DELI • הזמנות יומיות</title>
+<link rel="icon" href="/icons/icon-512.png" type="image/png">
 <script src="https://unpkg.com/lucide@latest"></script>
-
-  <link rel="stylesheet" href="/css/style.css?v=2" />
-
-  
-  <script defer src="/js/ui.js"></script>
-  
+<link rel="stylesheet" href="/css/style.css?v=2" />
+<script defer src="/js/ui.js"></script>
 </head>
 <body>
-    <div id="globalLoader">
-  <div class="spinner"></div>
-  <p>טוען נתונים...</p>
-</div>
-
-<!-- התוכן שלך -->
-<div id="pageContent" style="display:none">
-<header class="brandbar">
-  <span class="brand-title">NEW DELI</span>
-  <div class="brandbar-right">
-    <button id="notifToggle" class="icon-btn">
-      <i data-lucide="bell-off"></i>
-    </button>
-    <span class="burger" id="burger">&#9776;</span>
+  <div id="globalLoader">
+    <div class="spinner"></div>
+    <p>טוען נתונים...</p>
   </div>
-</header>
 
+  <div id="pageContent" style="display:none">
+    <header class="brandbar">
+      <span class="brand-title">NEW DELI</span>
+      <div class="brandbar-right">
+        <button id="notifToggle" class="icon-btn"><i data-lucide="bell-off"></i></button>
+        <span class="burger" id="burger">&#9776;</span>
+        <button id="themeToggle" class="icon-btn">🌙/☀️</button>
+      </div>
+    </header>
 
+    <nav class="mobile-nav" id="mobileNav">
+      <button id="closeNav" class="close-btn">✖</button>
+      <ul>
+        <li><a href="/"><span class="icon">🏠</span> דף הבית</a></li>
+        <li><a href="/create"><span class="icon">🗓️</span> יצירת משמרת</a></li>
+        <li><a href="/manage"><span class="icon">✅</span> ניהול משמרת</a></li>
+        <li><a href="/admin"><span class="icon">📚</span> ארכיון / דשבורד מנהל</a></li>
+        <li><a href="/invoices-page"><span class="icon">🧾</span> חשבוניות</a></li>
+        <li><a href="/suppliers-page"><span class="icon">🏷️</span> ספקים</a></li>
+        <li><a href="/orders-page"><span class="icon">📦</span> הזמנות</a></li>
+        <li><a href="/dispersals-page"><span class="icon">🚕</span> פיזורים</a></li>
+    <li><a href="/logout"><span class="icon">🚪</span> התנתקות</a></li>
+      </ul>
+    </nav>
 
-<nav class="mobile-nav" id="mobileNav">
-  <button id="closeNav" class="close-btn">✖</button>
-  <ul>
-    <li><a href="/"><span class="icon">🏠</span> דף הבית</a></li>
-    <li><a href="/create"><span class="icon">🗓️</span> יצירת משמרת</a></li>
-    <li><a href="/manage"><span class="icon">✅</span> ניהול משמרת</a></li>
-    <li><a href="/admin-login"><span class="icon">📚</span> ארכיון / דשבורד מנהל</a></li>
-    <li><a href="/invoices-page"><span class="icon">🧾</span> חשבוניות</a></li>
-    <li><a href="/suppliers-page"><span class="icon">🏷️</span> ספקים</a></li>
-    <li><a href="/orders-page"><span class="icon">📦</span> הזמנות</a></li>
-    <li><a href="/dispersals-page"><span class="icon">🚕</span> פיזורים</a></li>
-  </ul>
-</nav>
-  <div class="wrap">
-    <h1>הזמנות יומיות</h1>
+    <div class="wrap">
+      <h1>הזמנות יומיות</h1>
 
-    <!-- בר עליון: בחירת תאריך + כפתורי טעינה/שמירה -->
-    <div class="card">
-      <form id="loadForm" class="row">
-        <div>
-<label>תאריך</label>
-<input type="date" name="date" id="dateInput" required>
-<small id="weekdayHint" class="muted" style="margin-inline-start:8px"></small>
-        </div>
-        <div>
-          <label>&nbsp;</label>
-          <button type="submit">טען / צור טופס</button>
-        </div>
-        <div>
-          <label>&nbsp;</label>
-          <button type="button" id="saveBtn">שמור</button>
-        </div>
-      </form>
-      <p class="muted" id="msg"></p>
+      <!-- בר עליון -->
+      <div class="card">
+        <form id="loadForm" class="row">
+          <div>
+            <label>תאריך</label>
+            <input type="date" name="date" id="dateInput" required>
+            <small id="weekdayHint" class="muted" style="margin-inline-start:8px"></small>
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <button type="submit">טען / צור טופס</button>
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <button type="button" id="saveBtn">שמור</button>
+          </div>
+        </form>
+        <p class="muted" id="msg"></p>
+      </div>
+
+      <!-- טפסי ספקים -->
+      <div id="suppliersWrap"></div>
     </div>
-
-    <!-- טפסי ספקים -->
-    <div id="suppliersWrap"></div>
-
-    <!-- הערות כלליות ליום -->
-    <!-- <div class="card" id="notesCard" style="display:none">
-      <label>הערות כלליות ליום</label>
-      <textarea id="dayNotes"></textarea>
-    </div> -->
   </div>
 
   <script>
@@ -88,77 +75,93 @@
     const saveBtn   = document.getElementById('saveBtn');
     const msg       = document.getElementById('msg');
     const wrap      = document.getElementById('suppliersWrap');
-    // const notesCard = document.getElementById('notesCard');
-    const dayNotes  = document.getElementById('dayNotes');
 
-    let current = null; // { date, blocks:[{supplierId,supplier,items:[{name,unit,currentQty,toOrderQty,notes}]}], notes }
+    let current = null;
+
+    // ===== פונקציית CSRF =====
+    async function getCsrf() {
+      const res = await fetch("/csrf-token", { credentials: "include" });
+      const data = await res.json();
+      return data.csrfToken;
+    }
 
     // טען/צור טופס ליום
     loadForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const date = dateInput.value;
       if (!date) return;
-      msg.textContent = 'טוען...';
-      const res = await fetch('/orders?date=' + encodeURIComponent(date));
+      // msg.textContent = 'טוען...';
+        showToast('טוען ...')
+
+      const csrf = await getCsrf();
+      const res = await fetch('/orders?date=' + encodeURIComponent(date), {
+        credentials: 'include',
+        headers: { "CSRF-Token": csrf }
+      });
       const data = await res.json();
+
       if (data.ok) {
         current = data.order;
         render();
-        msg.textContent = 'נטען ✔';
+        // msg.textContent = 'נטען ✔';
+        showToast('נטען ✔')
       } else {
-        msg.textContent = data.message || 'שגיאה';
+        // msg.textContent = data.message || 'שגיאה';
+        showToast(data.message || 'שגיאה')
       }
       setTimeout(()=> msg.textContent='', 1500);
     });
-function weekdayFromYMD(ymd) {
-  if (!ymd) return '';
-  // נפרק ידנית כדי להימנע מבעיות אזור זמן
-  const [y, m, d] = ymd.split('-').map(Number);
-  const dt = new Date(y, m - 1, d); // תאריך מקומי
-  return dt.toLocaleDateString('he-IL', { weekday: 'long' }); // לדוגמה: "שלישי"
-}
 
-function updateWeekdayHint() {
-  const ymd = document.getElementById('dateInput').value;
-  document.getElementById('weekdayHint').textContent =
-    ymd ? `(${weekdayFromYMD(ymd)})` : '';
-}
+    function weekdayFromYMD(ymd) {
+      if (!ymd) return '';
+      const [y, m, d] = ymd.split('-').map(Number);
+      const dt = new Date(y, m - 1, d);
+      return dt.toLocaleDateString('he-IL', { weekday: 'long' });
+    }
 
-// בעת טעינת הדף:
-updateWeekdayHint();
-
-// בכל שינוי תאריך:
-document.getElementById('dateInput').addEventListener('change', updateWeekdayHint);
+    function updateWeekdayHint() {
+      const ymd = dateInput.value;
+      document.getElementById('weekdayHint').textContent =
+        ymd ? `(${weekdayFromYMD(ymd)})` : '';
+    }
+    updateWeekdayHint();
+    dateInput.addEventListener('change', updateWeekdayHint);
 
     // שמירה
     saveBtn.addEventListener('click', async () => {
       if (!current) return;
       collectFromUI();
-      msg.textContent = 'שומר...';
+      // msg.textContent = 'שומר...';
+      showToast('שומר...')
+      const csrf = await getCsrf();
       const res = await fetch('/orders', {
         method:'POST',
-        headers:{ 'Content-Type':'application/json' },
-        body: JSON.stringify({ date: current.date, blocks: current.blocks, notes: current.notes || '' })
+        credentials: 'include',
+        headers:{ 
+          'Content-Type':'application/json',
+          "CSRF-Token": csrf
+        },
+        body: JSON.stringify({ 
+          date: current.date, 
+          blocks: current.blocks, 
+          notes: current.notes || '' 
+        })
       });
       const data = await res.json();
-      msg.textContent = data.ok ? 'נשמר ✔' : (data.message || 'שגיאה בשמירה');
+      // msg.textContent = data.ok ? 'נשמר ✔' : (data.message || 'שגיאה בשמירה');
+      showToast(data.ok ? 'נשמר ✔' : (data.message || 'שגיאה בשמירה'))
       setTimeout(()=> msg.textContent='', 1500);
     });
 
     function render(){
       wrap.innerHTML = '';
       if (!current.blocks || !current.blocks.length) {
-  const empty = document.createElement('div');
-  empty.className = 'card';
-  empty.innerHTML = `<p style="text-align:center;color:#666">אין ספקים ליום זה</p>`;
-  wrap.appendChild(empty);
-//   notesCard.style.display = 'block';
-  dayNotes.value = current.notes || '';
-  return;
-}
-
-    //   notesCard.style.display = 'block';
-    //   dayNotes.value = current.notes || '';
+        const empty = document.createElement('div');
+        empty.className = 'card';
+        empty.innerHTML = `<p style="text-align:center;color:#666">אין ספקים ליום זה</p>`;
+        wrap.appendChild(empty);
+        return;
+      }
 
       (current.blocks || []).forEach((b, bi) => {
         const card = document.createElement('div');
@@ -193,11 +196,10 @@ document.getElementById('dateInput').addEventListener('change', updateWeekdayHin
         wrap.appendChild(card);
       });
 
-      // מאזינים לכל האינפוטים
+      // מאזינים לשינויים
       wrap.querySelectorAll('input').forEach(inp => {
         inp.addEventListener('input', onFieldChange);
       });
-    //   dayNotes.addEventListener('input', () => current.notes = dayNotes.value);
     }
 
     function onFieldChange(e){
@@ -211,11 +213,9 @@ document.getElementById('dateInput').addEventListener('change', updateWeekdayHin
     }
 
     function collectFromUI(){
-      // כבר מעדכנים oninput; כאן רק דואגים להערות יום
-    //   current.notes = dayNotes.value || '';
+      // כרגע רק המוצרים מתעדכנים ישירות; הערות יום אם תפעיל אותן
     }
 
-    // utils
     function num(n){ return Number(n||0); }
     function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
     function escapeAttr(s){ return escapeHtml(s).replace(/"/g,'&quot;'); }
@@ -224,23 +224,8 @@ document.getElementById('dateInput').addEventListener('change', updateWeekdayHin
     const today = new Date().toISOString().slice(0,10);
     dateInput.value = today;
   </script>
-  <script src="/js/global.js"></script>
-<script src="/js/ui-enhance.js" defer></script>
-<script>
-    async function loadUser() {
-  try {
-    const res = await fetch("/user");
-    const data = await res.json();
-    if (data.ok && data.user) {
-console.log(data.user.name)
-    }
-  } catch (err) {
-    console.error("שגיאה בשליפת משתמש:", err);
-  }
-}
 
-loadUser();
-</script>
-</div>
+  <script src="/js/global.js"></script>
+  
 </body>
 </html>

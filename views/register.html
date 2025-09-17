@@ -2,136 +2,220 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>הרשמה</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=2"> <!-- קישור ל־CSS ששלחת -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>כניסה / הרשמה</title>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
   <style>
-    .register-card {
-      background: var(--card);
-      border: 1px solid var(--card-border);
-      border-left: 5px solid var(--btn-primary);
-      border-radius: var(--radius);
-      padding: 28px;
-      margin: 50px auto;
-      max-width: 420px;
-      box-shadow: var(--shadow-1);
-      animation: fadeIn .5s ease;
+    :root {
+      --bg: #0E0E0E;
+      --card: #1C1C1C;
+      --ink: #fff;
+      --ink-muted: #b8b8b8;
+      --primary: #00FFA3;
+      --primary-hover: #00C2FF;
+      --error: #FF3B3B;
+      --radius: 14px;
+      --shadow: 0 8px 28px rgba(0, 0, 0, 0.6);
     }
-
-    .register-card h1 {
-      font-size: 1.6rem;
-      margin-bottom: 24px;
-      color: var(--btn-primary);
-      text-align: center;
-    }
-
-    .register-card form {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    .register-card label {
-      font-weight: 600;
+    body {
+      margin: 0;
+      font-family: "Heebo", sans-serif;
+      background: var(--bg);
       color: var(--ink);
-      margin-bottom: 6px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
     }
-
-    .register-card input,
-    .register-card select {
+    .auth-container {
       width: 100%;
+      max-width: 420px;
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      animation: popIn 0.5s ease;
+    }
+    .auth-tabs {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+    }
+    .auth-tab {
+      flex: 1;
+      text-align: center;
+      padding: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      border-radius: var(--radius);
+      transition: background 0.3s, color 0.3s;
+      color: var(--ink-muted);
+    }
+    .auth-tab.active {
+      background: var(--primary);
+      color: #000;
+    }
+    form {
+      display: none;
+      flex-direction: column;
+      gap: 14px;
+      animation: fadeIn 0.4s ease;
+    }
+    form.active {
+      display: flex;
+    }
+    input, select {
       padding: 12px 14px;
-      border: 1px solid var(--card-border);
-      border-radius: 10px;
-      background: var(--bg-alt);
+      border-radius: var(--radius);
+      border: 1px solid #333;
+      background: #111;
       color: var(--ink);
       font-size: 1rem;
-      transition: border .2s, box-shadow .2s;
-    }
-
-    .register-card input:focus,
-    .register-card select:focus {
-      border-color: var(--btn-primary);
-      box-shadow: 0 0 0 2px rgba(0,255,163,.3);
       outline: none;
+      transition: border 0.2s, box-shadow 0.2s;
     }
-
-    .register-card button {
-      background: var(--btn-primary);
-      color: #0E0E0E;
-      padding: 14px;
+    input:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 6px rgba(0,255,163,.5);
+    }
+    button {
+      background: var(--primary);
       border: none;
-      border-radius: 10px;
+      border-radius: var(--radius);
+      padding: 12px;
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      box-shadow: var(--shadow-1);
-      transition: all .25s ease;
+      transition: background 0.2s, transform 0.2s;
     }
-
-    .register-card button:hover {
-      background: var(--btn-primary-hover);
+    button:hover {
+      background: var(--primary-hover);
       transform: translateY(-2px);
-      box-shadow: var(--shadow-2);
     }
-
-    #status {
-      margin-top: 14px;
-      text-align: center;
-      font-size: 0.95rem;
+    .msg {
+      font-size: 0.9rem;
       color: var(--ink-muted);
+      text-align: center;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    /* מובייל */
+    @media (max-width: 500px) {
+      .auth-container {
+        margin: 0 12px;
+        padding: 18px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="register-card">
-    <h1>הרשמה</h1>
-    <form id="registerForm">
-      <div>
-        <label>שם:</label>
-        <input type="text" name="name" required>
-      </div>
-      <div>
-        <label>תפקיד:</label>
-        <select name="role">
-          <option value="worker">עובד</option>
-          <option value="manager">אחמ״ש</option>
-          <option value="admin">מנהל</option>
-        </select>
-      </div>
-      <button type="submit">שמור</button>
-    </form>
-    <p id="status"></p>
-  </div>
+  <div class="auth-container">
+    <div class="auth-tabs">
+      <div class="auth-tab active" data-tab="login">כניסה</div>
+      <div class="auth-tab" data-tab="register">הרשמה</div>
+    </div>
+
+    <!-- טופס כניסה -->
+<form id="loginForm" class="active" method="POST">
+  <input type="text" id="loginUsername" name="username" placeholder="שם משתמש" required>
+  <input type="password" id="loginPassword" name="password" placeholder="סיסמא" required>
+  <button type="submit">התחבר</button>
+</form>
+
+<!-- טופס הרשמה -->
+<form id="registerForm" method="POST">
+  <input type="text" id="registerUsername" name="username" placeholder="שם משתמש" required>
+  <input type="password" id="registerPassword" name="password" placeholder="סיסמא" required>
+  <select id="registerRole" name="role">
+    <option value="user">משתמש</option>
+    <option value="manager">מנהל</option>
+    <option value="admin">אדמין</option>
+  </select>
+  <button type="submit">הרשמה</button>
+</form>
 
   <script>
-    const form = document.getElementById("registerForm");
-    const status = document.getElementById("status");
+      const tokenRes = await fetch("/csrf-token", { credentials: "include" });
+const { csrfToken } = await tokenRes.json();
+    const tabs = document.querySelectorAll(".auth-tab");
+    const forms = {
+      login: document.getElementById("loginForm"),
+      register: document.getElementById("registerForm")
+    };
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const fd = new FormData(form);
-      const data = Object.fromEntries(fd.entries());
-
-      status.textContent = "שומר...";
-
-      try {
-        const res = await fetch("/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        });
-        const out = await res.json();
-        status.textContent = out.ok ? "✅ נשמר בהצלחה" : "❌ " + out.message;
-        if (out.ok) {
-          window.location.href = '/'; // שולח ישר ל־"/"
-        }
-      } catch (err) {
-        status.textContent = "❌ שגיאה: " + err.message;
-      }
+    tabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        tabs.forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        Object.values(forms).forEach(f => f.classList.remove("active"));
+        forms[tab.dataset.tab].classList.add("active");
+      });
     });
   </script>
+  <script src="/js/global.js"></script>
+<script>
+
+  // LOGIN
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const username = document.getElementById("loginUsername").value.trim();
+    const password = document.getElementById("loginPassword").value.trim();
+const tokenRes = await fetch("/csrf-token", { credentials: "include" });
+const { csrfToken } = await tokenRes.json();
+    const res = await fetch('/login', {
+      method: 'POST',
+      credentials: "include",
+      headers: { 'Content-Type': 'application/json',"CSRF-Token": csrfToken },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+    if (data.ok) {
+      localStorage.setItem('userRole', data.user.role);
+      localStorage.setItem('username', data.user.username);
+      window.location.href = "/";   // 🟢 הפניה אחרי login
+    } else {
+      showToast(data.message || "שגיאה בהתחברות", { type: "error" });
+    }
+  });
+
+  // REGISTER
+  document.getElementById("registerForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const username = document.getElementById("registerUsername").value.trim();
+    const password = document.getElementById("registerPassword").value.trim();
+    const role     = document.getElementById("registerRole").value;
+const tokenRes = await fetch("/csrf-token", { credentials: "include" });
+const { csrfToken } = await tokenRes.json();
+    const res = await fetch('/register', {
+      method: 'POST',
+      credentials: "include",
+      headers: { 'Content-Type': 'application/json',"CSRF-Token": csrfToken },
+      body: JSON.stringify({ username, password, role })
+    });
+
+    const data = await res.json();
+    if (data.ok) {
+      localStorage.setItem('userRole', data.user.role);
+      localStorage.setItem('username', data.user.username);
+      window.location.href = "/";   // 🟢 הפניה אחרי register
+    } else {
+      showToast(data.message || "שגיאה בהרשמה", { type: "error" });
+    }
+  });
+</script>
+
 </body>
 </html>

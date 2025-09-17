@@ -3,132 +3,143 @@
 <head>
 <meta charset="UTF-8" />
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
-
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>NEW DELI • חשבוניות</title>
-  <link rel="stylesheet" href="/css/style.css?v=2" />
-  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#2b5329">
-  <link rel="icon" href="/icons/icon-512.png" type="image/png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NEW DELI • חשבוניות</title>
+<link rel="stylesheet" href="/css/style.css?v=2" />
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#2b5329">
+<link rel="icon" href="/icons/icon-512.png" type="image/png">
 <script src="https://unpkg.com/lucide@latest"></script>
-
-
-
-  
-  <script defer src="/js/ui.js"></script>
+<script defer src="/js/ui.js"></script>
 </head>
 <body class="theme-dark-premium">
   <div id="globalLoader">
-  <div class="spinner"></div>
-  <p>טוען נתונים...</p>
-</div>
-
-<!-- התוכן שלך -->
-<div id="pageContent" style="display:none">
-<header class="brandbar">
-  <span class="brand-title">NEW DELI</span>
-  <div class="brandbar-right">
-    <button id="notifToggle" class="icon-btn">
-      <i data-lucide="bell-off"></i>
-    </button>
-    <span class="burger" id="burger">&#9776;</span>
+    <div class="spinner"></div>
+    <p>טוען נתונים...</p>
   </div>
-</header>
 
+  <div id="pageContent" style="display:none">
+    <header class="brandbar">
+      <span class="brand-title">NEW DELI</span>
+      <div class="brandbar-right">
+        <button id="notifToggle" class="icon-btn"><i data-lucide="bell-off"></i></button>
+        <span class="burger" id="burger">&#9776;</span>
+        <button id="themeToggle" class="icon-btn">🌙/☀️</button>
+      </div>
+    </header>
 
+    <nav class="mobile-nav" id="mobileNav">
+      <button id="closeNav" class="close-btn">✖</button>
+      <ul>
+        <li><a href="/"><span class="icon">🏠</span> דף הבית</a></li>
+        <li><a href="/create"><span class="icon">🗓️</span> יצירת משמרת</a></li>
+        <li><a href="/manage"><span class="icon">✅</span> ניהול משמרת</a></li>
+        <li><a href="/admin"><span class="icon">📚</span> ארכיון / דשבורד מנהל</a></li>
+        <li><a href="/invoices-page"><span class="icon">🧾</span> חשבוניות</a></li>
+        <li><a href="/suppliers-page"><span class="icon">🏷️</span> ספקים</a></li>
+        <li><a href="/orders-page"><span class="icon">📦</span> הזמנות</a></li>
+        <li><a href="/dispersals-page"><span class="icon">🚕</span> פיזורים</a></li>
+    <li><a href="/logout"><span class="icon">🚪</span> התנתקות</a></li>
+      </ul>
+    </nav>
 
-  <nav class="mobile-nav" id="mobileNav">
-    <button id="closeNav" class="close-btn">✖</button>
-    <ul>
-      <li><a href="/"><span class="icon">🏠</span> דף הבית</a></li>
-      <li><a href="/create"><span class="icon">🗓️</span> יצירת משמרת</a></li>
-      <li><a href="/manage"><span class="icon">✅</span> ניהול משמרת</a></li>
-      <li><a href="/admin-login"><span class="icon">📚</span> ארכיון / דשבורד מנהל</a></li>
-      <li><a href="/invoices-page"><span class="icon">🧾</span> חשבוניות</a></li>
-      <li><a href="/suppliers-page"><span class="icon">🏷️</span> ספקים</a></li>
-      <li><a href="/orders-page"><span class="icon">📦</span> הזמנות</a></li>
-      <li><a href="/dispersals-page"><span class="icon">🚕</span> פיזורים</a></li>
-    </ul>
-  </nav>
+    <div class="wrap">
+      <h1>חשבוניות</h1>
 
-  <div class="wrap">
-    <h1>חשבוניות</h1>
+      <!-- העלאה -->
+      <div class="card">
+        <form id="uploadForm" enctype="multipart/form-data">
+          <div class="row">
+            <div>
+              <label>תאריך משמרת</label>
+              <input type="date" name="date" required />
+            </div>
+            <div>
+              <label>שם ספק</label>
+              <input type="text" name="supplier" placeholder="לדוגמה: סופר-דרינק בע״מ" required />
+            </div>
+            <label>קובץ חשבונית (תמונה / PDF)</label>
+            <div class="file-upload">
+<input type="file" id="fileInput" name="file" accept="image/*,application/pdf" style="display:none">
+<button type="button" id="fileBtn">בחר קובץ</button>
 
-    <!-- העלאה -->
-    <div class="card">
-      <form id="uploadForm" enctype="multipart/form-data">
-        <div class="row">
-          <div>
-            <label>תאריך משמרת</label>
-            <input type="date" name="date" required />
+              <span id="fileName">לא נבחר קובץ</span>
+            </div>
+            <div style="margin-top: 20px;">
+              <button type="submit">העלה חשבונית</button>
+            </div>
           </div>
-          <div>
-            <label>שם ספק</label>
-            <input type="text" name="supplier" placeholder="לדוגמה: סופר-דרינק בע״מ" required />
-          </div>
-<label>קובץ חשבונית (תמונה / PDF)</label>
-<div class="file-upload">
-  <input type="file" id="fileInput" name="file" accept="image/*,application/pdf" required hidden>
-  <button type="button" id="fileBtn">בחר קובץ</button>
-  <span id="fileName">לא נבחר קובץ</span>
-</div>
-          <div style="margin-top: 20px;">
-            <button type="submit">העלה חשבונית</button>
-          </div>
-        </div>
-        <p class="muted" id="uploadMsg"></p>
-      </form>
-    </div>
-
-    <!-- חיפוש/סינון -->
-    <div class="card">
-      <form id="filterForm">
-        <div class="row">
-          <div>
-            <label>חפש לפי תאריך</label>
-            <input type="date" name="date" />
-          </div>
-          <div>
-            <label>חפש לפי ספק</label>
-            <input type="text" name="supplier" placeholder="שם ספק" />
-          </div>
-        </div>
-
-        <div class="row buttons">
-          <button type="submit" class="secondary">סנן</button>
-          <button style="margin-top: 10px;" type="button" id="clearFilters" class="secondary">נקה</button>
-        </div>
-      </form>
-    </div>
-
-    <!-- טבלה -->
-    <div class="card">
-      <div style="overflow:auto">
-        <table id="tbl">
-          <thead>
-            <tr>
-              <th>תאריך</th>
-              <th>ספק</th>
-              <th>חשבונית</th>
-              <th>העלה</th>
-              <th style="width:160px">פעולות</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+          <p class="muted" id="uploadMsg"></p>
+        </form>
       </div>
 
-      <div class="pager">
-        <button id="prevBtn" class="secondary">‹ הקודם</button>
-        <span class="muted" id="pageInfo"></span>
-        <button id="nextBtn" class="secondary">הבא ›</button>
+      <!-- חיפוש/סינון -->
+      <div class="card">
+        <form id="filterForm">
+          <div class="row">
+            <div>
+              <label>חפש לפי תאריך</label>
+              <input type="date" name="date" />
+            </div>
+            <div>
+              <label>חפש לפי ספק</label>
+              <input type="text" name="supplier" placeholder="שם ספק" />
+            </div>
+          </div>
+          <div class="row buttons">
+            <button type="submit" class="secondary">סנן</button>
+            <button type="button" id="clearFilters" class="secondary">נקה</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- טבלה -->
+      <div class="card">
+        <div style="overflow:auto">
+          <table id="tbl">
+            <thead>
+              <tr>
+                <th>תאריך</th>
+                <th>ספק</th>
+                <th>חשבונית</th>
+                <th>העלה</th>
+                <th style="width:160px">פעולות</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="pager">
+          <button id="prevBtn" class="secondary">‹ הקודם</button>
+          <span class="muted" id="pageInfo"></span>
+          <button id="nextBtn" class="secondary">הבא ›</button>
+        </div>
       </div>
     </div>
   </div>
 
   <script>
+async function uploadInvoice() {
+  const fileInput = document.getElementById("fileInput");
+  if (!fileInput.files.length) {
+    alert("חייב לבחור קובץ!");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("file", fileInput.files[0]);
+
+  const res = await fetch("/upload-invoice", {
+    method: "POST",
+    body: formData
+  });
+
+  const data = await res.json();
+  console.log(data);
+}
+
+
     const uploadForm = document.getElementById('uploadForm');
     const uploadMsg  = document.getElementById('uploadMsg');
     const filterForm = document.getElementById('filterForm');
@@ -140,17 +151,35 @@
 
     let state = { date:'', supplier:'', skip:0, limit:20, total:0 };
 
+    // ===== פונקציית CSRF =====
+    async function getCsrf() {
+      const res = await fetch("/csrf-token", { credentials: "include" });
+      const data = await res.json();
+      return data.csrfToken;
+    }
+
     // העלאה
     uploadForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      uploadMsg.textContent = 'מעלה...';
+      // uploadMsg.textContent = 'מעלה...';
+      showToast('מעלה...')
       const fd = new FormData(uploadForm);
       try {
-        const res = await fetch('/upload-invoice', { method:'POST', body: fd });
+        const csrf = await getCsrf();
+const res = await fetch('/upload-invoice', { 
+  method:'POST',
+  credentials:'include',
+  headers:{ 
+    
+    "CSRF-Token": csrf
+  },
+  body: fd 
+});
         const data = await res.json();
-        uploadMsg.textContent = data.message || (data.ok ? 'הועלה' : 'שגיאה');
+        showToast(data.message || (data.ok ? 'הועלה' : 'שגיאה'))
         if (data.ok) {
           uploadForm.reset();
+          fileName.textContent = 'לא נבחר קובץ';
           load();
         }
       } catch (err) {
@@ -193,7 +222,11 @@
       params.set('skip', state.skip);
       params.set('limit', state.limit);
 
-      const res = await fetch('/invoices?' + params.toString());
+      const csrf = await getCsrf();
+      const res = await fetch('/invoices?' + params.toString(), { 
+        credentials:'include',
+        headers:{ "CSRF-Token": csrf }
+      });
       const data = await res.json();
       state.total = data.total || 0;
 
@@ -202,13 +235,11 @@
           <td data-label="תאריך">${escapeHtml(r.shiftDate || '')}</td>
           <td data-label="ספק">${escapeHtml(r.supplier || '')}</td>
           <td data-label="חשבונית">
-            <a href="${r.url}" target="_blank" style="color: white;" title="${escapeHtml(r.originalName || '')}">
-              צפייה בקובץ
-            </a>
+            <a href="${r.url}" target="_blank" style="color: white;" title="${escapeHtml(r.originalName || '')}">צפייה בקובץ</a>
           </td>
           <td data-label="העלה">${escapeHtml(r.uploadedBy || '')}</td>
           <td class="actions">
-            <button onclick="delInvoice('${r._id}')" class="secondary">מחק</button>
+            <button class="secondary delBtn" data-id="${r._id}">מחק</button>
           </td>
         </tr>
       `).join('');
@@ -219,34 +250,45 @@
 
       prevBtn.disabled = state.skip <= 0;
       nextBtn.disabled = state.skip + state.limit >= state.total;
+
+      // חיבור מאזינים למחיקה
+      tbody.querySelectorAll('.delBtn').forEach(btn=>{
+        btn.addEventListener('click',()=>delInvoice(btn.dataset.id));
+      });
     }
 
     async function delInvoice(id) {
       if (!confirm('למחוק את החשבונית?')) return;
-      const res = await fetch('/invoice/' + encodeURIComponent(id), { method:'DELETE' });
+      const csrf = await getCsrf();
+      const res = await fetch('/invoice/' + encodeURIComponent(id), { 
+        method:'DELETE',
+        credentials:'include',
+        headers:{ "CSRF-Token": csrf }
+      });
       const data = await res.json();
       alert(data.message || (data.ok ? 'נמחק' : 'שגיאה'));
       if (data.ok) load();
     }
 
-    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m])); }
+    function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m])); }
 
-    load();
+    // קובץ
     const fileInput = document.getElementById('fileInput');
-const fileBtn = document.getElementById('fileBtn');
-const fileName = document.getElementById('fileName');
+    const fileBtn = document.getElementById('fileBtn');
+    const fileName = document.getElementById('fileName');
+    fileBtn.addEventListener("click", () => {
+      document.getElementById('fileInput').click();
+    })
+    fileBtn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', () => {
+      fileName.textContent = fileInput.files.length ? fileInput.files[0].name : 'לא נבחר קובץ';
+    });
 
-fileBtn.addEventListener('click', () => fileInput.click());
-
-fileInput.addEventListener('change', () => {
-  fileName.textContent = fileInput.files.length
-    ? fileInput.files[0].name
-    : 'לא נבחר קובץ';
-});
-
+    // טעינה ראשונית
+    load();
   </script>
+
   <script src="/js/global.js"></script>
-<script src="/js/ui-enhance.js" defer></script>
-</div>
+  
 </body>
 </html>

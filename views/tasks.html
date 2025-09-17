@@ -164,6 +164,7 @@
       <i data-lucide="bell-off"></i>
     </button>
     <span class="burger" id="burger">&#9776;</span>
+<button id="themeToggle" class="icon-btn">🌙/☀️</button>
   </div>
 </header>
 
@@ -175,12 +176,13 @@
     <li><a href="/"><span class="icon">🏠</span> דף הבית</a></li>
     <li><a href="/create"><span class="icon">🗓️</span> יצירת משמרת</a></li>
     <li><a href="/manage"><span class="icon">✅</span> ניהול משמרת</a></li>
-    <li><a href="/admin-login"><span class="icon">📚</span> ארכיון / דשבורד מנהל</a></li>
+    <li><a href="/admin"><span class="icon">📚</span> ארכיון / דשבורד מנהל</a></li>
     <li><a href="/invoices-page"><span class="icon">🧾</span> חשבוניות</a></li>
     <li><a href="/suppliers-page"><span class="icon">🏷️</span> ספקים</a></li>
     <li><a href="/task"><span class="icon">⚒</span> משימות</a></li>
     <li><a href="/orders-page"><span class="icon">📦</span> הזמנות</a></li>
     <li><a href="/dispersals-page"><span class="icon">🚕</span> פיזורים</a></li>
+    <li><a href="/logout"><span class="icon">🚪</span> התנתקות</a></li>
   </ul>
 </nav>
 
@@ -245,104 +247,10 @@
 
 
   
-<script>
-  const addForm = document.getElementById("addTaskForm");
-function showSkeleton(elId, rows = 3) {
-  const el = document.getElementById(elId);
-  el.innerHTML = "";
-  for (let i = 0; i < rows; i++) {
-    el.innerHTML += `
-      <tr class="skeleton-row">
-        <td><div class="skeleton" style="width:120px;height:16px;"></div></td>
-        <td class="actions">
-          <div class="skeleton" style="width:60px;height:16px;display:inline-block;margin:0 4px;"></div>
-          <div class="skeleton" style="width:60px;height:16px;display:inline-block;margin:0 4px;"></div>
-        </td>
-      </tr>
-    `;
-  }
-}
-  // טעינת משימות מהשרת
-async function loadTasks() {
-  // מציג שלדים
-  showSkeleton("dailyTasks");
-  showSkeleton("weeklyTasks");
-  showSkeleton("monthlyTasks");
 
-  try {
-    const res = await fetch("/api/tasks");
-    const data = await res.json();
-    renderTasks(data); // אחרי שהמידע חוזר מחליפים תוכן
-  } catch (err) {
-    console.error("❌ שגיאה בטעינת משימות:", err);
-  }
-}
+<script src="/js/tasks.js"></script>
 
-  // הוספת משימה
-  addForm.addEventListener("submit", async e => {
-    e.preventDefault();
-    const fd = new FormData(addForm);
-    await fetch("/api/tasks", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(Object.fromEntries(fd))
-    });
-    addForm.reset();
-    loadTasks();
-  });
-
-  // מחיקת משימה
-  async function delTask(id) {
-    if (!confirm("למחוק משימה?")) return;
-    await fetch("/api/tasks/" + id, { method: "DELETE" });
-    loadTasks();
-  }
-
-  // רינדור משימות לקטגוריות
-  function renderTasks(tasks) {
-    const daily = tasks.filter(t => t.category === "daily");
-    const weekly = tasks.filter(t => t.category === "weekly");
-    const monthly = tasks.filter(t => t.category === "monthly");
-
-const renderRows = (arr, elId) => {
-  document.getElementById(elId).innerHTML = arr.map(t => `
-    <tr>
-      <td>${t.name}</td>
-      <td class="actions">
-        <button class="edit-btn" onclick="editTask('${t._id}', '${t.name}', '${t.category}')">✏️</button>
-        <button class="delete-btn" onclick="delTask('${t._id}')">🗑️</button>
-      </td>
-    </tr>
-  `).join("");
-};
-
-    renderRows(daily, "dailyTasks");
-    renderRows(weekly, "weeklyTasks");
-    renderRows(monthly, "monthlyTasks");
-  }
-async function editTask(id, oldName, oldCategory) {
-  const newName = prompt("ערוך שם משימה:", oldName);
-  if (!newName || newName.trim() === "" || newName === oldName) return;
-
-  const newCategory = prompt("ערוך קטגוריה (daily/weekly/monthly):", oldCategory);
-  if (!["daily","weekly","monthly"].includes(newCategory)) {
-    alert("קטגוריה לא תקינה");
-    return;
-  }
-
-  await fetch("/api/tasks/" + id, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name: newName.trim(), category: newCategory })
-  });
-
-  loadTasks();
-}
-
-  // טעינה ראשונית
-  loadTasks();
-</script>
 <script src="/js/global.js"></script>
-<script src="/js/ui-enhance.js" defer></script>
+
 </body>
 </html>
