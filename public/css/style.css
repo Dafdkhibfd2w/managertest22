@@ -90,7 +90,6 @@ h3 { font-size: 1.2rem; color: var(--ink-muted); }
   color: var(--ink); cursor: pointer;
   padding: 6px; display: flex; align-items: center; justify-content: center;
 } */
-.burger { font-size: 26px; cursor: pointer; }
 
 /* =========================
    MOBILE NAV
@@ -673,20 +672,7 @@ th, td {
    HIGHLIGHT
    ========================= */
 
-.highlight
-/* tr:hover td, */
-{
-  background: rgba(0, 255, 163, 0.1);
-  border-color: var(--btn-primary);
-  box-shadow: 0 0 12px rgba(0, 255, 163, 0.4),
-              0 0 24px rgba(0, 194, 255, 0.3);
-  transform: translateY(-2px);
-  transition: all 0.25s ease;
-  border-radius: 20px;
-margin: 30px auto;
-    max-width: 330px;
-  padding: 20px;
-}
+
 .highlight-strong {
   background: rgba(0, 255, 163, 0.18);
   border: 1px solid var(--btn-primary-hover);
@@ -1163,25 +1149,13 @@ body.light {
   background:var(--btn-primary);
   color:#000 !important;
   border-radius:50%;
-  width:60px;height:60px;margin-top:-30px;
+  max-width:80px;height:70px;margin-top:-30px;
   display:flex;align-items:center;justify-content:center;
   box-shadow:0 0 20px rgba(0,255,163,.5);
 }
 
-/* לבית יש עיצוב מיוחד – רק כשהוא active */
-.bottom-nav .home-btn{
-  color:var(--ink);
-  font-size:1.4rem;
-  transition:all .3s ease;
-}
-.bottom-nav .home-btn.active{
-  background:var(--btn-primary);
-  color:#000 !important;
-  border-radius:50%;
-  width:60px;height:60px;margin-top:-30px;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 20px rgba(0,255,163,.5);
-}
+
+
 
 /* לא להציג במחשב */
 @media (min-width:769px){ .bottom-nav{display:none;} }
@@ -1194,3 +1168,122 @@ body.light {
   }
 }
 
+
+
+
+.shift-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 20px rgba(0,255,163,0.3);
+}
+
+.shift-card .shift-date {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--btn-primary);
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.shift-card .shift-details {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--ink-muted);
+  margin-bottom: 12px;
+}
+
+.shift-card .status {
+  font-weight: 600;
+  color: var(--success);
+  margin-bottom: 12px;
+}
+
+.shift-card .actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.shift-card .actions button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: var(--btn-primary);
+  color: #000;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.shift-card .actions button:hover {
+  background: var(--btn-primary-hover);
+}
+/* גריד של כרטיסי משמרות */
+.shifts-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  padding: 20px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+@media (min-width: 768px) {
+  .shifts-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1200px) {
+  .shifts-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+
+
+/* בסיס כל כרטיס */
+.shift-card,
+.highlight {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 24px;                /* פדינג פנימי רחב יותר */
+  min-height: 180px;            /* גובה מינימלי */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* כותרות / מטא למעלה */
+.shift-card .meta,
+.highlight .meta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 0.95rem;
+}
+
+/* כפתורים למטה */
+.shift-card button,
+.highlight button {
+  padding: 10px 18px;
+  font-size: 0.9rem;
+  border-radius: 10px;
+  background: var(--btn-primary);
+  color: #000;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.shift-card button:hover,
+.highlight button:hover {
+  background: var(--btn-primary-hover);
+  transform: translateY(-2px);
+}
+
+/* אפקט hover */
+.shift-card:hover,
+.highlight:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.5);
+}

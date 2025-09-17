@@ -158,21 +158,67 @@
 </style>
 
 
-<header class="brandbar">
-  <span class="brand-title">NEW DELI</span>
+  <header class="brandbar">
   <div class="brandbar-right">
-    <button id="notifToggle" class="icon-btn">
-      <i id="notifIcon" style="font-size: 20px;" class="fa-solid fa-bell"></i>
-    </button>
-    <span class="burger" id="burger">&#9776;</span>
-<button id="themeToggle" class="icon-btn">🌙/☀️</button>
+    <a href="/profile" class="nav-item">
+      <i class="fa-solid fa-user"></i>
+      <span>פרופיל</span>
+    </a>
+
+    <a href="/notifications" class="nav-item">
+      <i class="fa-solid fa-bell"></i>
+      <span>התראות</span>
+    </a>
+
+    <a href="/" class="nav-item home-btn">
+      <i class="fa-solid fa-house"></i>
+      <span>בית</span>
+    </a>
+
+    <a href="/settings" class="nav-item">
+      <i class="fa-solid fa-gear"></i>
+      <span>הגדרות</span>
+    </a>
+
+    <a href="/menu" class="nav-item">
+      <i class="fa-solid fa-bars"></i>
+      <span>תפריט</span>
+    </a>
   </div>
 </header>
 
+<nav class="bottom-nav">
+  <a href="/profile" class="nav-item">
+    <i class="fa-solid fa-user"></i>
+    <span>פרופיל</span>
+  </a>
+  <!-- <a href="/notifications" class="nav-item">
+    <i class="fa-solid fa-bell"></i>
+    <span>התראות</span>
+  </a>
+   -->
+  <a id="notifToggle" class="icon-btn nav-item">
+    <i id="notifIcon" style="font-size: 20px;" class="fa-solid fa-bell"></i>
+    <span>התראות</span>
+  </a>
+  
+  <a href="/" class="nav-item home-btn">
+    <i class="fa-solid fa-house"></i>
+    <span>בית</span>
+  </a>
+  <a href="/settings" class="nav-item">
+    <i class="fa-solid fa-gear"></i>
+    <span>הגדרות</span>
+  </a>
+  <a class="nav-item">
+    <i  id="burger" class="fa-solid fa-bars"></i>
+    <span>תפריט</span>
+  </a>
+</nav>
 
 
 <nav class="mobile-nav" id="mobileNav">
-  <button id="closeNav" class="close-btn">✖</button>
+  <!-- <button style="display: none;" id="closeNav" class="close-btn">✖</button>  -->
   <ul>
     <li><a href="/"><span class="icon">🏠</span> דף הבית</a></li>
     <li><a href="/create"><span class="icon">🗓️</span> יצירת משמרת</a></li>
@@ -180,13 +226,12 @@
     <li><a href="/admin"><span class="icon">📚</span> ארכיון / דשבורד מנהל</a></li>
     <li><a href="/invoices-page"><span class="icon">🧾</span> חשבוניות</a></li>
     <li><a href="/suppliers-page"><span class="icon">🏷️</span> ספקים</a></li>
-    <li><a href="/task"><span class="icon">⚒</span> משימות</a></li>
     <li><a href="/orders-page"><span class="icon">📦</span> הזמנות</a></li>
     <li><a href="/dispersals-page"><span class="icon">🚕</span> פיזורים</a></li>
     <li><a href="/logout"><span class="icon">🚪</span> התנתקות</a></li>
   </ul>
+  <button id="closeNav" class="close-btn">✖</button> 
 </nav>
-
   <div class="wrap">
     <h1>ניהול משימות</h1>
     

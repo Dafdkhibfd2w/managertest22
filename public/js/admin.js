@@ -35,27 +35,30 @@ function renderShifts(shifts) {
   const container = document.getElementById("shiftsContainer");
   container.innerHTML = "";
 
-  shifts.forEach(shift => {
-    const dayName = getDayName(shift.date);
-    const teamArr = normalizeTeam(shift.team);
-    const leadName = shift.manager ?? (teamArr[0] || "");
-    const closed = shift.closed ? "סגור" : "פתוח";
+shifts.forEach(shift => {
+  const dayName = getDayName(shift.date);
+  const teamArr = normalizeTeam(shift.team);
+  const leadName = shift.manager ?? (teamArr[0] || "");
+  const closed = shift.closed ? "סגור" : "פתוח";
 
-    const card = document.createElement("div");
-    card.className = "highlight";
-    card.innerHTML = `
-      <div class="meta">
-        ${chip(`${shift.date}${dayName ? ` (${dayName})` : ""}`)}
-        ${chip(`צוות: ${teamArr.length ? teamArr.join(", ") : "—"}`)}
-        ${chip(`אחמ״ש: ${leadName || "—"}`)}
-        ${chip(`סטטוס: ${closed}`)}
-      </div>
-      <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
-        <button class="edit-btn" type="button" data-date="${shift.date}">הצג / ערוך</button>
-      </div>
-    `;
-    container.appendChild(card);
-  });
+  const card = document.createElement("div");
+  card.className = "shift-card";
+  card.innerHTML = `
+    <div class="shift-date">
+      ${shift.date}${dayName ? ` (${dayName})` : ""}
+    </div>
+    <div class="shift-details">
+      <p>צוות: ${teamArr.length ? teamArr.join(", ") : "—"}</p>
+      <p>אחמ״ש: ${leadName || "—"}</p>
+    </div>
+    <div class="status">סטטוס: ${closed}</div>
+    <div class="actions">
+      <button class="edit-btn" type="button" data-date="${shift.date}">הצג / ערוך</button>
+    </div>
+  `;
+  container.appendChild(card);
+});
+
 
   // מאזינים לכפתורי עריכה
   container.querySelectorAll(".edit-btn").forEach(btn => {
