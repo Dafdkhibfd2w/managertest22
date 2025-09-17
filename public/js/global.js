@@ -93,13 +93,18 @@ if (btn) {
 const burger = document.getElementById("burger");
 const mobileNav = document.getElementById("mobileNav");
 const closeNav = document.getElementById("closeNav");
-burger?.addEventListener("click", () => mobileNav.classList.add("active"));
-closeNav?.addEventListener("click", () => mobileNav.classList.remove("active"));
-window.addEventListener("click", (e) => {
-  if (!mobileNav.contains(e.target) && e.target !== burger) {
-    mobileNav.classList.remove("active");
-  }
-});
+
+if (burger && mobileNav && closeNav) {
+  burger.addEventListener("click", () => mobileNav.classList.add("active"));
+  closeNav.addEventListener("click", () => mobileNav.classList.remove("active"));
+
+  window.addEventListener("click", (e) => {
+    if (!mobileNav.contains(e.target) && e.target !== burger) {
+      mobileNav.classList.remove("active");
+    }
+  });
+}
+
 
 // ===== Push Notifications =====
 function urlBase64ToUint8Array(base64String) {
