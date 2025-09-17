@@ -50,8 +50,18 @@ app.post('/upload-invoice', requireUser, upload.single('file'), async (req, res)
     if (!date || !supplier || !f) {
       return res.status(400).json({ ok:false, message:'חסר date / supplier / קובץ' });
     }
-const FileType = require("file-type");
-const type = await FileType.fileTypeFromBuffer(f.buffer);
+
+try {
+  // גרסאות חדשות (v17+)
+  ({ fileTypeFromBuffer } = require("file-type"));
+} catch (e) {
+  // גרסאות ישנות יותר (עד v16)
+  const fileType = require("file-type");
+  fileTypeFromBuffer = fileType.fromBuffer;
+}
+
+// שימוש אחיד:
+const type = await fileTypeFromBuffer(f.buffer);
     if (!type || !isAllowedMime(type.mime)) {
       return res.status(400).json({ ok:false, message:'קובץ לא מאומת' });
     }
