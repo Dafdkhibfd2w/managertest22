@@ -109,7 +109,8 @@ app.post('/upload-invoice', requireUser, upload.single('file'), async (req, res)
   }
 });
 
-
+const compression = require("compression");
+app.use(compression());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
@@ -1237,7 +1238,7 @@ app.post("/save-subscription", async (req, res) => {
 app.post("/send-notification", async (req, res) => {
   const message = req.body.message || "התראה חדשה";
   const payload = JSON.stringify({
-    title: "📢 הודעה מהאדמין",
+    title: "📢 הודעת מנהל",
     body: message
   });
 
