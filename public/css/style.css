@@ -1134,7 +1134,21 @@ body.light {
   box-shadow:0 -4px 16px rgba(0,0,0,.5);
   border-top:1px solid var(--card-border);z-index:2000;
   transition:all .3s ease;
-  
+  padding-bottom: env(safe-area-inset-bottom); 
+}
+
+.nav-item{
+background: var(--card);
+border-bottom: 2px solid #00FFA3;
+text-decoration: none;
+padding: 3px;
+border-radius: 10px;
+color: white;
+transition: 0.3s all;
+}
+.nav-item:hover{
+background-color:#00FFA3;
+
 }
 
 .bottom-nav .nav-item{
