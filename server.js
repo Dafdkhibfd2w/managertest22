@@ -1213,17 +1213,25 @@ webpush.setVapidDetails(
   privateVapidKey
 );
 // app.use(express.json());
-let subscriptions = []; // לא const
+const PushSubscription = require("./models/PushSubscription");
 
-app.post("/save-subscription", (req, res) => {
+app.post("/save-subscription", async (req, res) => {
   if (!req.body || !req.body.endpoint) {
     return res.status(400).json({ ok: false, error: "No subscription" });
   }
-  // מחיקה של כפולים
-  subscriptions = subscriptions.filter(s => s.endpoint !== req.body.endpoint);
-  subscriptions.push(req.body);
-  console.log("✅ Subscription saved:", req.body.endpoint);
-  res.json({ ok: true });
+
+  try {
+    await PushSubscription.findOneAndUpdate(
+      { endpoint: req.body.endpoint },
+      req.body,
+      { upsert: true, new: true }
+    );
+    console.log("✅ Subscription saved:", req.body.endpoint);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error("❌ DB error:", err);
+    res.status(500).json({ ok: false, error: "DB error" });
+  }
 });
 
 app.post("/send-notification", async (req, res) => {
@@ -1233,9 +1241,10 @@ app.post("/send-notification", async (req, res) => {
     body: message
   });
 
+  const subs = await PushSubscription.find({});
   let sent = 0, failed = 0;
 
-  for (const sub of subscriptions) {
+  for (const sub of subs) {
     try {
       await webpush.sendNotification(sub, payload);
       sent++;
@@ -1243,16 +1252,15 @@ app.post("/send-notification", async (req, res) => {
       failed++;
       if (err.statusCode === 410 || err.statusCode === 404) {
         console.log("⚠️ Subscription expired:", sub.endpoint);
-        subscriptions = subscriptions.filter(s => s.endpoint !== sub.endpoint);
+        await PushSubscription.deleteOne({ endpoint: sub.endpoint });
       } else {
-        console.error("❌ Error sending push:", err);
+        console.error("❌ Error sending push:", err.message);
       }
     }
   }
 
-  res.json({ ok: true, message: `נשלח בהצלחה ל-${sent}, נכשל ל-${failed}` });
+  res.json({ ok: true, sent, failed });
 });
-
 
 
 const User = require('./models/user');

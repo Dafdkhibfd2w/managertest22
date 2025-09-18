@@ -382,3 +382,99 @@ document.addEventListener("DOMContentLoaded", () => {
   activate(".brandbar");
   activate(".bottom-nav");
 });
+
+
+function fixNav() {
+  const nav = document.querySelector(".bottom-nav");
+  nav.style.bottom = "0px";
+}
+window.addEventListener("resize", fixNav);
+window.addEventListener("orientationchange", fixNav);
+fixNav();
+
+
+
+// ==========================
+// מצב אופליין – NEW DELI
+// ==========================
+
+// בעת טעינת העמוד
+// document.addEventListener("DOMContentLoaded", () => {
+//   // הצגת מצב רשת ראשוני
+//   if (!navigator.onLine) showOfflineBanner();
+
+//   // מאזין לשינוי מצב הרשת
+//   window.addEventListener("online", () => {
+//     hideOfflineBanner();
+//     syncData();
+//   });
+//   window.addEventListener("offline", () => {
+//     showOfflineBanner();
+//   });
+// });
+
+// // ==========================
+// // פונקציה לשמירה מקומית אם אין אינטרנט
+// // ==========================
+// function saveShiftOffline(shift) {
+//   let offlineData = JSON.parse(localStorage.getItem("offlineShifts")) || [];
+//   offlineData.push(shift);
+//   localStorage.setItem("offlineShifts", JSON.stringify(offlineData));
+//   console.log("💾 נשמר מקומית (אין אינטרנט)", shift);
+// }
+
+// // ==========================
+// // סנכרון לשרת כשחוזר אינטרנט
+// // ==========================
+// async function syncData() {
+//   const offlineData = JSON.parse(localStorage.getItem("offlineShifts")) || [];
+//   if (offlineData.length === 0) return;
+
+//   for (const shift of offlineData) {
+//     try {
+//       await fetch("/api/shifts", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify(shift),
+//       });
+//       console.log("🚀 סונכרן לשרת:", shift);
+//     } catch (err) {
+//       console.error("❌ שגיאת סנכרון:", err);
+//       return; // עצירה אם השרת לא זמין
+//     }
+//   }
+
+//   // אם הצליח – מנקה מהאחסון המקומי
+//   localStorage.removeItem("offlineShifts");
+// }
+
+// // ==========================
+// // באנר UI
+// // ==========================
+// function showOfflineBanner() {
+//   let banner = document.getElementById("offlineBanner");
+//   if (!banner) {
+//     banner = document.createElement("div");
+//     banner.id = "offlineBanner";
+//     banner.textContent = "⚠️ אין אינטרנט – הנתונים נשמרים מקומית";
+//     banner.style.cssText = `
+//       position: fixed;
+//       top: 0;
+//       left: 0;
+//       right: 0;
+//       background: #ff3b3b;
+//       color: #fff;
+//       text-align: center;
+//       padding: 10px;
+//       font-weight: bold;
+//       z-index: 9999;
+//     `;
+//     document.body.appendChild(banner);
+//   }
+//   banner.style.display = "block";
+// }
+
+// function hideOfflineBanner() {
+//   const banner = document.getElementById("offlineBanner");
+//   if (banner) banner.style.display = "none";
+// }

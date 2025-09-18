@@ -1137,7 +1137,9 @@ body.light {
   padding-bottom: env(safe-area-inset-bottom); 
   z-index: 9500; 
 }
-
+#pageContent{
+  padding-bottom: 55px;
+}
 .nav-item{
 background: var(--card);
 border-bottom: 2px solid #00FFA3;
