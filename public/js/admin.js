@@ -53,7 +53,7 @@ shifts.forEach(shift => {
     </div>
     <div class="status">סטטוס: ${closed}</div>
     <div class="actions">
-      <button class="edit-btn" type="button" data-date="${shift.date}">הצג / ערוך</button>
+      <button style="padding: 8px 14px;border: none;border-radius: 8px;background: var(--accent);cursor: pointer;font-weight: 600;transition: 0.2s;" class="edit-btn" type="button" data-date="${shift.date}">הצג / ערוך</button>
     </div>
   `;
   container.appendChild(card);
@@ -269,3 +269,113 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   });
 });
+
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const buttons = document.querySelectorAll(".sidebar button, .bottom-nav .nav-item");
+      const pages = document.querySelectorAll(".admin-pages section");
+
+      buttons.forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          const target = btn.getAttribute("data-page");
+
+          // עדכון אקטיב
+          buttons.forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+
+          // החלפת עמוד
+          pages.forEach(sec => {
+            sec.classList.remove("active");
+            if (sec.id === `page-${target}`) sec.classList.add("active");
+          });
+        });
+      });
+
+      // דמו התראות
+      document.getElementById("notifForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const msg = document.getElementById("notifMessage").value;
+        document.getElementById("notifStatus").textContent = "✅ נשלחה הודעה: " + msg;
+        document.getElementById("notifMessage").value = "";
+      });
+    });
+
+
+    async function loadUsers() {
+  const res = await fetch("/admin/users");
+  const users = await res.json();
+
+  const tbody = document.getElementById("usersTableBody");
+  tbody.innerHTML = "";
+
+  users.forEach(user => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td data-label="תמונה"><img src="${user.avatar || '/icons/icon-192.png'}" alt="avatar"></td>
+      <td data-label="שם">${user.username}</td>
+      <td>
+        <select data-label="תפקיד" data-id="${user._id}" class="roleSelect">
+          <option value="employee" ${user.role === "employee" ? "selected" : ""}>עובד</option>
+          <option value="shiftManager" ${user.role === "shiftManager" ? "selected" : ""}>אחמ״ש</option>
+          <option value="admin" ${user.role === "admin" ? "selected" : ""}>מנהל</option>
+        </select>
+      </td>
+      <td>
+ <button class="saveRoleBtn" data-id="${user._id}">שמור</button>
+
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+async function updateRole(userId) {
+  const select = document.querySelector(`.roleSelect[data-id="${userId}"]`);
+  const newRole = select.value;
+
+  const res = await fetch("/admin/update-role", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId, role: newRole })
+  });
+
+  const data = await res.json();
+  if (data.ok) {
+    alert("✅ עודכן בהצלחה!");
+  } else {
+    alert("❌ שגיאה בעדכון!");
+  }
+}
+async function attachRoleEvents() {
+  const buttons = document.querySelectorAll(".saveRoleBtn");
+
+  buttons.forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const userId = btn.dataset.id;
+      const select = document.querySelector(`.roleSelect[data-id="${userId}"]`);
+      const newRole = select.value;
+
+      const csrfToken = await getCsrf();
+
+      const res = await fetch("/admin/update-role", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "CSRF-Token": csrfToken
+        },
+        body: JSON.stringify({ userId, role: newRole })
+      });
+
+      const data = await res.json();
+      if (data.ok) {
+        showToast('עודכן בהצלחה')
+      } else {
+        showToast('שגיאה בעדכון!', {type: 'error'})
+      }
+    });
+  });
+}
+
+// קריאה אחרי loadUsers
+loadUsers().then(attachRoleEvents);

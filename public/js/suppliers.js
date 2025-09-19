@@ -115,6 +115,7 @@ async function getCsrf() {
           <td data-label="טלפון">${escapeHtml(s.phone) || 'לא הוזן'}</td>
           <td data-label="ימים">${(s.days||[]).map(dayLabel).join(', ')}</td>
           <td data-label="מוצרים">${(s.items||[]).map(it => escapeHtml(it.name)).join(', ')}</td>
+          <td data-label="הועלה">${escapeHtml(s.createdBy || 'לא ידוע')}</td>
           <td class="actions">
             <button style="width:100px;" class="secondary editBtn" data-id="${s._id}">ערוך</button>
             <button style="width:100px;" class="danger delBtn" data-id="${s._id}">מחק</button>
@@ -125,11 +126,11 @@ async function getCsrf() {
       tblBody.querySelectorAll('.editBtn').forEach(btn=>{
         btn.addEventListener('click',()=>editSupplier(btn.dataset.id));
       });
+      
       tblBody.querySelectorAll('.delBtn').forEach(btn=>{
         btn.addEventListener('click',()=>delSupplier(btn.dataset.id));
       });
     }
-
     async function editSupplier(id){
       const s = currentList.find(x => x._id === id);
       if (!s) return;

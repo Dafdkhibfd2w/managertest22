@@ -109,11 +109,14 @@ app.post('/upload-invoice', requireUser, upload.single('file'), async (req, res)
   }
 });
 
-const compression = require("compression");
-app.use(compression());
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static('public'));
+app.use(express.static('public', {
+  maxAge: 0,            // לא לשמור ב־cache
+  etag: false,          // לא להחזיר ETag
+  lastModified: false   // לא להשתמש בתאריך עדכון
+}));
 app.set('trust proxy', 1);
 app.disable('x-powered-by');
 function isAllowedMime(m) {
@@ -149,7 +152,7 @@ const apiLimiter = rateLimit({
   max: 200,
 });
 app.use(['/login','/register'], authLimiter);
-app.use(['/orders','/invoices','/suppliers'], apiLimiter);
+app.use(['/orders','/invoices'], apiLimiter);
 // ===== Cloudinary =====
 
 
@@ -165,6 +168,17 @@ cloudinary.config({
 });
 app.use((req, res, next) => {
   console.log(`[EXPRESS] ${req.method} ${req.url}`);
+    if (req.url.endsWith(".html")) {
+    res.setHeader("Cache-Control", "no-store"); 
+  }
+    if (req.url.endsWith(".css") || req.url.endsWith(".js")) {
+    res.setHeader("Cache-Control", "no-store");
+  }
+  next();
+});
+app.use((req, res, next) => {
+  res.setHeader("Content-Security-Policy", 
+    "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com;");
   next();
 });
 // ===== MongoDB Connect =====
@@ -183,82 +197,6 @@ app.use(async (req, res, next) => {
 
 
 
-
-// ===== Schemas for Shifts (כמו אצלך) =====
-// const ExecutionSchema = new mongoose.Schema({
-//   task:   { type: String, required: true },
-//   worker: { type: String, default: '' },
-//   time:   { type: String, default: '' },
-// }, { _id: false });
-
-// const RuntimeNoteSchema = new mongoose.Schema({
-//   id:     { type: String, required: true },
-//   text:   { type: String, required: true },
-//   author: { type: String, default: 'אחמ״ש' },
-//   time:   { type: Date,   default: Date.now }
-// }, { _id: false });
-
-// const ShiftSchema = new mongoose.Schema({
-//   date:   { type: String, required: true, unique: true }, // YYYY-MM-DD
-//   manager:{ type: String, default: '' },
-//   team:   { type: [String], default: [] },
-// scores: {
-//   type: Map,
-//   of: Number,
-//   default: () => new Map()
-// },
-//   tasks: {
-//     daily:   { type: [String], default: [] },
-//     weekly:  { type: [String], default: [] },
-//     monthly: { type: [String], default: [] },
-//   },
-
-//   executions: {
-//     daily:   { type: [ExecutionSchema], default: [] },
-//     weekly:  { type: [ExecutionSchema], default: [] },
-//     monthly: { type: [ExecutionSchema], default: [] },
-//   },
-
-//   notes:         { type: String, default: '' },
-//   runtimeNotes:  { type: [RuntimeNoteSchema], default: [] },
-//   closed:        { type: Boolean, default: false },
-//   closedAt:      { type: Date, default: null },
-// }, { timestamps: true });
-
-// const Shift = mongoose.model('Shift', ShiftSchema);
-
-// ===== Helpers =====
-const ADMIN_PIN = process.env.ADMIN_PIN || '1111';
-function requireLogin(req, res, next) {
-  if (req.cookies && req.cookies.user) {
-    try {
-      req.user = JSON.parse(req.cookies.user);
-      return next();
-    } catch {
-      res.clearCookie("user");
-      return res.redirect("/login");
-    }
-  }
-  return res.redirect("/login");
-}
-
-function requireAuth(role) {
-  return (req,res,next) => {
-    const token = req.cookies.token;
-    if (!token) return res.status(401).json({ ok:false, message:"לא מחובר" });
-
-    try {
-      const decoded = jwt.verify(token, SECRET);
-      req.user = decoded;
-      if (role && req.user.role !== role) {
-        return res.status(403).sendFile(path.join(__dirname, "views", "unauthorized.html"));
-      }
-      next();
-    } catch (e) {
-      return res.status(401).json({ ok:false, message:"טוקן לא תקין" });
-    }
-  };
-}
 
 function requireUser(req, res, next) {
   const cookie = req.cookies.user;
@@ -281,7 +219,7 @@ const csrfProtection = csrf({
   }
 });
 app.use(csrfProtection);
-
+const { requireAuth } = require("./public/middlewares/auth");
 // החזרת הטוקן ל-Frontend
 app.get("/csrf-token", (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
@@ -311,18 +249,7 @@ function upsertExecutions(targetExec, incomingExec) {
     });
   });
 }
-function requireLoginPage(req, res, next) {
-  if (req.cookies && req.cookies.user) {
-    try {
-      JSON.parse(req.cookies.user); // רק לוודא שזה תקין
-      return next();
-    } catch {
-      res.clearCookie("user");
-    }
-  }
-  // 🛑 לא מחובר → שולח אותו לעמוד לוגין
-  return res.redirect("/login");
-}
+
 
 function alignExecutionsByTasks(shift, executions) {
   const out = { daily: [], weekly: [], monthly: [] };
@@ -348,19 +275,19 @@ function weekdayIndexFromDateStr(yyyy_mm_dd) {
 app.get('/create',requireAuth('manager'), (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
-app.get('/', requireLoginPage, (req, res) => {
+app.get('/', requireAuth(), (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'home.html'));
 });
-app.get('/manage',requireLoginPage, (req, res) => {
+app.get('/manage',requireAuth(), (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'manage.html'));
 });
-app.get('/dispersals-page',requireLoginPage, (req, res) => {
+app.get('/dispersals-page',requireAuth(), (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'dispersals.html'));
 });
-app.get('/orders-page',requireLoginPage, (req, res) => {               // << דף ההזמנות
+app.get('/orders-page',requireAuth(), (req, res) => {               // << דף ההזמנות
   res.sendFile(path.join(__dirname, 'views', 'orders.html'));
 });
-app.get('/invoices-page',requireLoginPage, (req, res) => {
+app.get('/invoices-page',requireAuth(), (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'invoices.html'));
 });
 app.get('/test', (req, res) => {
@@ -371,9 +298,7 @@ app.get('/test', (req, res) => {
 app.get('/task', requireAuth('manager'),(req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'tasks.html'));
 });
-app.get('/suppliers-page', requireAuth('manager'),(req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'suppliers.html'));
-});
+
 app.get('/manifest.json', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'manifest.json'));
 });
@@ -460,12 +385,12 @@ app.delete('/invoice/:id', async (req, res) => {
 });
 
 // ===== View: Profile page =====
-app.get("/profile", requireLogin, (req, res) => {
+app.get("/profile", requireAuth(), (req, res) => {
   res.sendFile(path.join(__dirname, "views", "profile.html"));
 });
 
 // ===== API: Profile Data =====
-app.get("/profile-data", requireLogin, async (req, res) => {
+app.get("/profile-data", requireAuth(), async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-passwordHash");
     if (!user) return res.status(404).json({ ok: false, message: "משתמש לא נמצא" });
@@ -476,14 +401,14 @@ app.get("/profile-data", requireLogin, async (req, res) => {
     res.status(500).json({ ok: false, message: "שגיאה בשרת" });
   }
 });
-app.get("/profile-edit", requireLogin, (req, res) => {
+app.get("/profile-edit", requireAuth(), (req, res) => {
   res.sendFile(path.join(__dirname, "views", "profile-edit.html"));
 });
 
 // ===== API: Update Profile =====
 
 // API לעדכון פרופיל עם העלאת תמונה
-app.post("/profile-update", requireLogin, upload.single("avatar"), async (req, res) => {
+app.post("/profile-update", requireAuth(), upload.single("avatar"), async (req, res) => {
   try {
     const { username, password } = req.body;
     const update = {};
@@ -768,6 +693,9 @@ app.post('/delete-runtime-note', async (req, res) => {
     return res.status(500).json({ ok: false, message: 'שגיאה בשרת' });
   }
 });
+app.get("/me", requireAuth(), (req, res) => {
+  res.json({ ok: true, user: req.user });
+});
 
 app.post('/finalize-shift', requireUser, async (req, res) => {
   try {
@@ -848,6 +776,26 @@ app.get('/orders', async (req, res) => {
     res.status(500).json({ ok:false, message:'שגיאת שרת' });
   }
 });
+// קבלת כל המשתמשים
+// app.get("/admin/users", async (req, res) => {
+//   const users = await User.find({}, "name email role avatar");
+//   res.json(users);
+// });
+app.get("/admin/users", async (req, res) => {
+  const users = await User.find({}, "username role avatar");
+  res.json(users);
+});
+// עדכון role
+app.post("/admin/update-role", async (req, res) => {
+  const { userId, role } = req.body;
+  try {
+    await User.findByIdAndUpdate(userId, { role });
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
 app.post('/orders', requireUser, async (req, res) => {
   try {
     const { date, blocks, notes } = req.body || {};
@@ -1024,7 +972,8 @@ app.post('/migrate-add-runtimeNotes', async (req, res) => {
     res.status(500).json({ ok:false });
   }
 });
-app.post('/suppliers', async (req, res) => {
+app.post('/suppliers', requireUser, async (req, res) => {
+
   try {
     const { name, phone, days, items, active } = req.body || {};
     const doc = await Supplier.create({
@@ -1032,8 +981,11 @@ app.post('/suppliers', async (req, res) => {
       phone: String(phone||'').trim(),
       days: Array.isArray(days) ? days.map(Number) : [], // <<< חשוב
       items: Array.isArray(items) ? items.map(it => ({ name: it.name, unit: it.unit||'' })) : [],
-      active: active !== undefined ? !!active : true
+      active: active !== undefined ? !!active : true,
+      createdBy: req.user?.name || "system"
     });
+console.log("Current user:", req.user);
+
     res.json({ ok:true, supplier: doc });
   } catch (e) {
     console.error('POST /suppliers error', e);

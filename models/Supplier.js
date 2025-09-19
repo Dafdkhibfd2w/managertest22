@@ -11,7 +11,7 @@ const SupplierSchema = new mongoose.Schema({
     name: { type: String, required: true },
     unit: { type: String, default: '' }
   }],
-
+  createdBy: { type: String, default: "system" },
   active: { type: Boolean, default: true }
 }, { timestamps: true });
 

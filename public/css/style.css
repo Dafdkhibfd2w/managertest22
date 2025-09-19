@@ -332,7 +332,7 @@ textarea { min-height: 100px; resize: vertical; }
 /* =========================
    BUTTONS
    ========================= */
-button:not(#notifToggle, #burger, .close-btn, #userbtn), .btn {
+button:not(#notifToggle, #burger, .close-btn, #userbtn, #side_button), .btn {
   background: var(--btn-primary);
   color: #0E0E0E;
   padding: 12px 20px;
@@ -374,7 +374,6 @@ button:not(#notifToggle,.close-btn, #burger, #userbtn):hover, .btn:hover {
   text-align: left;   /* מיושרים לשמאל */
 }
 .actions {
-  display: flex;
   flex-direction: column; /* כדי שיהיו אחד מתחת לשני */
   gap: 8px;              /* הרווח ביניהם (שנה ל-10px/12px לפי מה שמתאים) */
 }
@@ -653,17 +652,22 @@ th, td {
   justify-content: center;
   align-items: center;
   z-index: 9999;
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 .modal.active { display: flex; }
 .modal-content {
   background: #1c1c1c;
   border-radius: 12px;
   padding: 20px;
-  max-width: 600px;
+  max-width: 800px;
   width: 90%;
   max-height: 90vh;       /* חשוב! */
+  overflow-y: scroll;       /* כן לגלול */
+  -ms-overflow-style: none; /* IE/Edge ישן */
+  scrollbar-width: none;    /* Firefox */
   overflow-y: auto;       /* מאפשר גלילה פנימית */
 }
+
 @keyframes popIn {
   from { opacity: 0; transform: scale(.95); }
   to { opacity: 1; transform: scale(1); }
@@ -1158,7 +1162,7 @@ background-color:#00FFA3;
   flex:1;text-align:center;color:var(--ink-muted);
   font-size:.8rem;text-decoration:none;
   display:flex;flex-direction:column;align-items:center;gap:4px;
-  transition:all .3s ease;
+  transition: color 0.3s ease, transform 0.2s ease;
 }
 .bottom-nav .nav-item i{font-size:20px;}
 
@@ -1186,8 +1190,25 @@ background-color:#00FFA3;
   }
 }
 
+#shiftsContainer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* שלוש עמודות */
+  gap: 16px; /* רווחים בין הכרטיסיות */
+  max-width: 1300px;
+  margin: auto;
+  padding: 10px;
+}
+@media (max-width: 900px) {
+  #shiftsContainer {
+    grid-template-columns: repeat(2, 1fr); /* בטאבלט 2 בעמודה */
+  }
+}
 
-
+@media (max-width: 600px) {
+  #shiftsContainer {
+    grid-template-columns: 1fr; /* בפלאפון כרטיסייה אחת בשורה */
+  }
+}
 
 .shift-card:hover {
   transform: translateY(-4px);

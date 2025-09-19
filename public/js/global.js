@@ -232,10 +232,22 @@ function showLoader() {
     return acc;
   }, {});
   
-  if (cookies.user) {
-    const user = JSON.parse(cookies.user);
-    console.log("מחובר כ:", user.name, "תפקיד:", user.role);
+async function loadMe() {
+  try {
+    const res = await fetch("/me");
+    const data = await res.json();
+    if (data.ok) {
+      console.log("מחובר כ:", data.user.id, "תפקיד:", data.user.role);
+    } else {
+      window.location.href = "/login";
+    }
+  } catch {
+    window.location.href = "/login";
   }
+}
+
+loadMe();
+
 
 
   async function loadUser() {
@@ -245,7 +257,7 @@ function showLoader() {
     if (data.ok && data.user) {
       if (document.getElementById("user")) {
       document.getElementById("user").textContent =
-        `ברוכים הבאים ${data.user.name} למערכת ניהול משמרות`
+        `ברוכים הבאים ${data.user.name}`
       }
     }
   } catch (err) {
@@ -315,21 +327,22 @@ document.getElementById('themeToggle')?.addEventListener('click', () => {
     setTimeout(() => bell.style.animation = "", 600);
   });
 
-  document.addEventListener("DOMContentLoaded", async () => {
-  try {
-    const res = await fetch("/user");
-    const data = await res.json();
-    if (!data.ok || !data.user) {
-      window.location.href = "/login"; // 🛑 לא מחובר → לוגין
-    }
-  } catch {
-    window.location.href = "/login";
-  }
-});
+//   document.addEventListener("DOMContentLoaded", async () => {
+//   try {
+//     const res = await fetch("/user");
+//     const data = await res.json();
+//     if (window.location.href === '/login') return;
+//     if (!data.ok || !data.user) {
+//       window.location.href = "/login"; // 🛑 לא מחובר → לוגין
+//     }
+//   } catch {
+//     window.location.href = "/login";
+//   }
+// });
 // כפתור Logout
 document.getElementById("logoutBtn")?.addEventListener("click", async (e) => {
   e.preventDefault();
-  const res = await fetch("/logout", { method: "POST" });
+  const res = await fetch("/logout", { method: "POST", headers: {"CSRF-TOKEN": await getCsrf()} });
   const data = await res.json();
   if (data.ok) {
     window.location.href = "/login";
@@ -478,3 +491,8 @@ fixNav();
 //   const banner = document.getElementById("offlineBanner");
 //   if (banner) banner.style.display = "none";
 // }
+
+
+document.querySelector(".gohome")?.addEventListener("click", () => {
+    window.location.href = "/"; // אם אין היסטוריה
+});
