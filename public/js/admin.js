@@ -67,10 +67,28 @@ shifts.forEach(shift => {
 }
 
 async function loadShifts() {
-  const res = await fetch("/get-all-shifts", { credentials: "include" });
-  allShifts = await res.json();
-  renderShifts(allShifts);
-}
+  const loading = document.getElementById("loadingShifts");
+  const container = document.getElementById("shiftsContainer");
+
+  try {
+    // מציג את הספינר ומסתיר את המשמרות
+    loading.style.display = "flex";
+    container.style.display = "none";
+
+    const res = await fetch("/get-all-shifts", { credentials: "include" });
+    allShifts = await res.json();
+
+    // מסתיר את הטעינה ומציג את המשמרות
+    loading.style.display = "none";
+    container.style.display = "block";
+
+    renderShifts(allShifts);
+
+  } catch (err) {
+    loading.innerHTML = `<p style="color:red;">שגיאה בטעינת משמרות</p>`;
+    console.error("Load error:", err);
+  }
+}}
 
 function filterShifts() {
   const date = document.getElementById("filterDate").value;
