@@ -69,20 +69,17 @@ function renderShifts(shifts) {
     btn.addEventListener("click", () => openEdit(btn.dataset.date));
   });
 }
-
 async function loadShifts() {
   const loading = document.getElementById("loadingShifts");
   const container = document.getElementById("shiftsContainer");
 
   try {
-    // מציג טעינה
-    loading.style.display = "flex";
+    loading.style.display = "block";
     container.style.display = "none";
 
     const res = await fetch("/get-all-shifts", { credentials: "include" });
     allShifts = await res.json();
 
-    // מציג משמרות
     loading.style.display = "none";
     container.style.display = "block";
 

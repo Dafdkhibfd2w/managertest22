@@ -1352,3 +1352,18 @@ background-color:#00FFA3;
   100% { transform: rotate(360deg); }
 }
 
+
+.skeleton-card {
+  background: var(--panel);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+
+.skeleton-line {
+  height: 16px;
+  margin: 8px 0;
+  border-radius: 4px;
+}
+
