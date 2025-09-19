@@ -35,30 +35,34 @@ function renderShifts(shifts) {
   const container = document.getElementById("shiftsContainer");
   container.innerHTML = "";
 
-shifts.forEach(shift => {
-  const dayName = getDayName(shift.date);
-  const teamArr = normalizeTeam(shift.team);
-  const leadName = shift.manager ?? (teamArr[0] || "");
-  const closed = shift.closed ? "סגור" : "פתוח";
+  shifts.forEach(shift => {
+    const dayName = getDayName(shift.date);
+    const teamArr = normalizeTeam(shift.team);
+    const leadName = shift.manager ?? (teamArr[0] || "");
+    const closed = shift.closed ? "סגור" : "פתוח";
 
-  const card = document.createElement("div");
-  card.className = "shift-card";
-  card.innerHTML = `
-    <div class="shift-date">
-      ${shift.date}${dayName ? ` (${dayName})` : ""}
-    </div>
-    <div class="shift-details">
-      <p>צוות: ${teamArr.length ? teamArr.join(", ") : "—"}</p>
-      <p>אחמ״ש: ${leadName || "—"}</p>
-    </div>
-    <div class="status">סטטוס: ${closed}</div>
-    <div class="actions">
-      <button style="padding: 8px 14px;border: none;border-radius: 8px;background: var(--accent);cursor: pointer;font-weight: 600;transition: 0.2s;" class="edit-btn" type="button" data-date="${shift.date}">הצג / ערוך</button>
-    </div>
-  `;
-  container.appendChild(card);
-});
-
+    const card = document.createElement("div");
+    card.className = "shift-card";
+    card.innerHTML = `
+      <div class="shift-date">
+        ${shift.date}${dayName ? ` (${dayName})` : ""}
+      </div>
+      <div class="shift-details">
+        <p>צוות: ${teamArr.length ? teamArr.join(", ") : "—"}</p>
+        <p>אחמ״ש: ${leadName || "—"}</p>
+      </div>
+      <div class="status">סטטוס: ${closed}</div>
+      <div class="actions">
+        <button style="padding: 8px 14px;border: none;border-radius: 8px;background: var(--accent);cursor: pointer;font-weight: 600;transition: 0.2s;" 
+          class="edit-btn" 
+          type="button" 
+          data-date="${shift.date}">
+          הצג / ערוך
+        </button>
+      </div>
+    `;
+    container.appendChild(card);
+  });
 
   // מאזינים לכפתורי עריכה
   container.querySelectorAll(".edit-btn").forEach(btn => {
@@ -71,14 +75,14 @@ async function loadShifts() {
   const container = document.getElementById("shiftsContainer");
 
   try {
-    // מציג את הספינר ומסתיר את המשמרות
+    // מציג טעינה
     loading.style.display = "flex";
     container.style.display = "none";
 
     const res = await fetch("/get-all-shifts", { credentials: "include" });
     allShifts = await res.json();
 
-    // מסתיר את הטעינה ומציג את המשמרות
+    // מציג משמרות
     loading.style.display = "none";
     container.style.display = "block";
 
@@ -88,7 +92,7 @@ async function loadShifts() {
     loading.innerHTML = `<p style="color:red;">שגיאה בטעינת משמרות</p>`;
     console.error("Load error:", err);
   }
-}}
+}
 
 function filterShifts() {
   const date = document.getElementById("filterDate").value;
