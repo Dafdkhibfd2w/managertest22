@@ -30,6 +30,9 @@
       padding:0;
       min-height: 100vh;
     }
+    a{
+      text-decoration: none;
+    }
 
     /* ===== Layout ===== */
     .sidebar {
@@ -49,7 +52,7 @@
       font-size: 1.2rem;
     }
 
-    .sidebar button {
+    .sidebar a {
       display: flex;
       align-items: center;
       gap: 10px;
@@ -64,8 +67,8 @@
       font-size: 1rem;
     }
 
-    .sidebar button.active,
-    .sidebar button:hover {
+    .sidebar a.active,
+    .sidebar a:hover {
       background: var(--accent-hover);
       color: #000;
     }
@@ -289,7 +292,24 @@
     color: var(--accent);
     margin-left: auto; /* דוחף אותו לצד ימין */
   }
-  
+/* מוחקים את #text { margin-right: 250px; } */
+.floating-home {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  background: var(--accent);
+  color: #000;
+  font-size: 1.2rem;
+  padding: 10px 15px;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  z-index: 3000;
+  transition: 0.2s;
+}
+.floating-home:hover {
+  background: var(--accent-hover);
+}
+
 
   /* תמונה */
   .users-table img {
@@ -310,14 +330,19 @@
   </style>
 </head>
 <body>
+<a href="/" class="floating-home"><i class="fa-solid fa-house"></i></a>
+
+
+
 
   <div class="sidebar">
     <h2>📊 ניהול</h2>
-    <button id="side_button" class="active" data-page="shifts"><i class="fa-solid fa-calendar"></i> משמרות</button>
-    <button id="side_button" data-page="notifications"><i class="fa-solid fa-bell"></i> התראות</button>
-    <button id="side_button" data-page="suppliers"><i class="fa-solid fa-truck"></i> ספקים</button>
-    <button id="side_button" data-page="users"><i class="fa-solid fa-users"></i> משתמשים</button>
-    <button id="side_button" data-page="reports"><i class="fa-solid fa-chart-column"></i> דוחות</button>
+<a class="nav-btn active" href="#shifts" data-page="shifts"><i class="fa-solid fa-calendar"></i> משמרות</a>
+<a class="nav-btn" href="#notifications" data-page="notifications"><i class="fa-solid fa-bell"></i> התראות</a>
+<a class="nav-btn" href="#suppliers" data-page="suppliers"><i class="fa-solid fa-truck"></i> ספקים</a>
+<a class="nav-btn" href="#users" data-page="users"><i class="fa-solid fa-users"></i> משתמשים</a>
+<a class="nav-btn" href="#reports" data-page="reports"><i class="fa-solid fa-chart-column"></i> דוחות</a>
+
 <!-- <button id="side_button_users" data-page="users">
   <i class="fa-solid fa-users"></i> משתמשים
 </button> -->
@@ -516,12 +541,21 @@
 </div>
 
   <!-- Bottom Nav Mobile -->
-  <nav class="bottom-nav">
-    <a href="#" class="nav-item active" data-page="shifts"><i class="fa-solid fa-calendar"></i><span>משמרות</span></a>
-    <a href="#" class="nav-item" data-page="notifications"><i class="fa-solid fa-bell"></i><span>התראות</span></a>
-    <a href="#" class="nav-item" data-page="users"><i class="fa-solid fa-users"></i><span>משתמשים</span></a>
-    <a href="#" class="nav-item" data-page="suppliers"><i class="fa-solid fa-truck"></i><span>ספקים</span></a>
-  </nav>
+<nav class="bottom-nav">
+  <a class="nav-btn nav-item" href="#shifts" data-page="shifts">
+    <i class="fa-solid fa-calendar"></i><span>משמרות</span>
+  </a>
+  <a class="nav-btn nav-item" href="#notifications" data-page="notifications">
+    <i class="fa-solid fa-bell"></i><span>התראות</span>
+  </a>
+  <a class="nav-btn nav-item" href="#users" data-page="users">
+    <i class="fa-solid fa-users"></i><span>משתמשים</span>
+  </a>
+  <a class="nav-btn nav-item" href="#suppliers" data-page="suppliers">
+    <i class="fa-solid fa-truck"></i><span>ספקים</span>
+  </a>
+</nav>
+
   <script src="/js/suppliers.js" defer></script>
 <script>
 async function loadReports() {

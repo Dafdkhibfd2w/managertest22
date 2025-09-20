@@ -292,37 +292,103 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   });
 });
+// document.addEventListener("DOMContentLoaded", () => {
+//   const buttons = document.querySelectorAll(".nav-btn");
+//   const pages = document.querySelectorAll(".admin-pages section");
 
+//   function showPage(target) {
+//     // מסיר active מכולם
+//     buttons.forEach(b => b.classList.remove("active"));
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const buttons = document.querySelectorAll(".sidebar button, .bottom-nav .nav-item");
-      const pages = document.querySelectorAll(".admin-pages section");
+//     // מסמן active לכל הכפתורים (גם בסיידבר וגם בבוטום נאב) עם אותו data-page
+//     document.querySelectorAll(`.nav-btn[data-page="${target}"]`).forEach(el => {
+//       el.classList.add("active");
+//     });
 
-      buttons.forEach(btn => {
-        btn.addEventListener("click", (e) => {
-          e.preventDefault();
-          const target = btn.getAttribute("data-page");
+//     // מציג את העמוד המתאים
+//     pages.forEach(sec => {
+//       sec.classList.remove("active");
+//       if (sec.id === `page-${target}`) sec.classList.add("active");
+//     });
+//   console.log("Active page:", target);
 
-          // עדכון אקטיב
-          buttons.forEach(b => b.classList.remove("active"));
-          btn.classList.add("active");
+//   }
 
-          // החלפת עמוד
-          pages.forEach(sec => {
-            sec.classList.remove("active");
-            if (sec.id === `page-${target}`) sec.classList.add("active");
-          });
-        });
-      });
+//   // שינוי עמוד בלחיצה
+//   buttons.forEach(btn => {
+//     btn.addEventListener("click", (e) => {
+//       e.preventDefault();
+//       const target = btn.dataset.page;
+//       history.pushState(null, "", `#${target}`);
+//       showPage(target);
+//     });
+//   });
 
-      // דמו התראות
-      document.getElementById("notifForm").addEventListener("submit", (e) => {
-        e.preventDefault();
-        const msg = document.getElementById("notifMessage").value;
-        document.getElementById("notifStatus").textContent = "✅ נשלחה הודעה: " + msg;
-        document.getElementById("notifMessage").value = "";
-      });
+//   // טיפול בריענון הדף (load ראשון)
+//   let hash = window.location.hash.replace("#", "");
+//   if (!hash) hash = "shifts"; // ברירת מחדל
+//   showPage(hash);
+
+//   // טיפול בלחיצה על back/forward בדפדפן
+//   window.addEventListener("hashchange", () => {
+//     const newHash = window.location.hash.replace("#", "") || "shifts";
+//     showPage(newHash);
+//   });
+
+//   // דמו התראות
+//   const notifForm = document.getElementById("notifForm");
+//   if (notifForm) {
+//     notifForm.addEventListener("submit", (e) => {
+//       e.preventDefault();
+//       const msg = document.getElementById("notifMessage").value;
+//       document.getElementById("notifStatus").textContent = "✅ נשלחה הודעה: " + msg;
+//       document.getElementById("notifMessage").value = "";
+//     });
+//   }
+// });
+
+document.addEventListener("DOMContentLoaded", () => {
+  const buttons = document.querySelectorAll(".nav-btn");
+  const pages = document.querySelectorAll(".admin-pages section");
+
+  function showPage(target) {
+    // מנקה אקטיב
+    buttons.forEach(b => b.classList.remove("active"));
+
+    // מסמן active גם ב־sidebar וגם ב־bottom-nav
+    document.querySelectorAll(`.nav-btn[data-page="${target}"]`)
+      .forEach(el => el.classList.add("active"));
+
+    // מציג את העמוד הנכון
+    pages.forEach(sec => {
+      sec.classList.remove("active");
+      if (sec.id === `page-${target}`) sec.classList.add("active");
     });
+  }
+
+  // לחיצה על כפתור
+  buttons.forEach(btn => {
+    btn.addEventListener("click", e => {
+      e.preventDefault();
+      const target = btn.dataset.page;
+      location.hash = target; // חשוב: מעדכן את ה־URL
+      showPage(target);
+    });
+  });
+
+  // טעינה ראשונה
+  let hash = location.hash.replace("#", "") || "shifts";
+  showPage(hash);
+
+  // back / forward
+  window.addEventListener("hashchange", () => {
+    const newHash = location.hash.replace("#", "") || "shifts";
+    showPage(newHash);
+  });
+});
+
+
+
 
 
     async function loadUsers() {
@@ -402,3 +468,23 @@ async function attachRoleEvents() {
 
 // קריאה אחרי loadUsers
 loadUsers().then(attachRoleEvents);
+
+
+let touchStartX = 0;
+let touchEndX = 0;
+
+function checkSwipe() {
+  if (touchEndX - touchStartX > 100) {
+    // החלקה ימינה → חזור לבית
+    window.location.href = "/";
+  }
+}
+
+document.addEventListener("touchstart", e => {
+  touchStartX = e.changedTouches[0].screenX;
+});
+
+document.addEventListener("touchend", e => {
+  touchEndX = e.changedTouches[0].screenX;
+  checkSwipe();
+});
