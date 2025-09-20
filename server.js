@@ -324,10 +324,7 @@ app.get('/manifest.json', (req, res) => {
 //     </div>
 //   `);
 // });
-app.post('/admin-logout', (req, res) => {
-  res.clearCookie('adminAuth', { sameSite: 'lax' });
-  res.redirect('/admin-login');
-});
+
 app.get('/admin', requireAuth('manager'), (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'admin.html'));
 });
@@ -904,6 +901,30 @@ app.get('/orders-list', async (req, res) => {
     res.json({ ok:true, days: rows });
   } catch (e) {
     console.error('GET /orders-list error', e);
+    res.status(500).json({ ok:false, days: [] });
+  }
+});
+
+app.get('/users-list', async (req, res) => {
+  try {
+    const limit = Math.min(200, Math.max(1, parseInt(req.query.limit || '30')));
+    const rows = await User.find({}, { date:1, createdAt:1, updatedAt:1 })
+      .sort({ date: -1 }).limit(limit).lean();
+    res.json({ ok:true, users: rows });
+  } catch (e) {
+    console.error('GET /users-list error', e);
+    res.status(500).json({ ok:false, users: [] });
+  }
+});
+
+app.get('/suppliers-list', async (req, res) => {
+  try {
+    const limit = Math.min(200, Math.max(1, parseInt(req.query.limit || '30')));
+    const rows = await Supplier.find({}, { date:1, createdAt:1, updatedAt:1 })
+      .sort({ date: -1 }).limit(limit).lean();
+    res.json({ ok:true, days: rows });
+  } catch (e) {
+    console.error('GET /suppliers-list error', e);
     res.status(500).json({ ok:false, days: [] });
   }
 });

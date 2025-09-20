@@ -34,8 +34,7 @@ function chip(text) {
 function renderShifts(shifts) {
   const container = document.getElementById("shiftsContainer");
   container.innerHTML = "";
-  container.style.display = "grid"; // <<< חובה אם התחלת ב-none
-
+  container.style.display = 'grid';
 
 shifts.forEach(shift => {
   const dayName = getDayName(shift.date);
@@ -45,10 +44,9 @@ shifts.forEach(shift => {
 
   const card = document.createElement("div");
   card.className = "shift-card";
-  card.innerHTML = 
-`
+  card.innerHTML = `
     <div class="shift-date">
-${shift.date}${dayName ? ` (${dayName})` : ""}
+      ${shift.date}${dayName ? ` (${dayName})` : ""}
     </div>
     <div class="shift-details">
       <p>צוות: ${teamArr.length ? teamArr.join(", ") : "—"}</p>
@@ -57,10 +55,18 @@ ${shift.date}${dayName ? ` (${dayName})` : ""}
     <div class="status">סטטוס: ${closed}</div>
     <div class="actions">
       <button style="padding: 8px 14px;border: none;border-radius: 8px;background: var(--accent);cursor: pointer;font-weight: 600;transition: 0.2s;" class="edit-btn" type="button" data-date="${shift.date}">הצג / ערוך</button>
-    </div>`;
+    </div>
+  `;
   container.appendChild(card);
 });
+
+
+  // מאזינים לכפתורי עריכה
+  container.querySelectorAll(".edit-btn").forEach(btn => {
+    btn.addEventListener("click", () => openEdit(btn.dataset.date));
+  });
 }
+
 
 
 async function loadShifts() {
@@ -172,8 +178,12 @@ async function openEdit(date) {
   modal.setAttribute("aria-hidden", "false");
 
   modal.onclick = (e) => { if (e.target === modal) closeEdit(); };
-  document.addEventListener("keydown", escCloseOnce);
 }
+
+
+
+
+
 
 function renderAdminRuntimeNotes(shift) {
   const listEl = document.getElementById("runtimeNotesListAdmin");

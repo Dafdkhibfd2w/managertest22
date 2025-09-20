@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>NEW DELI • דף מנהל</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="icon" href="/icons/icon-512.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
       --bg: #121212;
@@ -460,7 +462,7 @@
     <div class="kpi-card"><h3 id="kpiShifts">0</h3><p>משמרות החודש</p></div>
     <div class="kpi-card"><h3 id="kpiUsers">0</h3><p>עובדים פעילים</p></div>
     <div class="kpi-card"><h3 id="kpiMoney">0₪</h3><p>פיזורים</p></div>
-    <div class="kpi-card"><h3 id="kpiOrders">0</h3><p>הזמנות</p></div>
+    <div class="kpi-card"><h3 id="kpiOrders">0</h3><p>ספקים</p></div>
   </div>
 
   <!-- Charts -->
@@ -521,46 +523,45 @@
     <a href="#" class="nav-item" data-page="suppliers"><i class="fa-solid fa-truck"></i><span>ספקים</span></a>
   </nav>
   <script src="/js/suppliers.js" defer></script>
-<script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 async function loadReports() {
   const shifts = await fetch("/get-all-shifts").then(r=>r.json());
-  const leaderboard = await fetch("/points/leaderboard").then(r=>r.json());
+  const users = await fetch("/users-list").then(r=>r.json());
   const dispersals = await fetch("/dispersals").then(r=>r.json());
-  const orders = await fetch("/orders-list").then(r=>r.json());
+  const suppliers = await fetch("/suppliers-list").then(r=>r.json());
 
   // עדכון KPI
   document.getElementById("kpiShifts").textContent = shifts.length;
-  document.getElementById("kpiUsers").textContent = leaderboard.leaderboard.length;
+  document.getElementById("kpiUsers").textContent = users.users.length;
   document.getElementById("kpiMoney").textContent = dispersals.reduce((a,b)=>a+(b.price||0),0) + "₪";
-  document.getElementById("kpiOrders").textContent = orders.days.length;
+  document.getElementById("kpiOrders").textContent = suppliers.days.length;
 
   // גרף משמרות
-  const ctx1 = document.getElementById("shiftsChart");
-  new Chart(ctx1, {
-    type: "bar",
-    data: {
-      labels: shifts.map(s=>s.date).slice(-7),
-      datasets: [{
-        label: "מספר משמרות",
-        data: shifts.slice(-7).map(()=>1),
-        backgroundColor: "#00FFA3"
-      }]
-    }
-  });
+  // const ctx1 = document.getElementById("shiftsChart");
+  // new Chart(ctx1, {
+  //   type: "bar",
+  //   data: {
+  //     labels: shifts.map(s=>s.date).slice(-7),
+  //     datasets: [{
+  //       label: "מספר משמרות",
+  //       data: shifts.slice(-7).map(()=>1),
+  //       backgroundColor: "#00FFA3"
+  //     }]
+  //   }
+  // });
 
-  // גרף עובדים (עוגה)
-  const ctx2 = document.getElementById("usersChart");
-  new Chart(ctx2, {
-    type: "pie",
-    data: {
-      labels: leaderboard.leaderboard.map(u=>u.name),
-      datasets: [{
-        data: leaderboard.leaderboard.map(u=>u.points),
-        backgroundColor: ["#00FFA3","#00C2FF","#FFD600","#FF3B3B","#8E44AD"]
-      }]
-    }
-  });
+  // // גרף עובדים (עוגה)
+  // const ctx2 = document.getElementById("usersChart");
+  // new Chart(ctx2, {
+  //   type: "pie",
+  //   data: {
+  //     labels: leaderboard.leaderboard.map(u=>u.name),
+  //     datasets: [{
+  //       data: leaderboard.leaderboard.map(u=>u.points),
+  //       backgroundColor: ["#00FFA3","#00C2FF","#FFD600","#FF3B3B","#8E44AD"]
+  //     }]
+  //   }
+  // });
 }
 loadReports();
 </script>
