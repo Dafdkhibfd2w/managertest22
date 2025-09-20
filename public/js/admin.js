@@ -34,6 +34,8 @@ function chip(text) {
 function renderShifts(shifts) {
   const container = document.getElementById("shiftsContainer");
   container.innerHTML = "";
+  container.style.display = "grid"; // <<< חובה אם התחלת ב-none
+
 
 shifts.forEach(shift => {
   const dayName = getDayName(shift.date);
@@ -46,7 +48,7 @@ shifts.forEach(shift => {
   card.innerHTML = 
 `
     <div class="shift-date">
-{shift.date}${dayName ? ` (${dayName})` : ""}
+${shift.date}${dayName ? ` (${dayName})` : ""}
     </div>
     <div class="shift-details">
       <p>צוות: ${teamArr.length ? teamArr.join(", ") : "—"}</p>

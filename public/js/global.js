@@ -284,9 +284,8 @@ async function fetchWithLoader(url, opts) {
 
 // שימוש:
 document.addEventListener("DOMContentLoaded", async () => {
-  // נגיד כאן אתה קורא ל־DB
   const data = await fetchWithLoader("/get-shift");
-  console.log("Loaded:", data);
+  // console.log("Loaded:", data);
 });
 
  // הפעלה/כיבוי Dark/Light Mode
@@ -398,8 +397,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 function fixNav() {
-  const nav = document.querySelector(".bottom-nav");
-  nav.style.bottom = "0px";
+  if(document.querySelector(".bottom-nav")) {
+    document.querySelector(".bottom-nav").style.bottom = '0px';
+  }
 }
 window.addEventListener("resize", fixNav);
 window.addEventListener("orientationchange", fixNav);
