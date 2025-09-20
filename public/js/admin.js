@@ -43,9 +43,9 @@ shifts.forEach(shift => {
 
   const card = document.createElement("div");
   card.className = "shift-card";
-  card.innerHTML = `
+  card.innerHTML = 
     <div class="shift-date">
-      ${shift.date}${dayName ? ` (${dayName})` : ""}
+      ${shift.date}${dayName ?  (${dayName}) : ""}
     </div>
     <div class="shift-details">
       <p>צוות: ${teamArr.length ? teamArr.join(", ") : "—"}</p>
@@ -55,21 +55,31 @@ shifts.forEach(shift => {
     <div class="actions">
       <button style="padding: 8px 14px;border: none;border-radius: 8px;background: var(--accent);cursor: pointer;font-weight: 600;transition: 0.2s;" class="edit-btn" type="button" data-date="${shift.date}">הצג / ערוך</button>
     </div>
-  `;
+  ;
   container.appendChild(card);
 });
 
 
-  // מאזינים לכפתורי עריכה
-  container.querySelectorAll(".edit-btn").forEach(btn => {
-    btn.addEventListener("click", () => openEdit(btn.dataset.date));
-  });
-}
-
 async function loadShifts() {
-  const res = await fetch("/get-all-shifts", { credentials: "include" });
-  allShifts = await res.json();
-  renderShifts(allShifts);
+  const loading = document.getElementById("loadingShifts");
+  const container = document.getElementById("shiftsContainer");
+
+  try {
+    loading.style.display = "block";
+    container.style.display = "none";
+
+    const res = await fetch("/get-all-shifts", { credentials: "include" });
+    allShifts = await res.json();
+
+    loading.style.display = "none";
+    container.style.display = "block";
+
+    renderShifts(allShifts);
+
+  } catch (err) {
+    loading.innerHTML = `<p style="color:red;">שגיאה בטעינת משמרות</p>`;
+    console.error("Load error:", err);
+  }
 }
 
 function filterShifts() {
