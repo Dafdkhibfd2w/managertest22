@@ -125,8 +125,8 @@ h3 { font-size: 1.2rem; color: var(--ink-muted); }
 .wrap {
   max-width: 700px;    /* מגביל לרוחב סביר */
   margin: 0 auto;       /* ממרכז באמצע */
-  padding: 20px;
 }
+
 /* =========================
    CARDS
    ========================= */
