@@ -330,6 +330,8 @@ textarea { min-height: 100px; resize: vertical; }
 /* =========================
    BUTTONS
    ========================= */
+
+
 button:not(#notifToggle, #burger, .close-btn, #userbtn, #side_button), .btn {
   background: var(--btn-primary);
   color: #0E0E0E;
@@ -1143,6 +1145,16 @@ body.light {
   padding-bottom: 55px;
 }
 .nav-item{
+background: var(--card);
+border-bottom: 2px solid #00FFA3;
+text-decoration: none;
+padding: 3px;
+border-radius: 10px;
+color: white;
+transition: 0.3s all;
+}
+
+.go-home{
 background: var(--card);
 border-bottom: 2px solid #00FFA3;
 text-decoration: none;

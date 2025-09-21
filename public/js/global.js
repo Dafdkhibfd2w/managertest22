@@ -114,10 +114,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const pages = document.querySelectorAll(".admin-pages section");
 
   function showPage(target) {
-    // מנקה אקטיב
+    // מנקה active
     buttons.forEach(b => b.classList.remove("active"));
 
-    // מסמן active גם ב־sidebar וגם ב־bottom-nav
+    // מסמן active לכפתורים עם אותו data-page
     document.querySelectorAll(`.nav-btn[data-page="${target}"]`)
       .forEach(el => el.classList.add("active"));
 
@@ -128,33 +128,31 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // לחיצה על כפתור
-  buttons.forEach(btn => {
-    btn.addEventListener("click", e => {
-      e.preventDefault();
-      const target = btn.dataset.page;
-
-      if (target) {
-        // ניווט רגיל בין עמודים
-        location.hash = target;
-        showPage(target);
-      } else {
-        // כפתור MORE → פותח sidebar
-        mobileNav.classList.add("active");
-      }
-    });
-  });
-
-  // טעינה ראשונה
-  let hash = location.hash.replace("#", "") || "shifts";
+  // === טעינה ראשונה ===
+  let hash = location.hash.replace("#", "");
+  if (!hash) {
+    hash = "shifts"; // ברירת מחדל
+    location.hash = hash;
+  }
   showPage(hash);
 
   // back / forward
   window.addEventListener("hashchange", () => {
-    const newHash = location.hash.replace("#", "") || "shifts";
+    const newHash = location.hash.replace("#", "") || "manage";
     showPage(newHash);
   });
+
+  // לחיצה על כפתורים
+  buttons.forEach(btn => {
+    btn.addEventListener("click", e => {
+      e.preventDefault();
+      const target = btn.dataset.page;
+      location.hash = target;
+      showPage(target);
+    });
+  });
 });
+
 
 
 // ===== Push Notifications =====

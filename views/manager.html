@@ -233,6 +233,7 @@
       .admin-pages section {
       margin-right: 0;
     }
+
     #text {
       margin-right: 0;
     }
@@ -296,7 +297,6 @@
   background: var(--accent-hover);
 }
 
-
   /* תמונה */
   .users-table img {
     width: 50px;
@@ -327,20 +327,27 @@
   </ul>
   <button id="closeNav" class="close-btn">✖</button> 
 </nav>
-  <div class="sidebar">
-    <h2>📊 ניהול</h2>
-<a class="nav-btn active" href="#shifts" data-page="shifts"><i class="fa-solid fa-calendar"></i> משמרות</a>
-<a class="nav-btn" href="#notifications" data-page="notifications"><i class="fa-solid fa-bell"></i> התראות</a>
-<a class="nav-btn" href="#suppliers" data-page="suppliers"><i class="fa-solid fa-truck"></i> ספקים</a>
-<a class="nav-btn" href="#users" data-page="users"><i class="fa-solid fa-users"></i> משתמשים</a>
-<a class="nav-btn" href="#reports" data-page="reports"><i class="fa-solid fa-chart-column"></i> דוחות</a>
+<div class="sidebar">
+  <h2>📊 ניהול</h2>
 
-<!-- <button id="side_button_users" data-page="users">
-  <i class="fa-solid fa-users"></i> משתמשים
-</button> -->
-    
-    <button id="side_button" class="gohome" style="margin-top: auto;"><i class="fa-solid fa-right-from-bracket"></i>חזרה לעמוד הראשי</button>
-  </div>
+  <a class="nav-btn active" href="#dispersals" data-page="dispersals">
+    <i class="fa-solid fa-taxi"></i> פיזורים
+  </a>
+  <a class="nav-btn" href="#manage" data-page="manage">
+    <i class="fa-solid fa-calendar-days"></i> משמרת
+  </a>
+  <a class="nav-btn" href="#invoices" data-page="invoices">
+    <i class="fa-solid fa-file-invoice-dollar"></i> חשבוניות
+  </a>
+  <a class="nav-btn" href="#orders" data-page="orders">
+    <i class="fa-solid fa-truck"></i> הזמנות
+  </a>
+
+  <button class="side_button" class="gohome" style="margin-top:auto; margin-bottom: 30px;">
+    <i class="fa-solid fa-right-from-bracket"></i> חזרה לעמוד הראשי
+  </button>
+</div>
+
 
 
 
