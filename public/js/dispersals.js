@@ -1,5 +1,4 @@
-    // ===== Helpers =====
-    const addForm     = document.getElementById('addForm');
+    const addForm = document.getElementById('addForm');
     const addMsg      = document.getElementById('addMsg');
     const filterForm  = document.getElementById('filterForm');
     const clearBtn    = document.getElementById('clearFilters');

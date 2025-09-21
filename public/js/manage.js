@@ -1,8 +1,8 @@
 // ===== refs
-const loadForm      = document.getElementById("loadForm");
+const loadManageForm  = document.getElementById("loadManageForm");
 const updateForm    = document.getElementById("updateForm");
 const shiftSection  = document.getElementById("shiftSection");
-const saveBtn       = document.getElementById("saveUpdates");
+const savemanage       = document.getElementById("saveUpdates");
 const finalizeBtn   = document.getElementById("finalizeBtn");
 const saveStatus    = document.getElementById("saveStatus");
 const leadChip      = document.getElementById("leadChip");
@@ -106,9 +106,9 @@ function updateStatus(shift) {
 /* =========================
    טעינת משמרת
    ========================= */
-loadForm.addEventListener("submit", async (e) => {
+loadManageForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const date = new FormData(loadForm).get("date");
+  const date = new FormData(loadManageForm).get("date");
   showSkeleton();
 
   const res = await fetch(`/get-shift?date=${date}`, { credentials: "include" });
@@ -117,7 +117,7 @@ loadForm.addEventListener("submit", async (e) => {
   if (!shift) {
     updateForm.innerHTML = "לא נמצאה משמרת עבור התאריך הזה.";
     shiftSection.style.display = "block";
-    saveBtn.style.display = "none";
+    savemanage.style.display = "none";
     finalizeBtn.style.display = "none";
     leadChip.textContent = "אחמ״ש: —";
     updateStatus(null);
@@ -176,7 +176,7 @@ renderRuntimeNotes(
   // renderCategory("daily");
 
   shiftSection.style.display = "block";
-  saveBtn.style.display = "inline-block";
+  savemanage.style.display = "inline-block";
   finalizeBtn.style.display = "inline-block";
 });
 
@@ -316,7 +316,7 @@ async function saveSingleTask(btn) {
 /* =========================
    שמירה כוללת
    ========================= */
-saveBtn.addEventListener("click", async () => {
+savemanage.addEventListener("click", async () => {
   const date = updateForm.dataset.date;
   const executions = { daily: [], weekly: [], monthly: [] };
 
@@ -401,7 +401,7 @@ const csrf = await getCsrf();
     showToast("המשמרת נסגרה בהצלחה.")
     // document.getElementById("finalizeStatus").textContent = result.message || "המשמרת נסגרה בהצלחה.";
     updateForm.querySelectorAll("select,input[type='time'],button.save-single").forEach(el => el.disabled = true);
-    saveBtn.disabled = true;
+    savemanage.disabled = true;
     updateStatus({ closed: true }); // עדכון סטטוס לסגור
   } catch (err) {
     document.getElementById("finalizeStatus").textContent = err.message || "סגירה נכשלה.";

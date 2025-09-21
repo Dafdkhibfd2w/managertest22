@@ -1245,6 +1245,11 @@ const jwt = require('jsonwebtoken');
 app.get("/login", (req, res) => {
   res.sendFile(path.join(__dirname, "views", "register.html"));
 });
+
+app.get("/manager", (req, res) => {
+  res.sendFile(path.join(__dirname, "views", "manager.html"));
+});
+
 app.post("/logout", (req, res) => {
   res.clearCookie("user", { sameSite: "lax" });
   res.json({ ok: true, message: "התנתקת בהצלחה" });

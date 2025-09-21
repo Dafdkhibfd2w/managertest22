@@ -164,19 +164,6 @@
     }
 
     /* ===== Bottom Nav (Mobile) ===== */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 65px;
-      background: var(--panel);
-      display: none;
-      justify-content: space-around;
-      align-items: center;
-      border-top: 1px solid #333;
-      z-index: 2000;
-    }
 
     .bottom-nav .nav-item {
       flex: 1;
@@ -332,7 +319,17 @@
 <body>
 <a href="/" class="floating-home"><i class="fa-solid fa-house"></i></a>
 
+<nav class="mobile-nav" id="mobileNav">
+  <!-- <button style="display: none;" id="closeNav" class="close-btn">✖</button>  -->
+  <ul>
+    <li><a href="/"><span class="icon">🏠</span> דף הבית</a></li>
+    <li><a href="/admin#create"><span class="icon">🗓️</span> יצירת משמרת</a></li>
+    <li><a href="/admin#tasks"><span class="icon">⚒</span> ניהול משימות</a></li>
 
+    <li><a href="/logout"><span class="icon">🚪</span> התנתקות</a></li>
+  </ul>
+  <button id="closeNav" class="close-btn">✖</button> 
+</nav>
 
 
   <div class="sidebar">
@@ -372,6 +369,22 @@
       </section>
 <section class="card" id="page-users">
   <h2>📊 ניהול משתמשים</h2>
+
+  <!-- טעינה -->
+  <div id="loadingUsers" style="display:none;">
+    <div class="skeleton-card">
+      <div class="skeleton skeleton-line" style="width: 60%;"></div>
+      <div class="skeleton skeleton-line" style="width: 40%;"></div>
+      <div class="skeleton skeleton-line" style="width: 80%;"></div>
+    </div>
+    <div class="skeleton-card">
+      <div class="skeleton skeleton-line" style="width: 70%;"></div>
+      <div class="skeleton skeleton-line" style="width: 50%;"></div>
+      <div class="skeleton skeleton-line" style="width: 90%;"></div>
+    </div>
+  </div>
+
+  <!-- טבלה -->
   <table class="users-table">
     <thead>
       <tr>
@@ -386,6 +399,279 @@
     </tbody>
   </table>
 </section>
+
+      <section id="page-tasks">
+<style>
+    #tasksTable {
+  width: 100%;
+  border-collapse: collapse;
+  direction: rtl;
+  text-align: right;
+}
+
+#tasksTable th, #tasksTable td {
+  padding: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+#tasksTable th {
+  background: rgba(255,255,255,0.05);
+  font-weight: 600;
+  color: #fff;
+}
+
+#tasksTable td {
+  color: #ddd;
+}
+#tasksTable td.actions, 
+#tasksTable th.actions {
+  text-align: center;
+  width: 80px;
+}
+.task-category {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  margin-bottom: 24px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.task-category h2 {
+  margin: 0 0 12px;
+  font-size: 1.2rem;
+  color: white;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding-bottom: 6px;
+}
+
+.tasks-table {
+  width: 100%;
+  max-width: 500px;   /* קובע מקסימום */
+  margin: 0 auto;     /* מרכז */
+  border-collapse: collapse;
+}
+
+
+.tasks-table th,
+.tasks-table td {
+  padding: 10px 16px;
+  text-align: center;
+  white-space: nowrap; /* לא לשבור שורה */
+}
+
+.tasks-table th {
+  background: rgba(255,255,255,0.05);
+  font-weight: 600;
+  color: #fff;
+}
+
+.tasks-table td {
+  color: #ddd;
+}
+
+.tasks-table td.actions {
+  text-align: center;
+  width: 80px;
+}
+
+.delete-btn {
+  background: linear-gradient(135deg, #3cb371, #2e8b57);
+  border: none;
+  border-radius: 10px;
+  padding: 6px 12px;
+  cursor: pointer;
+  color: #fff;
+  font-size: 14px;
+  transition: 0.2s;
+}
+.delete-btn:hover {
+  filter: brightness(1.2);
+  transform: scale(1.05);
+}
+.edit-btn {
+  background: linear-gradient(135deg, #ffa500, #ff7f50);
+  border: none;
+  border-radius: 10px;
+  padding: 6px 12px;
+  cursor: pointer;
+  color: #fff;
+  font-size: 14px;
+  margin-left: 6px;
+  transition: 0.2s;
+}
+.edit-btn:hover {
+  filter: brightness(1.2);
+  transform: scale(1.05);
+}
+.actions button {
+  display: inline-flex;   /* במקום block */
+  justify-content: center;
+  align-items: center;
+  width: auto;            /* שלא יתפרס על כל התא */
+  min-width: 36px;
+  padding: 6px 12px;
+  margin: 0 4px;          /* ריווח בין הכפתורים */
+  border-radius: 10px;
+  cursor: pointer;
+  color: #fff;
+  font-size: 14px;
+  margin-top: 10px;
+  transition: 0.2s;
+}
+.no-tasks {
+  text-align: center;
+  color: #999;
+  font-size: 0.95rem;
+  padding: 12px;
+  font-style: italic;
+}
+
+.edit-btn {
+  background: linear-gradient(135deg, #ffa500, #ff7f50);
+}
+.edit-btn:hover {
+  filter: brightness(1.15);
+  transform: scale(1.05);
+}
+
+.delete-btn {
+  background: linear-gradient(135deg, #3cb371, #2e8b57);
+}
+.delete-btn:hover {
+  filter: brightness(1.15);
+  transform: scale(1.05);
+}
+
+</style>
+
+  <div class="wrap">
+    <h1>ניהול משימות</h1>
+    
+    <div class="card">
+      <form id="addTaskForm">
+        <label>קטגוריה</label>
+        <select name="category" required>
+          <option value="daily">יומי</option>
+          <option value="weekly">שבועי</option>
+          <option value="monthly">חודשי</option>
+        </select>
+
+        <label>שם המשימה</label>
+        <input type="text" name="name" placeholder="לדוג׳: לסגור קופה" required />
+
+        <button type="submit">➕ הוסף משימה</button>
+      </form>
+    </div>
+
+<div class="task-category">
+  <h2>משימות יומיות</h2>
+  <table class="tasks-table">
+    <thead>
+      <tr>
+        <th>משימה</th>
+        <th class="actions">פעולות</th>
+      </tr>
+    </thead>
+    <tbody id="dailyTasks"></tbody>
+  </table>
+</div>
+
+<div class="task-category">
+  <h2>משימות שבועיות</h2>
+  <table class="tasks-table">
+    <thead>
+      <tr>
+        <th>משימה</th>
+        <th class="actions">פעולות</th>
+      </tr>
+    </thead>
+    <tbody id="weeklyTasks"></tbody>
+  </table>
+</div>
+
+<div class="task-category">
+  <h2>משימות חודשיות</h2>
+  <table class="tasks-table">
+    <thead>
+      <tr>
+        <th>משימה</th>
+        <th class="actions">פעולות</th>
+      </tr>
+    </thead>
+    <tbody id="monthlyTasks"></tbody>
+  </table>
+</div>
+  </div>
+
+
+  
+
+<script src="/js/tasks.js"></script>
+
+      </section>
+
+      <section id="page-create">
+        <h2>יצירת משמרת</h2>
+
+              <div class="card">
+
+  <form id="shiftForm" >
+    <label>:תאריך <input type="date" name="date" required></label><br><br>
+
+    <label>:צוות <input type="text" name="team" placeholder="לדוג׳: יוסי, דנה, רועי" required></label><br><br>
+
+
+<label>:אחמ״ש הערב</label>
+<input type="text" name="manager" placeholder="שם האחמ״ש" required>
+<div class="task-picker">
+  <button type="button" class="picker-toggle" data-key="daily" aria-expanded="false">
+    <span class="picker-title">משימות יומיות</span><em class="chev">▾</em>
+  </button>
+  <div id="dailyPanel" class="picker-panel" hidden>
+    <div id="dailyList" class="task-list"></div>
+  </div>
+<br>
+  <button type="button" class="picker-toggle" data-key="weekly" aria-expanded="false">
+    <span class="picker-title">משימות שבועיות</span><em class="chev">▾</em>
+  </button>
+  <div id="weeklyPanel" class="picker-panel" hidden>
+    <div id="weeklyList" class="task-list"></div>
+  </div>
+<br>
+
+  <button type="button" class="picker-toggle" data-key="monthly" aria-expanded="false">
+    <span class="picker-title">משימות חודשיות</span><em class="chev">▾</em>
+  </button>
+  <div id="monthlyPanel" class="picker-panel" hidden>
+    <div id="monthlyList" class="task-list"></div>
+  </div>
+<br>
+
+
+
+    <label for="editNotes">:הערות / משימות מותאמות</label>
+<textarea id="editNotes" name="notes" placeholder="משימות מיוחדות, תזכורות, הערות כלליות..."></textarea>
+
+</div>
+
+
+<br>
+<div id="btn-area">
+    <button type="submit">יצירת משמרת</button>
+    <button style="margin-top: 5px;" id="go-back" class="btn btn--primary">חזור אחורה</button>
+</div>
+
+    <p id="status"></p>
+  </form>
+</card>
+
+  <script src="/js/script.js"></script>
+  </div>
+
+      </section>
+
+
 
       <section id="page-notifications">
         <h2>שליחת התראה</h2>
@@ -551,9 +837,15 @@
   <a class="nav-btn nav-item" href="#users" data-page="users">
     <i class="fa-solid fa-users"></i><span>משתמשים</span>
   </a>
+
   <a class="nav-btn nav-item" href="#suppliers" data-page="suppliers">
     <i class="fa-solid fa-truck"></i><span>ספקים</span>
   </a>
+  
+<a class="nav-btn nav-item" id="burger">
+  <i class="fa-solid fa-bars"></i>
+  <span>עוד</span>
+</a>
 </nav>
 
   <script src="/js/suppliers.js" defer></script>

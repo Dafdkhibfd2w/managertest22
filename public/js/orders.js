@@ -1,68 +1,6 @@
-<!DOCTYPE html>
-<html lang="he" dir="rtl">
-<head>
-<meta charset="UTF-8" />
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>NEW DELI • הזמנות יומיות</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-<link rel="icon" href="/icons/icon-512.png" type="image/png">
-
-<link rel="stylesheet" href="/css/style.css?v=2" />
-
-</head>
-<body>
-  <div id="globalLoader">
-    <div class="spinner"></div>
-    <p>טוען נתונים...</p>
-  </div>
-<nav class="mobile-nav" id="mobileNav">
-  <!-- <button style="display: none;" id="closeNav" class="close-btn">✖</button>  -->
-  <ul>
-    <li><a href="/"><span class="icon">🏠</span> דף הבית</a></li>
-    <li><a href="/create"><span class="icon">🗓️</span> יצירת משמרת</a></li>
-    <li><a href="/manage"><span class="icon">✅</span> ניהול משמרת</a></li>
-    <li><a href="/admin"><span class="icon">📚</span> ארכיון / דשבורד מנהל</a></li>
-    <li><a href="/invoices-page"><span class="icon">🧾</span> חשבוניות</a></li>
-    <li><a href="/suppliers-page"><span class="icon">🏷️</span> ספקים</a></li>
-    <li><a href="/orders-page"><span class="icon">📦</span> הזמנות</a></li>
-    <li><a href="/dispersals-page"><span class="icon">🚕</span> פיזורים</a></li>
-    <li><a href="/logout"><span class="icon">🚪</span> התנתקות</a></li>
-  </ul>
-  <button id="closeNav" class="close-btn">✖</button> 
-</nav>
-
-    <div class="wrap">
-      <h1>הזמנות יומיות</h1>
-
-      <!-- בר עליון -->
-      <div class="card">
-        <form id="loadForm" class="row">
-          <div>
-            <label>תאריך</label>
-            <input type="date" name="date" id="dateInput" required>
-            <small id="weekdayHint" class="muted" style="margin-inline-start:8px"></small>
-          </div>
-          <div>
-            <label>&nbsp;</label>
-            <button type="submit">טען / צור טופס</button>
-          </div>
-          <div>
-            <label>&nbsp;</label>
-            <button type="button" id="saveBtn">שמור</button>
-          </div>
-        </form>
-        <p class="muted" id="msg"></p>
-      </div>
-
-      <!-- טפסי ספקים -->
-      <div id="suppliersWrap"></div>
-    </div>
-  </div>
-
-  <script>
-    const dateInput = document.getElementById('dateInput');
-    const loadForm  = document.getElementById('loadForm');
+document.addEventListener("DOMContentLoaded", () => {
+const dateInput = document.getElementById('dateInput');
+    const loadOrdersForm  = document.getElementById('loadOrdersform');
     const saveBtn   = document.getElementById('saveBtn');
     const msg       = document.getElementById('msg');
     const wrap      = document.getElementById('suppliersWrap');
@@ -77,7 +15,7 @@
     }
 
     // טען/צור טופס ליום
-    loadForm.addEventListener('submit', async (e) => {
+    loadOrdersForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const date = dateInput.value;
       if (!date) return;
@@ -214,9 +152,5 @@
     // ברירת מחדל: טען היום
     const today = new Date().toISOString().slice(0,10);
     dateInput.value = today;
-  </script>
 
-  <script src="/js/global.js"></script>
-  
-</body>
-</html>
+    });

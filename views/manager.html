@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>NEW DELI • דף מנהל</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="icon" href="/icons/icon-512.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #121212;
+      --panel: #1E1E1E;
+      --ink: #fff;
+      --ink-muted: #aaa;
+      --accent: #00FFA3;
+      --accent-hover: #00C2FF;
+      --radius: 14px;
+      --shadow: 0 6px 18px rgba(0,0,0,0.6);
+    }
+
+    body {
+      margin: 0;
+      font-family: "Heebo", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      padding:0;
+      min-height: 100vh;
+    }
+    a{
+      text-decoration: none;
+    }
+
+    /* ===== Layout ===== */
+    .sidebar {
+        position: fixed;
+      width: 240px;
+      background: #1C1C1C;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: 100vh;
+    }
+
+    .sidebar h2 {
+      margin: 0 0 20px 0;
+      font-size: 1.2rem;
+    }
+
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      border: none;
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--ink-muted);
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 1rem;
+    }
+
+    .sidebar a.active,
+    .sidebar a:hover {
+      background: var(--accent-hover);
+      color: #000;
+    }
+
+    .main {
+      flex: 1;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 1.8rem;
+    }
+
+    /* ===== Pages ===== */
+    .admin-pages section {
+      display: none;
+      background: var(--panel);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin-top: 20px;
+      flex: 1;
+      margin-right: 250px;
+      overflow-y: auto;
+    }
+
+    .admin-pages section.active {
+      display: block;
+      animation: fadeSlide 0.4s ease;
+    }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== Cards ===== */
+    .shift-card {
+      border-radius: var(--radius);
+      padding: 50px;
+      margin-bottom: 16px;
+      transition: 0.3s;
+    }
+
+    .shift-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 18px rgba(0,255,163,0.3);
+    }
+
+    .shift-meta {
+      font-size: 0.9rem;
+      color: var(--ink-muted);
+      margin-bottom: 10px;
+    }
+
+    .shift-actions button {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 8px;
+      background: var(--accent);
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+
+    .shift-actions button:hover {
+      background: var(--accent-hover);
+    }
+
+    /* ===== Forms ===== */
+    input, textarea {
+      width: 100%;
+      margin: 8px 0;
+      padding: 12px;
+      border-radius: var(--radius);
+      border: 1px solid #333;
+      background: #111;
+      color: var(--ink);
+    }
+
+    button[type="submit"] {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+
+    /* ===== Bottom Nav (Mobile) ===== */
+
+    .bottom-nav .nav-item {
+      flex: 1;
+      text-align: center;
+      color: var(--ink-muted);
+      font-size: 0.75rem;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: 0.3s;
+    }
+
+    .bottom-nav .nav-item.active {
+      color: var(--accent);
+    }
+
+    .bottom-nav i {
+      font-size: 20px;
+    }
+#text{
+  margin-right: 250px;
+}
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+}
+
+.users-table th, 
+.users-table td {
+  padding: 10px;
+  border-bottom: 1px solid var(--card-border);
+  text-align: center;
+}
+
+.users-table img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.users-table select {
+  padding: 4px 6px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--ink);
+}
+
+.users-table button {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  background: var(--btn-primary);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.users-table button:hover {
+  background: var(--btn-primary-hover);
+}
+
+    /* Mobile breakpoint */
+    @media (max-width: 768px) {
+      .sidebar { display: none;transform: translateX(100%); }
+      .admin-pages section {
+      margin-right: 0;
+    }
+    #text {
+      margin-right: 0;
+    }
+      .main { padding: 16px; }
+      .bottom-nav { display: flex; }
+    }
+    @media (max-width: 768px) {
+  .users-table, 
+  .users-table thead, 
+  .users-table tbody, 
+  .users-table th, 
+  .users-table td, 
+  .users-table tr {
+    display: block;
+    width: 100%;
+  }
+
+  .users-table thead {
+    display: none; /* מסתיר כותרות */
+  }
+
+  .users-table tr {
+    background: var(--panel);
+    margin-bottom: 16px;
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+
+  .users-table td {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 8px 0;
+    border: none;
+    font-size: 0.95rem;
+  }
+
+  /* השם של השדה (data-label) */
+  .users-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--accent);
+    margin-left: auto; /* דוחף אותו לצד ימין */
+  }
+/* מוחקים את #text { margin-right: 250px; } */
+.floating-home {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  background: var(--accent);
+  color: #000;
+  font-size: 1.2rem;
+  padding: 10px 15px;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  z-index: 3000;
+  transition: 0.2s;
+}
+.floating-home:hover {
+  background: var(--accent-hover);
+}
+
+
+  /* תמונה */
+  .users-table img {
+    width: 50px;
+    height: 50px;
+    margin-left: 10px;
+  }
+
+  /* כפתור */
+  .users-table button {
+    width: 100%;
+    margin-top: 12px;
+    padding: 12px;
+    font-size: 1rem;
+  }
+}
+
+  </style>
+</head>
+<body>
+<a href="/" class="floating-home"><i class="fa-solid fa-house"></i></a>
+<nav class="mobile-nav" id="mobileNav">
+  <ul>
+    <li><a href="/"><span class="icon">🏠</span> דף הבית</a></li>
+    <li><a href="/admin#create"><span class="icon">🗓️</span> יצירת משמרת</a></li>
+    <li><a href="/admin#tasks"><span class="icon">⚒</span> ניהול משימות</a></li>
+
+    <li><a href="/logout"><span class="icon">🚪</span> התנתקות</a></li>
+  </ul>
+  <button id="closeNav" class="close-btn">✖</button> 
+</nav>
+  <div class="sidebar">
+    <h2>📊 ניהול</h2>
+<a class="nav-btn active" href="#shifts" data-page="shifts"><i class="fa-solid fa-calendar"></i> משמרות</a>
+<a class="nav-btn" href="#notifications" data-page="notifications"><i class="fa-solid fa-bell"></i> התראות</a>
+<a class="nav-btn" href="#suppliers" data-page="suppliers"><i class="fa-solid fa-truck"></i> ספקים</a>
+<a class="nav-btn" href="#users" data-page="users"><i class="fa-solid fa-users"></i> משתמשים</a>
+<a class="nav-btn" href="#reports" data-page="reports"><i class="fa-solid fa-chart-column"></i> דוחות</a>
+
+<!-- <button id="side_button_users" data-page="users">
+  <i class="fa-solid fa-users"></i> משתמשים
+</button> -->
+    
+    <button id="side_button" class="gohome" style="margin-top: auto;"><i class="fa-solid fa-right-from-bracket"></i>חזרה לעמוד הראשי</button>
+  </div>
+
+
+
+
+
+<div class="admin-pages">
+    <h1 id="text" >דף מנהל 👨‍💼</h1>
+    <div class="admin-pages">
+
+<section id="page-dispersals" class="manager-dispersals">
+  <div id="globalLoader">
+  <div class="spinner"></div>
+  <p>טוען נתונים...</p>
+</div>
+
+<div id="pageContent" style="display:none">
+  <div class="wrap">
+    <h1 style="margin-top: 50px;">פיזורים 🚕</h1>
+
+    <div class="card summary">
+      <span class="chip">סה״כ מוצג: <b id="sumShown">0</b> ₪</span>
+      <span class="chip">כמות רשומות: <b id="countShown">0</b></span>
+      <span class="muted">טיפ: אפשר לסנן לפי תאריך, נהג או שם של מישהו שנסע.</span>
+    </div>
+
+    <div class="card">
+      <form id="addForm">
+        <div class="row">
+          <div>
+            <label>תאריך משמרת</label>
+            <input type="date" name="date" required />
+          </div>
+          <div>
+            <label>מחיר מונית (₪)</label>
+            <input type="number" name="price" min="0" step="1" placeholder="לדוגמה: 55" required />
+          </div>
+          <div>
+            <label>נהג / חברה</label>
+            <input type="text" name="taxi" placeholder="לדוגמה: אבי / Gett" />
+          </div>
+        </div>
+        <div class="row" style="grid-template-columns: 1fr 1fr;">
+          <div>
+            <label>מי שילם</label>
+            <input type="text" name="payer" placeholder="לדוגמה: הקופה / עומר" />
+          </div>
+        </div>
+        <p class="muted" id="addMsg"></p>
+        <div><button type="submit">שמור פיזור</button></div>
+      </form>
+    </div>
+
+    <div class="card">
+      <form id="filterForm">
+        <div class="row">
+          <div>
+            <label>סינון לפי תאריך</label>
+            <input type="date" name="date" />
+          </div>
+          <div>
+            <label>חיפוש לפי נהג</label>
+            <input type="text" name="q" placeholder="הקלד שם נהג" />
+          </div>
+          <div class="row buttons">
+            <button type="submit" style="margin-top: 15px;" class="secondary">סנן</button>
+            <button type="button" id="clearFilters" style="margin-top: 9px;" class="secondary">נקה</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div style="overflow:auto">
+        <table id="tbl">
+          <thead>
+            <tr>
+              <th class="nowrap">תאריך</th>
+              <th class="nowrap">מחיר</th>
+              <th>נהג / חברה</th>
+              <th>שילם</th>
+              <th style="width:140px" class="nowrap">פעולות</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="pager">
+        <button id="prevBtn" class="secondary">‹ הקודם</button>
+        <span class="muted" id="pageInfo"></span>
+        <button id="nextBtn" class="secondary">הבא ›</button>
+      </div>
+    </div>
+  </div>
+  <script src="/js/dispersals.js"></script>
+
+</div>
+</section>
+
+<section id="page-orders" class="manager-orders">
+    <div class="wrap">
+      <h1>הזמנות יומיות</h1>
+      <div class="card">
+        <form id="loadOrdersform" class="row">
+          <div>
+            <label>תאריך</label>
+            <input type="date" name="date" id="dateInput" required>
+            <small id="weekdayHint" class="muted" style="margin-inline-start:8px"></small>
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <button type="submit">טען / צור טופס</button>
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <button type="button" id="saveBtn">שמור</button>
+          </div>
+        </form>
+        <p class="muted" id="msg"></p>
+      </div>
+      <div id="suppliersWrap"></div>
+    </div>
+<script src="/js/orders.js" defer></script>
+</section>
+
+<section id="page-invoices" class="manager-invoices">
+    <div class="wrap">
+      <h1>חשבוניות</h1>
+
+      <!-- העלאה -->
+      <div class="card">
+        <form id="uploadInvoicesForm" enctype="multipart/form-data">
+          <div class="row">
+            <div>
+              <label>תאריך משמרת</label>
+              <input type="date" name="date" required />
+            </div>
+            <div>
+              <label>שם ספק</label>
+              <input type="text" name="supplier" placeholder="לדוגמה: סופר-דרינק בע״מ" required />
+            </div>
+            <label>קובץ חשבונית (תמונה / PDF)</label>
+            <div class="file-upload">
+<input type="file" id="fileInput" name="file" accept="image/*,application/pdf" style="display:none">
+<button type="button" id="fileBtn">בחר קובץ</button>
+
+              <span id="fileName">לא נבחר קובץ</span>
+            </div>
+            <div style="margin-top: 20px;">
+              <button type="submit">העלה חשבונית</button>
+            </div>
+          </div>
+          <p class="muted" id="uploadMsg"></p>
+        </form>
+      </div>
+
+      <!-- חיפוש/סינון -->
+      <div class="card">
+        <form id="filterInvoicesForm">
+          <div class="row">
+            <div>
+              <label>חפש לפי תאריך</label>
+              <input type="date" name="date" />
+            </div>
+            <div>
+              <label>חפש לפי ספק</label>
+              <input type="text" name="supplier" placeholder="שם ספק" />
+            </div>
+          </div>
+          <div class="row buttons">
+            <button type="submit" class="secondary">סנן</button>
+            <button type="button" id="clearInvoicesFilters" class="secondary">נקה</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- טבלה -->
+      <div class="card">
+        <div style="overflow:auto">
+          <table id="tbl">
+            <thead>
+              <tr>
+                <th>תאריך</th>
+                <th>ספק</th>
+                <th>חשבונית</th>
+                <th>העלה</th>
+                <th style="width:160px">פעולות</th>
+              </tr>
+            </thead>
+            <tbody class="tbodyInvoices"></tbody>
+          </table>
+        </div>
+
+        <div class="pager">
+          <button id="prevBtnInv" class="secondary">‹ הקודם</button>
+          <span class="muted" id="pageInfoInv"></span>
+          <button id="nextBtnInv" class="secondary">הבא ›</button>
+        </div>
+      </div>
+    </div>
+<script src="/js/invoices.js" defer></script>
+</section>
+
+<section id="page-manage" class="manager-manage">
+    <div class="container" style="padding-top: 80px;">
+      <h1>ניהול משימות המשמרת</h1>
+
+      <form id="loadManageForm">
+        <label>בחר תאריך משמרת:</label>
+        <input type="date" name="date" required>
+        <button type="submit" class="btn btn--primary">טען משמרת</button>
+        <button id="go-back" type="button" class="btn btn--primary">חזור אחורה</button>
+        <div class="manage_btn" style="display: flex;justify-content: center;">
+          <span id="leadChip" class="lead-chip" style="display:none;"></span>
+          <span id="status" class="lead-chip" style="display:none;"></span>
+          <span id="createdByChip" class="lead-chip" style="display:none;"></span>
+        </div>
+      </form>
+
+      <div id="shiftSection" style="display:none;">
+        <h2>משימות</h2>
+        <form id="updateForm">
+          <div id="categories"></div>
+        </form>
+
+        <section id="runtimeNotesSection">
+          <h3>הערות בזמן המשמרת</h3>
+          <ul id="runtimeNotesList"></ul>
+          <br>
+          <div class="controls-row">
+            <input type="text" id="runtimeNoteText" placeholder="לדוגמה: נגמר החומר של הפלטה">
+            <button type="button" id="addRuntimeNoteBtn" style="color: black; margin-top: 10px;">➕</button>
+          </div>
+
+          <section id="managerNoteSection" class="manager-note-box">
+            <h3>הערות למשמרת</h3>
+            <p id="managerNote"></p>
+          </section>
+        </section>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin:30px auto;justify-content:center;">
+          <button id="saveUpdates" class="btn btn--accent" style="display:none;">שמור ביצועים</button>
+          <button id="finalizeBtn" class="btn btn--primary" style="display:none;">סיום משמרת</button>
+        </div>
+
+        <p id="saveStatus" class="subtitle"></p>
+      </div>
+    </div>
+
+    <div id="finalizeModal" class="modal" style="display:none">
+      <div class="modal-content">
+        <h2>סיכום משמרת לאישור אחמ״ש</h2>
+        <div id="finalizeSummary" class="section" style="margin-top:8px"></div>
+        <li style="display:flex;align-items:center;background:linear-gradient(180deg,#1f2937,#111827);border:1px dashed var(--border);border-radius:10px;padding:8px 10px;margin:6px 0">
+          <span style="font-weight: bold; margin-left: 6px;">הערות למשמרת:</span>
+          <span id="managerNotes" style="font-size:14px;color:white"></span>
+        </li>
+        <div class="modal-actions">
+          <button type="button" class="btn btn--primary" id="confirmFinalize">אישור וסגירת יום</button>
+          <button type="button" class="btn btn--ghost" id="cancelFinalize">סגור</button>
+        </div>
+        <p id="finalizeStatus" class="subtitle"></p>
+      </div>
+    </div>
+<script src="/js/manage.js" defer></script>
+</section>
+
+
+
+<nav class="bottom-nav">
+  <a class="nav-btn nav-item" href="#dispersals" data-page="dispersals">
+    <i class="fa-solid fa-taxi"></i><span>פיזורים</span>
+  </a>
+  <a class="nav-btn nav-item" href="#manage" data-page="manage">
+    <i class="fa-solid fa-calendar-days"></i><span>משמרת</span>
+  </a>
+  <a class="nav-btn nav-item" href="#invoices" data-page="invoices">
+    <i class="fa-solid fa-file-invoice-dollar"></i><span>חשבוניות</span>
+  </a>
+
+  <a class="nav-btn nav-item" href="#orders" data-page="orders">
+    <i class="fa-solid fa-truck"></i><span>הזמנות</span>
+  </a>
+  
+<!-- <a class="nav-btn nav-item" id="burger">
+  <i class="fa-solid fa-bars"></i>
+  <span>עוד</span>
+</a> -->
+</nav>
+
+  <script defer src="/js/global.js"></script>
+</body>
+</html>

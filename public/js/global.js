@@ -95,15 +95,66 @@ const mobileNav = document.getElementById("mobileNav");
 const closeNav = document.getElementById("closeNav");
 
 if (burger && mobileNav && closeNav) {
-  burger.addEventListener("click", () => mobileNav.classList.add("active"));
+  burger.addEventListener("click", (e) => {
+    e.preventDefault(); // מונע מעבר דף
+    mobileNav.classList.add("active");
+  });
+
   closeNav.addEventListener("click", () => mobileNav.classList.remove("active"));
 
   window.addEventListener("click", (e) => {
-    if (!mobileNav.contains(e.target) && e.target !== burger) {
+    if (!mobileNav.contains(e.target) && !burger.contains(e.target)) {
       mobileNav.classList.remove("active");
     }
   });
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const buttons = document.querySelectorAll(".nav-btn");
+  const pages = document.querySelectorAll(".admin-pages section");
+
+  function showPage(target) {
+    // מנקה אקטיב
+    buttons.forEach(b => b.classList.remove("active"));
+
+    // מסמן active גם ב־sidebar וגם ב־bottom-nav
+    document.querySelectorAll(`.nav-btn[data-page="${target}"]`)
+      .forEach(el => el.classList.add("active"));
+
+    // מציג את העמוד הנכון
+    pages.forEach(sec => {
+      sec.classList.remove("active");
+      if (sec.id === `page-${target}`) sec.classList.add("active");
+    });
+  }
+
+  // לחיצה על כפתור
+  buttons.forEach(btn => {
+    btn.addEventListener("click", e => {
+      e.preventDefault();
+      const target = btn.dataset.page;
+
+      if (target) {
+        // ניווט רגיל בין עמודים
+        location.hash = target;
+        showPage(target);
+      } else {
+        // כפתור MORE → פותח sidebar
+        mobileNav.classList.add("active");
+      }
+    });
+  });
+
+  // טעינה ראשונה
+  let hash = location.hash.replace("#", "") || "shifts";
+  showPage(hash);
+
+  // back / forward
+  window.addEventListener("hashchange", () => {
+    const newHash = location.hash.replace("#", "") || "shifts";
+    showPage(newHash);
+  });
+});
 
 
 // ===== Push Notifications =====

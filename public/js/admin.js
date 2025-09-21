@@ -347,77 +347,56 @@ document.addEventListener("DOMContentLoaded", async () => {
 //   }
 // });
 
-document.addEventListener("DOMContentLoaded", () => {
-  const buttons = document.querySelectorAll(".nav-btn");
-  const pages = document.querySelectorAll(".admin-pages section");
-
-  function showPage(target) {
-    // מנקה אקטיב
-    buttons.forEach(b => b.classList.remove("active"));
-
-    // מסמן active גם ב־sidebar וגם ב־bottom-nav
-    document.querySelectorAll(`.nav-btn[data-page="${target}"]`)
-      .forEach(el => el.classList.add("active"));
-
-    // מציג את העמוד הנכון
-    pages.forEach(sec => {
-      sec.classList.remove("active");
-      if (sec.id === `page-${target}`) sec.classList.add("active");
-    });
-  }
-
-  // לחיצה על כפתור
-  buttons.forEach(btn => {
-    btn.addEventListener("click", e => {
-      e.preventDefault();
-      const target = btn.dataset.page;
-      location.hash = target; // חשוב: מעדכן את ה־URL
-      showPage(target);
-    });
-  });
-
-  // טעינה ראשונה
-  let hash = location.hash.replace("#", "") || "shifts";
-  showPage(hash);
-
-  // back / forward
-  window.addEventListener("hashchange", () => {
-    const newHash = location.hash.replace("#", "") || "shifts";
-    showPage(newHash);
-  });
-});
 
 
 
 
 
-    async function loadUsers() {
-  const res = await fetch("/admin/users");
-  const users = await res.json();
 
+
+async function loadUsers() {
+  const loading = document.getElementById("loadingUsers");
   const tbody = document.getElementById("usersTableBody");
-  tbody.innerHTML = "";
 
-  users.forEach(user => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td data-label="תמונה"><img src="${user.avatar || '/icons/icon-192.png'}" alt="avatar"></td>
-      <td data-label="שם">${user.username}</td>
-      <td>
-        <select data-label="תפקיד" data-id="${user._id}" class="roleSelect">
-          <option value="employee" ${user.role === "employee" ? "selected" : ""}>עובד</option>
-          <option value="shiftManager" ${user.role === "shiftManager" ? "selected" : ""}>אחמ״ש</option>
-          <option value="admin" ${user.role === "admin" ? "selected" : ""}>מנהל</option>
-        </select>
-      </td>
-      <td>
- <button class="saveRoleBtn" data-id="${user._id}">שמור</button>
+  try {
+    // מציג skeleton
+    loading.style.display = "block";
+    tbody.innerHTML = "";
 
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
+    const res = await fetch("/admin/users");
+    const users = await res.json();
+
+    // מסתיר skeleton
+    loading.style.display = "none";
+
+    // בונה טבלה
+    users.forEach(user => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td data-label="תמונה">
+          <img src="${user.avatar || '/icons/icon-192.png'}" alt="avatar">
+        </td>
+        <td data-label="שם">${user.username}</td>
+        <td>
+          <select data-label="תפקיד" data-id="${user._id}" class="roleSelect">
+            <option value="employee" ${user.role === "employee" ? "selected" : ""}>עובד</option>
+            <option value="shiftManager" ${user.role === "shiftManager" ? "selected" : ""}>אחמ״ש</option>
+            <option value="admin" ${user.role === "admin" ? "selected" : ""}>מנהל</option>
+          </select>
+        </td>
+        <td>
+          <button class="saveRoleBtn" data-id="${user._id}">שמור</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+  } catch (err) {
+    loading.innerHTML = `<p style="color:red;">שגיאה בטעינת משתמשים</p>`;
+    console.error("Load users error:", err);
+  }
 }
+
 
 async function updateRole(userId) {
   const select = document.querySelector(`.roleSelect[data-id="${userId}"]`);
@@ -468,23 +447,3 @@ async function attachRoleEvents() {
 
 // קריאה אחרי loadUsers
 loadUsers().then(attachRoleEvents);
-
-
-let touchStartX = 0;
-let touchEndX = 0;
-
-function checkSwipe() {
-  if (touchEndX - touchStartX > 100) {
-    // החלקה ימינה → חזור לבית
-    window.location.href = "/";
-  }
-}
-
-document.addEventListener("touchstart", e => {
-  touchStartX = e.changedTouches[0].screenX;
-});
-
-document.addEventListener("touchend", e => {
-  touchEndX = e.changedTouches[0].screenX;
-  checkSwipe();
-});
