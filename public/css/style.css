@@ -71,20 +71,104 @@ h3 { font-size: 1.2rem; color: var(--ink-muted); }
 .brandbar {
   position: fixed;
   top: 0; left: 0; right: 0;
-  height: var(--navbar-height);
-  background: var(--bg-alt);
-  display: flex; align-items: center; justify-content: space-between;
+  height: var(--navbar-height, 60px);
+  background: var(--bg-alt, #1c1c1c);
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between;
   padding: 0 16px;
-  box-shadow: var(--shadow-1);
+  box-shadow: var(--shadow-1, 0 2px 8px rgba(0,0,0,0.3));
   z-index: 1000;
 }
+
+.brand-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand-logo {
+  height: 50px;
+  width: auto;
+}
+
 .brand-title {
   font-size: 1.3rem;
   font-weight: bold;
-  color: var(--btn-primary);
-  text-transform: uppercase;
+  color: var(--btn-primary, #00ffa3);
 }
-.brandbar-right { display: flex; align-items: center; gap: 12px; }
+.floating-home {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  background: var(--accent);
+  color: #000;
+  font-size: 1.2rem;
+  padding: 10px 15px;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  z-index: 3000;
+  transition: 0.2s;
+}
+.floating-home:hover {
+  background: var(--accent-hover);
+}
+/* ניווט */
+.brand-nav {
+  display: flex;
+  gap: 12px;
+}
+
+.brand-nav a {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: var(--card, #2a2a2a);
+  color: var(--ink, #fff);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+
+.brand-nav a:hover {
+  background: var(--btn-primary, #00ffa3);
+  color: #0e0e0e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+}
+
+.brand-nav a i {
+  font-size: 1rem;
+}
+
+/* בורגר במובייל */
+.burger {
+  display: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: var(--ink, #fff);
+}
+
+@media (max-width: 768px) {
+  .brand-nav {
+    display: none;
+  }
+  .burger {
+    display: block;
+  }
+}
+
+@media (min-width: 768px){
+    .floating-home {
+    display: none;
+  }
+}
+
+
 /* .icon-btn {
   background: none; border: none;
   color: var(--ink); cursor: pointer;
@@ -197,15 +281,7 @@ lead-chip.default {
   background: rgba(253, 253, 253, 0.19);
 }
 
-/* פתוח */
-.lead-chip.open {
 
-}
-
-/* סגור */
-.lead-chip.closed {
-
-}
 
 .skeleton-row td {
   padding: 12px;
@@ -1140,6 +1216,7 @@ body.light {
   transition:all .3s ease;
   padding-bottom: env(safe-area-inset-bottom); 
   z-index: 9500; 
+  margin-top: 20px;
 }
 #pageContent{
   padding-bottom: 55px;
@@ -1186,15 +1263,7 @@ transition: 0.3s all;
 
 
 /* לא להציג במחשב */
-@media (min-width:769px){ .bottom-nav{display:none;} }
-@media (max-width:769px){ 
-  header{
-    display:none;
-  }
-    .brandbar {
-    display: none;
-  }
-}
+
 
 #shiftsContainer {
   display: grid;
@@ -1373,3 +1442,77 @@ transition: 0.3s all;
   border-radius: 4px;
 }
 
+
+
+   /* ===== Layout ===== */
+    .sidebar {
+        position: fixed;
+      width: 240px;
+      background: #1C1C1C;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: 100vh;
+    }
+
+    .sidebar h2 {
+      margin: 0 0 20px 0;
+      font-size: 1.2rem;
+    }
+
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      border: none;
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--ink-muted);
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 1rem;
+    }
+
+    .sidebar a.active,
+    .sidebar a:hover {
+      background: var(--accent-hover);
+      color: #000;
+    }
+
+
+
+    /* ===== Pages ===== */
+    .admin-pages section {
+      display: none;
+      background: var(--panel);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      flex: 1;
+      margin-right: 270px;
+      overflow-y: auto;
+      margin-left: 40px;
+
+    }
+@media (max-width: 768px) {
+.admin-pages section{
+      margin-right: 20px;
+      margin-left: 20px;
+}
+.sidebar{
+  display: none;
+}
+}
+    .admin-pages section.active {
+      display: block;
+      animation: fadeSlide 0.4s ease;
+    }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }

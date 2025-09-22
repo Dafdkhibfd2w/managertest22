@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const SECRET = process.env.JWT_SECRET || "supersecret";
-
+const path = require("path");
 function requireAuth(role) {
   return (req, res, next) => {
     const token = req.cookies.token;
@@ -14,7 +14,8 @@ function requireAuth(role) {
 
       // אם יש בדיקת role ספציפי
       if (role && req.user.role !== role) {
-        return res.status(403).sendFile(path.join(__dirname, "views", "unauthorized.html"));
+res.status(403).sendFile(path.join(__dirname, "..", "..", "views", "unauthorized.html"));
+
       }
 
       next();

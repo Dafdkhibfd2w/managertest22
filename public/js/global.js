@@ -128,17 +128,22 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // === טעינה ראשונה ===
+  // === בחירת ברירת מחדל לפי path ===
   let hash = location.hash.replace("#", "");
   if (!hash) {
-    hash = "shifts"; // ברירת מחדל
+    const path = window.location.pathname;
+    if (path.startsWith("/admin")) {
+      hash = "shifts";   // ברירת מחדל ל-admin
+    } else if (path.startsWith("/manager")) {
+      hash = "manage";      // ברירת מחדל ל-manager
+    }
     location.hash = hash;
   }
   showPage(hash);
 
   // back / forward
   window.addEventListener("hashchange", () => {
-    const newHash = location.hash.replace("#", "") || "manage";
+    const newHash = location.hash.replace("#", "") || "home";
     showPage(newHash);
   });
 
@@ -152,6 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+
 
 
 
@@ -224,24 +230,23 @@ async function unsubscribePush() {
 }
 
 function updateBell(enabled) {
-  const notifIcon = document.getElementById("notifIcon");
-  if (!notifIcon) return;
-  if (enabled) {
-    notifIcon.classList.remove("fa-bell-slash");
-    notifIcon.classList.add("fa-bell");
-  } else {
-    notifIcon.classList.remove("fa-bell");
-    notifIcon.classList.add("fa-bell-slash");
-  }
+  const notifIcons = document.querySelectorAll('.notifIcon');
+  notifIcons.forEach(icon => {
+    icon.classList.remove("fa-bell", "fa-bell-slash");
+    icon.classList.add(enabled ? "fa-bell" : "fa-bell-slash");
+
+    // אפקט קטן
+    icon.classList.add("active");
+    setTimeout(() => icon.classList.remove("active"), 300);
+  });
 }
 
 
 // ===== Init =====
 document.addEventListener("DOMContentLoaded", () => {
-
-  const notifToggle = document.getElementById("notifToggle");
-
-notifToggle?.addEventListener("click", async () => {
+  const notifToggle = document.querySelectorAll(".notifToggle");
+notifToggle.forEach(btn => {
+btn.addEventListener("click", async () => {
   if (Notification.permission === "default") {
     // רק בפעם הראשונה זה יבקש הרשאה
     await initPush();
@@ -251,24 +256,26 @@ notifToggle?.addEventListener("click", async () => {
       await unsubscribePush();
     } else {
       // אין מנוי אבל יש הרשאה → נרשום מחדש
-      await initPush();
+      await initPush(); 
     }
   } else if (Notification.permission === "denied") {
     showToast("❌ חסמת התראות. כדי לאפשר שוב, עדכן בהגדרות הדפדפן.", { type: "error" });
   }
 });
-
-  // בדיקה ראשונית: אם כבר קיים subscription
-  navigator.serviceWorker.getRegistration()
-    .then(reg => reg?.pushManager.getSubscription())
-    .then(sub => {
-      if (sub) {
-        currentSubscription = sub;
-        updateBell(true);
-      }
-    });
+})
 });
 
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const reg = await navigator.serviceWorker.getRegistration();
+    const sub = await reg?.pushManager.getSubscription();
+    currentSubscription = sub;
+    updateBell(!!sub); // true אם יש מנוי, אחרת false
+  } catch (err) {
+    console.error("שגיאה בבדיקת subscription:", err);
+    updateBell(false);
+  }
+});
 
 function showLoader() {
   if (document.getElementById("globalLoader")) {document.getElementById("globalLoader").style.display = "flex";};
@@ -285,17 +292,23 @@ async function loadMe() {
   try {
     const res = await fetch("/me");
     const data = await res.json();
+
     if (data.ok) {
       console.log("מחובר כ:", data.user.id, "תפקיד:", data.user.role);
     } else {
-      window.location.href = "/login";
+      if (!location.pathname.includes("/login") && !location.pathname.includes("/register")) {
+        window.location.href = "/login";
+      }
     }
   } catch {
-    window.location.href = "/login";
+    if (!location.pathname.includes("/login") && !location.pathname.includes("/register")) {
+      window.location.href = "/login";
+    }
   }
 }
 
 loadMe();
+
 
 
 
@@ -369,11 +382,17 @@ document.getElementById('themeToggle')?.addEventListener('click', () => {
 });
 
 
-  document.getElementById("notifToggle")?.addEventListener("click", () => {
-    const bell = document.getElementById("notifIcon");
+document.querySelectorAll(".notifToggle").forEach((btn, index) => {
+  btn.addEventListener("click", () => {
+    const bell = btn.querySelector(".notifIcon"); 
+    if (!bell) return;
+
     bell.style.animation = "bellShake 0.6s ease";
     setTimeout(() => bell.style.animation = "", 600);
   });
+});
+
+
 
 //   document.addEventListener("DOMContentLoaded", async () => {
 //   try {

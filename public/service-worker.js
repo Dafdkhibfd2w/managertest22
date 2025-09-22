@@ -1,32 +1,18 @@
-self.addEventListener("push", function (event) {
-  const data = event.data?.json() || { title: "התראה חדשה", body: "" };
+// Service Worker לפיתוח – לא שומר כלום ב־cache
+self.addEventListener("install", () => {
+  console.log("⚡ Dev SW installed – No caching.");
+  self.skipWaiting();
+});
+
+self.addEventListener("activate", event => {
+  console.log("⚡ Dev SW activated – clearing old caches.");
   event.waitUntil(
-    self.registration.showNotification(data.title, {
-      body: data.body,
-      icon: "/icons/icon-192.png"
-    })
+    caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))))
   );
+  self.clients.claim();
 });
 
-self.addEventListener("notificationclick", function (event) {
-  event.notification.close();
-  event.waitUntil(
-    clients.openWindow("/") // אפשר לשנות ל־/home או כל דף שאתה רוצה
-  );
-});
-const CACHE_NAME = "new-deli-v1";
-const urlsToCache = ["/", "/css/style.css", "/js/global.js", "/icons/icon-192.png"];
-
-self.addEventListener("install", e => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
-  );
-});
-
-self.addEventListener("fetch", e => {
-  e.respondWith(
-    caches.match(e.request).then(response => {
-      return response || fetch(e.request);
-    })
-  );
+// תמיד מביא מהשרת – בלי cache
+self.addEventListener("fetch", event => {
+  event.respondWith(fetch(event.request));
 });

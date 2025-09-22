@@ -2,7 +2,7 @@
 require('dotenv').config();
 
 const express       = require('express');
-const path          = require('path');
+const path = require("path");
 const cookieParser  = require('cookie-parser');
 const bodyParser    = require('body-parser');
 const mongoose      = require('mongoose');
@@ -38,7 +38,7 @@ function isAllowedMime(m) {
 
 // ===== App =====
 const app  = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 6000;
 app.use(cookieParser());
 
 // ===== Middlewares =====
@@ -534,20 +534,6 @@ app.post('/update-single-task', async (req, res) => {
     } else {
       list.push({ task, worker: worker || "", time: time || "" });
     }
-
-    // === הוספת ניקוד אוטומטית ===
-if (worker) {
-  const pointsMap = { daily: 1, weekly: 3, monthly: 5 };
-  const points = pointsMap[category] || 1;
-
-  // ודא ש-shift.scores קיים
-  if (!shift.scores) shift.scores = new Map();
-
-  const currentPoints = shift.scores.get(worker) || 0;
-  shift.scores.set(worker, currentPoints + points);
-} else {
-  console.log("its old")
-}
 
     await shift.save();
     res.json({ ok: true, message: "נשמר ✔", shift });
@@ -1339,50 +1325,6 @@ app.get("/user", (req, res) => {
   }
   res.json({ ok: false });
 });
-// הוספת נקודות לעובד
-app.post("/points/add", async (req, res) => {
-  try {
-    const { date, worker, amount } = req.body;
-    const shift = await Shift.findOne({ date });
-    if (!shift) return res.status(404).json({ ok: false, message: "Shift not found" });
-
-    if (!shift.scores) shift.scores = new Map();
-    const add = Number(amount || 1);
-    const cur = shift.scores.get(worker) || 0;
-    shift.scores.set(worker, cur + add);
-
-    await shift.save();
-    res.json({ ok: true, worker, points: shift.scores.get(worker) });
-  } catch (err) {
-    res.status(500).json({ ok: false, message: err.message });
-  }
-});
-
-
-// דירוג כללי (Leaderboard)
-app.get("/points/leaderboard", async (req, res) => {
-  try {
-    const shifts = await Shift.find({}); // בלי lean כדי ש-Mongoose Map יעבוד
-    const totals = {};
-
-    shifts.forEach(s => {
-      if (s.scores) {
-        s.scores.forEach((pts, name) => {
-          totals[name] = (totals[name] || 0) + (pts || 0);
-        });
-      }
-    });
-
-    const leaderboard = Object.entries(totals)
-      .map(([name, points]) => ({ name, points }))
-      .sort((a, b) => b.points - a.points);
-
-    res.json({ ok: true, leaderboard });
-  } catch (err) {
-    res.status(500).json({ ok: false, message: err.message });
-  }
-}); 
-
 
 
 
@@ -1440,7 +1382,7 @@ app.use((err, req, res, next) => {
 if (process.env.VERCEL) {
   module.exports = app; // אין app.listen ב-Vercel
 } else {
-  app.listen(PORT, () => console.log(`🚀 Server listening on :${PORT}`));
+  app.listen(8080, () => console.log(`🚀 Server listening on :8080`));
 }
 
 
