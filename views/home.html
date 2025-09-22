@@ -180,14 +180,19 @@ h1.app-title {
     <span class="brand-title">DeliFlow</span>
   </div>
 
-  <nav class="brand-nav">
-    <a href="#settings"><i class="fa-solid fa-gear"></i> הגדרות</a>
-    <a id="notifToggle" class="notifToggle"><i class="fa-solid fa-bell notifIcon"></i> התראות</a>
-    <a href="/profile"><i class="fa-solid fa-user"></i> פרופיל</a>
-  </nav>
-    <a class="burger" id="burger">&#9776;</a>
-  
+  <div class="brand-right">
+    <span class="burger" id="burger">&#9776;</span>
+
+    <div class="user-menu">
+      <img src="/icons/avatar.png" alt="User" class="avatar" id="userAvatar">
+      <div class="dropdown" id="userDropdown">
+        <a href="/profile">👤 עריכת פרופיל</a>
+        <a href="/logout" id="logoutBtn">🚪 יציאה</a>
+      </div>
+    </div>
+  </div>
 </header>
+
 
 
 <!-- התוכן שלך -->

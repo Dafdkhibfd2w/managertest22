@@ -118,7 +118,56 @@ h3 { font-size: 1.2rem; color: var(--ink-muted); }
   display: flex;
   gap: 12px;
 }
+.brand-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
 
+/* Avatar */
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid var(--btn-primary, #00ffa3);
+  object-fit: cover;
+}
+.user-menu {
+  position: relative;
+}
+
+.dropdown {
+  display: none;
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background: var(--card, #2a2a2a);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  min-width: 160px;
+  overflow: hidden;
+  z-index: 2000;
+}
+
+.dropdown a {
+  display: block;
+  padding: 10px 14px;
+  color: var(--ink, #fff);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+
+.dropdown a:hover {
+  background: var(--btn-primary, #00ffa3);
+  color: #0e0e0e;
+}
+
+/* הצגת dropdown */
+.user-menu.open .dropdown {
+  display: block;
+}
 .brand-nav a {
   display: flex;
   align-items: center;
@@ -554,31 +603,6 @@ button:not(#notifToggle,.close-btn, #burger, #userbtn):hover, .btn:hover {
   padding: 6px;
 }
 
-.dropdown {
-  position: absolute;
-  top: 36px;
-  right: 0;
-  background: #1c1c1c;
-  border: 1px solid #333;
-  border-radius: 8px;
-  min-width: 140px;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.4);
-  z-index: 999;
-  display: flex;
-  flex-direction: column;
-}
-
-.dropdown a {
-  padding: 10px;
-  color: #fff;
-  text-decoration: none;
-  transition: background 0.2s;
-}
-
-.dropdown a:hover {
-  background: #00FFA3;
-  color: #000;
-}
 
 .hidden {
   display: none;
@@ -671,9 +695,6 @@ button:not(#notifToggle,.close-btn, #burger, #userbtn):hover, .btn:hover {
 }
 
 
-/* =========================
-   SELECT DROPDOWN
-   ========================= */
 select {
   appearance: none;
   -webkit-appearance: none;
