@@ -39,8 +39,6 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: "Heebo", sans-serif;
-  margin: 0;
-  padding: 0;
 }
 
 /* ===== מיכל כללי ===== */
@@ -181,16 +179,21 @@ h1.app-title {
   </div>
 
   <div class="brand-right">
-    <span class="burger" id="burger">&#9776;</span>
-
-    <div class="user-menu">
-      <img src="/icons/avatar.png" alt="User" class="avatar" id="userAvatar">
-      <div class="dropdown" id="userDropdown">
-        <a href="/profile">👤 עריכת פרופיל</a>
-        <a href="/logout" id="logoutBtn">🚪 יציאה</a>
-      </div>
-    </div>
+<a style="font-size: 24px;" id="notifToggle" class="notifToggle mlo"><i class="fa-solid fa-bell notifIcon"></i></a>
+<div class="user-menu">
+  <img src="/icons/avatar.png" alt="User" class="avatar mlo" id="userAvatar">
+  <div class="dropdown" id="userDropdown">
+    <a href="/profile"><i class="fa-solid fa-user"></i> עריכת פרופיל</a>
+    <a href="/logout" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> יציאה</a>
   </div>
+</div>
+    <span class="burger mlo" id="burger">&#9776;</span>
+
+  </div>
+    <nav class="brand-nav">
+    <a id="notifToggle" class="notifToggle" style="cursor: pointer;"> התראות<i class="fa-solid fa-bell notifIcon"></i></a>
+    <a href="/profile"> פרופיל<i class="fa-solid fa-user"></i></a>
+  </nav>
 </header>
 
 
@@ -231,6 +234,23 @@ h1.app-title {
   </div>
   <p class="footer-tip">💡 שמרו את האתר במסך הבית כדי להשתמש בו כאפליקציה!</p>
 </div>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+  const avatar = document.getElementById("userAvatar");
+  const menu = document.querySelector(".user-menu");
+
+  avatar.addEventListener("click", (e) => {
+    e.stopPropagation();
+    menu.classList.toggle("open");
+  });
+
+  // סגירה בלחיצה מחוץ
+  window.addEventListener("click", () => {
+    menu.classList.remove("open");
+  });
+});
+
+</script>
 <script src="/js/global.js"></script>
 </body>
 </html>

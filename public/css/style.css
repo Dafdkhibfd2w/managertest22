@@ -104,15 +104,13 @@ h3 { font-size: 1.2rem; color: var(--ink-muted); }
   background: var(--accent);
   color: #000;
   font-size: 1.2rem;
-  padding: 10px 15px;
+  padding: 7px 15px;
   border-radius: 50%;
   box-shadow: 0 4px 12px rgba(0,0,0,0.4);
   z-index: 3000;
   transition: 0.2s;
 }
-.floating-home:hover {
-  background: var(--accent-hover);
-}
+
 /* ניווט */
 .brand-nav {
   display: flex;
@@ -123,40 +121,54 @@ h3 { font-size: 1.2rem; color: var(--ink-muted); }
   align-items: center;
   gap: 16px;
 }
-
+.dropdown a i {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
 /* Avatar */
 .avatar {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   cursor: pointer;
-  border: 2px solid var(--btn-primary, #00ffa3);
+  border: 2px solid var(--bg-alt, #1c1c1c);
   object-fit: cover;
+  background: #222;
+  margin-top: 5px;
+  transition: transform 0.2s ease, border-color 0.3s ease;
 }
+
 .user-menu {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .dropdown {
   display: none;
   position: absolute;
-  top: 110%;
+  top: calc(100% + 8px); /* ישר מתחת לאווטאר עם רווח קטן */
   right: 0;
-  background: var(--card, #2a2a2a);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  min-width: 160px;
+  background: var(--card, #1f1f1f);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+  min-width: 200px;
   overflow: hidden;
   z-index: 2000;
+  opacity: 0;
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
-
 .dropdown a {
-  display: block;
-  padding: 10px 14px;
-  color: var(--ink, #fff);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: var(--ink, #eee);
   text-decoration: none;
-  font-size: 0.9rem;
-  transition: background 0.2s;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: background 0.25s ease, color 0.25s ease, padding-left 0.2s;
 }
 
 .dropdown a:hover {
@@ -164,9 +176,10 @@ h3 { font-size: 1.2rem; color: var(--ink-muted); }
   color: #0e0e0e;
 }
 
-/* הצגת dropdown */
 .user-menu.open .dropdown {
   display: block;
+  opacity: 1;
+    transform: translate(50px, 3px);
 }
 .brand-nav a {
   display: flex;
@@ -212,7 +225,7 @@ h3 { font-size: 1.2rem; color: var(--ink-muted); }
 }
 
 @media (min-width: 768px){
-    .floating-home {
+    .mlo {
     display: none;
   }
 }
@@ -484,7 +497,7 @@ button:not(#notifToggle,.close-btn, #burger, #userbtn):hover, .btn:hover {
 }
 
 .close-btn {
-    background: var(--primary);
+    background: rgba(200, 58, 58, 0.653);
   border: none;
   border-radius: var(--radius);
   padding: 12px;  font-size: 1rem;
