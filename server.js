@@ -543,6 +543,46 @@ app.post('/update-single-task', async (req, res) => {
   }
 });
 
+// בקובץ server.js או איפה שיש לך את הראוטים
+const XLSX = require("xlsx");
+
+app.get("/invoices/export", async (req, res) => {
+  try {
+    const { year, month } = req.query;
+    if (!year || !month) {
+      return res.status(400).json({ ok: false, message: "חסר year או month" });
+    }
+
+    // התאמה על "YYYY-MM"
+    const regex = new RegExp(`^${year}-${month.padStart(2, "0")}`);
+
+    const items = await Invoice.find({
+      shiftDate: { $regex: regex }
+    }).lean();
+
+    const rows = items.map(r => ({
+      "תאריך": r.shiftDate || "",
+      "ספק": r.supplier || "",
+      "שם קובץ": r.originalName || "",
+      "העלה": r.uploadedBy || "",
+      "קישור": r.url || ""
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "חשבוניות");
+
+    const buf = XLSX.write(wb, { type: "buffer", bookType: "xlsx" });
+    res.setHeader("Content-Disposition", `attachment; filename=invoices_${year}_${month}.xlsx`);
+    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    res.send(buf);
+  } catch (err) {
+    console.error("שגיאה ביצוא:", err);
+    res.status(500).json({ ok: false, message: "שגיאה ביצוא" });
+  }
+});
+
+
 
 app.post('/admin-update-shift', async (req, res) => {
   try {

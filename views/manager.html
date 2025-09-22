@@ -505,7 +505,27 @@
           </div>
         </form>
       </div>
+<div class="card">
+  <h3>ייצוא חשבוניות</h3>
+  <div class="row">
+    <label>בחר חודש:</label>
+    <input type="month" id="exportMonth" />
+    <button type="button" id="exportBtn">📥 ייצא לאקסל</button>
+  </div>
+</div>
+<script>
+  document.getElementById("exportBtn").addEventListener("click", () => {
+  const monthInput = document.getElementById("exportMonth").value;
+  if (!monthInput) {
+    showToast("❌ חייב לבחור חודש!", { type: "error" });
+    return;
+  }
 
+  const [year, month] = monthInput.split("-");
+  window.location.href = `/invoices/export?year=${year}&month=${month}`;
+});
+
+</script>
       <!-- טבלה -->
       <div class="card">
         <div style="overflow:auto">
@@ -522,6 +542,7 @@
             <tbody class="tbodyInvoices"></tbody>
           </table>
         </div>
+        
 
         <div class="pager">
           <button id="prevBtnInv" class="secondary">‹ הקודם</button>

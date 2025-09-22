@@ -1,3 +1,7 @@
+::-webkit-scrollbar{
+  display: none;
+}
+
 /* =========================
    THEME: Monochrome–Neon Premium
    ========================= */
@@ -63,6 +67,21 @@ h3 { font-size: 1.2rem; color: var(--ink-muted); }
   max-width: 1000px;
   margin: auto;
   padding: 24px;
+}
+input[type="month"] {
+  background: #111;         /* רקע כהה */
+  color: #fff;              /* טקסט לבן */
+  border: 1px solid var(--btn-primary, #00ffa3);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+input[type="month"]:focus {
+  outline: none;
+  border-color: var(--accent, #ffd700);
+  box-shadow: 0 0 8px rgba(0, 255, 163, 0.6);
 }
 
 /* =========================
@@ -1541,6 +1560,17 @@ transition: 0.3s all;
   display: none;
 }
 }
+
+@media (min-width: 768px) {
+.bottom-nav {
+display: none;
+}
+.floating-home{
+  display: none;
+}
+}
+
+
     .admin-pages section.active {
       display: block;
       animation: fadeSlide 0.4s ease;
