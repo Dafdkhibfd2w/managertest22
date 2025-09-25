@@ -1335,6 +1335,7 @@ body.light {
 .fab-menu.show {
   display: flex;
   animation: fadeInUp 0.3s ease;
+  margin-bottom: 20px;
 }
 
 .fab-menu li a {
@@ -1662,7 +1663,7 @@ display: none;
 }
 }
 #fabBtn{
-  margin-bottom: 10px;
+  margin-bottom: 25px;
 }
 
     .admin-pages section.active {
