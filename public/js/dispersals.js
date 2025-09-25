@@ -35,7 +35,8 @@ async function getCsrf() {
         });
         const data = await res.json();
         if (data.ok) {
-          addMsg.textContent = 'נשמר ✔';
+          // addMsg.textContent = 'נשמר ✔';
+          showToast('נשמר ✔')
           addForm.reset();
           await loadAll(); // רענון נתונים
           applyFiltersAndRender();

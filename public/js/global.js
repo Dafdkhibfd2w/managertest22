@@ -486,3 +486,17 @@ document.querySelectorAll('.gohome').forEach((btn) => {
 
   })
 })
+
+
+
+function fixBottomNav() {
+  const nav = document.querySelector(".bottom-nav");
+  if (!nav) return;
+
+  const vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty("--vh", `${vh}px`);
+}
+
+window.addEventListener("resize", fixBottomNav);
+window.addEventListener("orientationchange", fixBottomNav);
+fixBottomNav();

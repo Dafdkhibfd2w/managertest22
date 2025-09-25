@@ -1264,16 +1264,25 @@ body.light {
    BOTTOM NAVBAR (Mobile)
    ========================= */
 /* ==== BOTTOM NAVBAR (Mobile) ==== */
-.bottom-nav{
-  position:fixed;bottom:0;left:0;right:0;height:65px;
-  background:var(--bg-alt);
-  display:flex;justify-content:space-around;align-items:center;
-  box-shadow:0 -4px 16px rgba(0,0,0,.5);
-  border-top:1px solid var(--card-border);z-index:2000;
-  transition:all .3s ease;
-  padding-bottom: env(safe-area-inset-bottom); 
-  z-index: 9500; 
-  margin-top: 20px;
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(var(--vh, 1vh) * 7); /* תמיד 7% מהגובה הנוכחי */
+
+  background: var(--bg-alt);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  box-shadow: 0 -4px 16px rgba(0,0,0,.5);
+  border-top: 1px solid var(--card-border);
+  z-index: 9500;
+
+  /* חשוב: */
+  position: fixed;
+  inset-inline: 0;
+  bottom: env(safe-area-inset-bottom, 0);
 }
 #pageContent{
   padding-bottom: 55px;
