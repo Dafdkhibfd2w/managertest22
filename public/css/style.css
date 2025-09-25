@@ -1281,7 +1281,7 @@ body.light {
   right: 0;
   bottom: 0;
   height: 65px;
-  background: var(--bg-alt);
+  background: #111;
   display: flex;
   justify-content: space-around;
       text-decoration: none;
