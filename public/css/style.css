@@ -48,6 +48,11 @@ body {
   min-height: 100vh;
   padding-top: var(--navbar-height);
 }
+body, html {
+  height: calc(var(--vh, 1vh) * 100);
+  overflow-x: hidden;
+}
+
 /* כל השדות */
 input, textarea, select {
   text-align: right;     /* הטקסט מתחיל מצד ימין */
@@ -1281,9 +1286,10 @@ body.light {
   border-top: 1px solid var(--card-border);
   z-index: 9500;
 
-  /* טריק שמאלץ אותו תמיד להישאר במסך האמיתי */
-  min-height: calc(var(--vh, 1vh) * 8);
+  /* מכבד safe-area של אייפון */
+  padding-bottom: env(safe-area-inset-bottom);
 }
+
 #pageContent{
   padding-bottom: 55px;
 }
