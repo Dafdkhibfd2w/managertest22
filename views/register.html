@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>כניסה / הרשמה</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
  <link rel="icon" href="/icons/icon-512.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
@@ -31,7 +31,7 @@
       height: 100vh;
       overflow: hidden;
     }
-    .auth-container {
+    .card {
       width: 100%;
       max-width: 420px;
       background: var(--card);
@@ -42,34 +42,7 @@
       overflow: hidden;
       animation: popIn 0.5s ease;
     }
-    .auth-tabs {
-      display: flex;
-      justify-content: space-around;
-      margin-bottom: 20px;
-    }
-    .auth-tab {
-      flex: 1;
-      text-align: center;
-      padding: 10px;
-      cursor: pointer;
-      font-weight: 600;
-      border-radius: var(--radius);
-      transition: background 0.3s, color 0.3s;
-      color: var(--ink-muted);
-    }
-    .auth-tab.active {
-      background: var(--primary);
-      color: #000;
-    }
-    form {
-      display: none;
-      flex-direction: column;
-      gap: 14px;
-      animation: fadeIn 0.4s ease;
-    }
-    form.active {
-      display: flex;
-    }
+
     input, select {
       padding: 12px 14px;
       border-radius: var(--radius);
@@ -90,9 +63,11 @@
       border-radius: var(--radius);
       padding: 12px;
       font-size: 1rem;
+      width: 100%;
       font-weight: 600;
       cursor: pointer;
       transition: background 0.2s, transform 0.2s;
+      margin-top: 25px;
     }
     button:hover {
       background: var(--primary-hover);
@@ -121,105 +96,84 @@
   </style>
 </head>
 <body>
-  <div class="auth-container">
-    <div class="auth-tabs">
-      <div class="auth-tab active" data-tab="login">כניסה</div>
-      <div class="auth-tab" data-tab="register">הרשמה</div>
+  <div class="card">
+    <h2>התחברות באימייל</h2>
+    <div class="row">
+      <label>שם מלא</label>
+      <input id="nameInput" type="text" placeholder="דוגמה: יעל כהן" />
     </div>
+    <div class="row">
+      <label>אימייל</label>
+      <input id="emailInput" type="email" placeholder="name@example.com" />
+    </div>
+    <button id="sendEmailCodeBtn" type="button">שלח קוד למייל</button>
+    <div id="codeBlock" class="row hidden">
+      <label>הכנס קוד שקיבלת</label>
+      <input id="codeInput" type="text" placeholder="6 ספרות" />
+      <button id="verifyEmailCodeBtn" type="button">אמת והתחבר</button>
+    </div>
+    <div class="muted" id="hint"></div>
+  </div>
 
-    <!-- טופס כניסה -->
-<form id="loginForm" class="active" method="POST">
-  <input type="text" id="loginUsername" name="username" placeholder="שם משתמש" required>
-  <input type="password" id="loginPassword" name="password" placeholder="סיסמא" required>
-  <button type="submit">התחבר</button>
-</form>
-
-<!-- טופס הרשמה -->
-<form id="registerForm" method="POST">
-  <input type="text" id="registerUsername" name="username" placeholder="שם משתמש" required>
-  <input type="password" id="registerPassword" name="password" placeholder="סיסמא" required>
-  <select id="registerRole" name="role">
-    <option value="user">משתמש</option>
-    <option value="manager">מנהל</option>
-    <option value="admin">אדמין</option>
-  </select>
-  <button type="submit">הרשמה</button>
-</form>
-
-  <script>
-    async function getCsrf() {
-  const res = await fetch("/csrf-token", { credentials: "include" });
-  const data = await res.json();
-  return data.csrfToken;
+  <script src="/js/ui.js"></script>
+<script>
+async function getCsrf() {
+  const r = await fetch("/csrf-token", { credentials:"include" });
+  const j = await r.json();
+  return j.csrfToken;
 }
 
-    const tabs = document.querySelectorAll(".auth-tab");
-    const forms = {
-      login: document.getElementById("loginForm"),
-      register: document.getElementById("registerForm")
-    };
+function validateEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(e||'').toLowerCase()); }
 
-    tabs.forEach(tab => {
-      tab.addEventListener("click", () => {
-        tabs.forEach(t => t.classList.remove("active"));
-        tab.classList.add("active");
-        Object.values(forms).forEach(f => f.classList.remove("active"));
-        forms[tab.dataset.tab].classList.add("active");
-      });
-    });
-  </script>
-  <script src="/js/global.js"></script>
-<script>
+const nameEl  = document.getElementById('nameInput');
+const emailEl = document.getElementById('emailInput');
+const codeEl  = document.getElementById('codeInput');
+const hintEl  = document.getElementById('hint');
+const codeBlk = document.getElementById('codeBlock');
 
-  // LOGIN
-  document.getElementById("loginForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
+document.getElementById('sendEmailCodeBtn').addEventListener('click', async (e) => {
+  e.preventDefault(); // ← עכשיו תקין
 
-    const username = document.getElementById("loginUsername").value.trim();
-    const password = document.getElementById("loginPassword").value.trim();
+  const name  = nameEl.value.trim();
+  const email = emailEl.value.trim().toLowerCase();
 
-    const res = await fetch('/login', {
-      method: 'POST',
-      credentials: "include",
-      headers: { 'Content-Type': 'application/json',"CSRF-Token": await getCsrf() },
-      body: JSON.stringify({ username, password })
-    });
+  if (!name || !validateEmail(email)) {
+    hintEl.textContent = "בדוק שם ואימייל תקינים.";
+    return;
+  }
 
-    const data = await res.json();
-    if (data.ok) {
-      localStorage.setItem('userRole', data.user.role);
-      localStorage.setItem('username', data.user.username);
-      window.location.href = "/";   // 🟢 הפניה אחרי login
-    } else {
-      showToast(data.message || "שגיאה בהתחברות", { type: "error" });
-    }
+  const res = await fetch('/auth/request-email-code', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'CSRF-Token': await getCsrf() },
+    body: JSON.stringify({ name, email })
+  });
+  const data = await res.json();
+  // hintEl.textContent = data.message || (data.ok ? "נשלח קוד" : "שגיאה");
+  showToast(data.message || (data.ok ? "נשלח קוד" : "שגיאה"))
+  if (data.ok) codeBlk.classList.remove('hidden');
+});
+
+document.getElementById('verifyEmailCodeBtn').addEventListener('click', async (e) => {
+  e.preventDefault(); // ← עכשיו תקין
+
+  const email = emailEl.value.trim().toLowerCase();
+  const code  = codeEl.value.trim();
+
+  const res = await fetch('/auth/verify-email-code', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'CSRF-Token': await getCsrf() },
+    body: JSON.stringify({ email, code }),
+    credentials: "include"   // ← חובה
   });
 
-  // REGISTER
-  document.getElementById("registerForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const username = document.getElementById("registerUsername").value.trim();
-    const password = document.getElementById("registerPassword").value.trim();
-    const role     = document.getElementById("registerRole").value;
-
-    const res = await fetch('/register', {
-      method: 'POST',
-      credentials: "include",
-      headers: { 'Content-Type': 'application/json',"CSRF-Token": await getCsrf() },
-      body: JSON.stringify({ username, password, role })
-    });
-
-    const data = await res.json();
-    if (data.ok) {
-      localStorage.setItem('userRole', data.user.role);
-      localStorage.setItem('username', data.user.username);
-      window.location.href = "/";   // 🟢 הפניה אחרי register
-    } else {
-      showToast(data.message || "שגיאה בהרשמה", { type: "error" });
-    }
-  });
+  const data = await res.json();
+  if (data.ok) {
+    hintEl.textContent = "מחובר! מעביר לדף הבית…";
+    window.location.href = "/"; // ← מפנה לעמוד הראשי
+  } else {
+    hintEl.textContent = data.message || "קוד לא תקין";
+  }
+});
 </script>
-
 </body>
 </html>

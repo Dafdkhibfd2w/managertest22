@@ -4,85 +4,7 @@ async function getCsrf() {
   const data = await res.json();
   return data.csrfToken;
 }
-(function(){
-  const ROOT_ID = 'toast-root';
 
-  function ensureRoot(){
-    let root = document.getElementById(ROOT_ID);
-    if(!root){
-      root = document.createElement('div');
-      root.id = ROOT_ID;
-      document.body.appendChild(root);
-    }
-    return root;
-  }
-
-  function pickIcon(type){
-    switch(type){
-      case 'success': return '✅';
-      case 'info':    return 'ℹ️';
-      case 'warn':    return '⚠️';
-      case 'error':   return '⛔';
-      default:        return '🔔';
-    }
-  }
-
-  window.showToast = function(msg, opts={}){
-    const {
-      type='success',
-      duration=3000,
-      icon=pickIcon(type),
-      onClose
-    } = opts;
-
-    const root = ensureRoot();
-
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.setAttribute('role','status');
-    toast.setAttribute('aria-live','polite');
-    toast.style.position = 'relative';
-
-    const title = typeof msg === 'string' ? msg : (msg.title || '');
-    const desc  = typeof msg === 'string' ? ''  : (msg.desc  || '');
-
-    toast.innerHTML = `
-      <div class="icon">${icon}</div>
-      <div class="content">
-        <div class="title">${title}</div>
-        ${desc ? `<div class="desc">${desc}</div>` : ``}
-      </div>
-      <button class="close" aria-label="סגירה">✕</button>
-      <div class="bar"><i style="animation-duration:${duration}ms"></i></div>
-    `;
-
-    const close = () => {
-      toast.style.animation = 'toastOut .2s ease both';
-      setTimeout(() => {
-        toast.remove();
-        onClose && onClose();
-      }, 180);
-    };
-
-    toast.querySelector('.close').addEventListener('click', close);
-
-    toast.addEventListener('click', (e) => {
-      if(e.target.classList.contains('close')) return;
-      close();
-    });
-
-    root.appendChild(toast);
-
-    let timer = setTimeout(close, duration);
-
-    toast.addEventListener('mouseenter', () => clearTimeout(timer));
-    toast.addEventListener('mouseleave', () => {
-      timer = setTimeout(close, 800);
-    });
-
-    return close;
-  };
-})();
 
 // ===== ניווט בסיסי =====
 const btn = document.getElementById("go-back");
@@ -290,44 +212,52 @@ function showLoader() {
   
 async function loadMe() {
   try {
-    const res = await fetch("/me");
-    const data = await res.json();
+const res = await fetch("/me", { credentials: "include" });
+    if (!res.ok) {
+if (res.status === 403) {
+  window.location.href = "/unauthorized";
+}
+      throw new Error("Server error");
+    }
 
+    const data = await res.json();
     if (data.ok) {
-      console.log("מחובר כ:", data.user.id, "תפקיד:", data.user.role);
+      console.log("מחובר כ:", data.user._id, "תפקיד:", data.user.role);
     } else {
       if (!location.pathname.includes("/login") && !location.pathname.includes("/register")) {
         window.location.href = "/login";
       }
     }
-  } catch {
+  } catch (err) {
+    console.error("שגיאה בבקשת /me:", err);
     if (!location.pathname.includes("/login") && !location.pathname.includes("/register")) {
       window.location.href = "/login";
     }
   }
 }
 
+
 loadMe();
 
 
 
 
-  async function loadUser() {
+async function loadUser() {
   try {
-    const res = await fetch("/user");
+    const res = await fetch("/me", { credentials: "include" });
     const data = await res.json();
     if (data.ok && data.user) {
       if (document.getElementById("user")) {
-      document.getElementById("user").textContent =
-        `ברוכים הבאים ${data.user.name}`
+      document.getElementById("user").textContent = `שלום ${data.user.username} (${data.user.role})`;
       }
+
     }
   } catch (err) {
     console.error("שגיאה בשליפת משתמש:", err);
   }
 }
 
-loadUser();
+document.addEventListener("DOMContentLoaded", loadUser);
 function hideLoader() {
   if (document.getElementById("globalLoader")) {document.getElementById("globalLoader").style.display = "none";}
   if (document.getElementById("pageContent")) {document.getElementById("pageContent").style.display = "block";}
@@ -394,19 +324,7 @@ document.querySelectorAll(".notifToggle").forEach((btn, index) => {
 
 
 
-//   document.addEventListener("DOMContentLoaded", async () => {
-//   try {
-//     const res = await fetch("/user");
-//     const data = await res.json();
-//     if (window.location.href === '/login') return;
-//     if (!data.ok || !data.user) {
-//       window.location.href = "/login"; // 🛑 לא מחובר → לוגין
-//     }
-//   } catch {
-//     window.location.href = "/login";
-//   }
-// });
-// כפתור Logout
+
 document.getElementById("logoutBtn")?.addEventListener("click", async (e) => {
   e.preventDefault();
   const res = await fetch("/logout", { method: "POST", headers: {"CSRF-TOKEN": await getCsrf()} });
@@ -561,6 +479,10 @@ fixNav();
 // }
 
 
-document.querySelector(".gohome")?.addEventListener("click", () => {
+
+document.querySelectorAll('.gohome').forEach((btn) => {
+  btn.addEventListener("click", () => {
     window.location.href = "/"; // אם אין היסטוריה
-});
+
+  })
+})

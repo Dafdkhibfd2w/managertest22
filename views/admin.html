@@ -329,7 +329,7 @@
   <i class="fa-solid fa-users"></i> משתמשים
 </button> -->
     
-  <button class="side_button" class="gohome" style="margin-top:auto; margin-bottom: 30px;">
+  <button class="side_button gohome" style="margin-top:auto; margin-bottom: 30px;">
     <i class="fa-solid fa-right-from-bracket"></i> חזרה לעמוד הראשי
   </button>  </div>
 
@@ -645,7 +645,6 @@
 <br>
 <div id="btn-area">
     <button type="submit">יצירת משמרת</button>
-    <button style="margin-top: 5px;" id="go-back" class="btn btn--primary">חזור אחורה</button>
 </div>
 
     <p id="status"></p>
@@ -752,22 +751,73 @@
     </div>
       </section>
 <section id="page-reports" class="admin-report">
-  <h2>📊 דוחות</h2>
+  <h2>📊 דוחות וניהול</h2>
 
   <!-- KPIs -->
   <div class="kpi-grid">
-    <div class="kpi-card"><h3 id="kpiShifts">0</h3><p>משמרות החודש</p></div>
-    <div class="kpi-card"><h3 id="kpiUsers">0</h3><p>עובדים פעילים</p></div>
-    <div class="kpi-card"><h3 id="kpiMoney">0₪</h3><p>פיזורים</p></div>
-    <div class="kpi-card"><h3 id="kpiOrders">0</h3><p>ספקים</p></div>
+    <div class="kpi-card">
+      <h3 id="kpiShifts">0</h3>
+      <p>משמרות החודש</p>
+      <small>כולל בוקר / ערב</small>
+    </div>
+    <div class="kpi-card">
+      <h3 id="kpiUsers">0</h3>
+      <p>עובדים פעילים</p>
+      <small>חודש נוכחי</small>
+    </div>
+    <div class="kpi-card">
+      <h3 id="kpiMoney">0₪</h3>
+      <p>סכום פיזורים</p>
+      <small>סה״כ הוצאות</small>
+    </div>
+    <div class="kpi-card">
+      <h3 id="kpiOrders">0</h3>
+      <p>ספקים</p>
+      <small>במערכת</small>
+    </div>
   </div>
 
   <!-- Charts -->
-  <div class="charts">
-    <canvas id="shiftsChart"></canvas>
-    <canvas id="usersChart"></canvas>
+  <!-- <div class="charts">
+    <div class="chart-card">
+      <h3>📈 סטטיסטיקת משמרות</h3>
+      <canvas id="shiftsChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>👥 סטטיסטיקת עובדים</h3>
+      <canvas id="usersChart"></canvas>
+    </div>
+  </div> -->
+
+  <!-- Export Invoices -->
+<div class="export-container">
+  <div class="card export-card">
+    <h3>📥 ייצוא חשבוניות</h3>
+    <p>בחר חודש לייצוא דוחות חשבוניות לאקסל.</p>
+    <div class="row">
+      <label for="exportMonth1">חודש:</label>
+      <input type="month" style="border: none;" id="exportMonth1" />
+    </div>
+      <button type="button" id="exportBtn" class="btn_exports">ייצא לאקסל</button>
+    <small>קובץ ה־Excel יכיל פירוט לפי תאריכים, ספקים וסכומים.</small>
   </div>
+
+
+
+<div class="card export-card">
+  <h3>📑 ייצוא פיזורים</h3>
+    <p>בחר חודש לייצוא דוחות פיזורים לאקסל.</p>
+  <div class="row">
+    <label for="exportMonth1">חודש:</label>
+    <input type="month" style="border: none;" id="exportDispersalsMonth" />
+  </div>
+      <button type="button" id="exportDispersalsBtn" class="btn_exports">📥 ייצא לאקסל</button>
+    <small>קובץ ה־Excel יכיל פירוט לפי תאריכים, ספקים וסכומים.</small>
+</div>
+</div>
+
 </section>
+
       <!-- עמוד הזמנות -->
       <section id="page-orders">
         <h2>ניהול הזמנות</h2>
@@ -836,48 +886,51 @@
 
   <script src="/js/suppliers.js" defer></script>
 <script>
-async function loadReports() {
-  const shifts = await fetch("/get-all-shifts").then(r=>r.json());
-  const users = await fetch("/users-list").then(r=>r.json());
-  const dispersals = await fetch("/dispersals").then(r=>r.json());
-  const suppliers = await fetch("/suppliers-list").then(r=>r.json());
-
-  // עדכון KPI
-  document.getElementById("kpiShifts").textContent = shifts.length;
-  document.getElementById("kpiUsers").textContent = users.users.length;
-  document.getElementById("kpiMoney").textContent = dispersals.reduce((a,b)=>a+(b.price||0),0) + "₪";
-  document.getElementById("kpiOrders").textContent = suppliers.days.length;
-
-  // גרף משמרות
-  // const ctx1 = document.getElementById("shiftsChart");
-  // new Chart(ctx1, {
-  //   type: "bar",
-  //   data: {
-  //     labels: shifts.map(s=>s.date).slice(-7),
-  //     datasets: [{
-  //       label: "מספר משמרות",
-  //       data: shifts.slice(-7).map(()=>1),
-  //       backgroundColor: "#00FFA3"
-  //     }]
-  //   }
-  // });
-
-  // // גרף עובדים (עוגה)
-  // const ctx2 = document.getElementById("usersChart");
-  // new Chart(ctx2, {
-  //   type: "pie",
-  //   data: {
-  //     labels: leaderboard.leaderboard.map(u=>u.name),
-  //     datasets: [{
-  //       data: leaderboard.leaderboard.map(u=>u.points),
-  //       backgroundColor: ["#00FFA3","#00C2FF","#FFD600","#FF3B3B","#8E44AD"]
-  //     }]
-  //   }
-  // });
+function showKpiSkeleton() {
+  document.querySelectorAll(".kpi-card h3").forEach(h3 => {
+    h3.innerHTML = `
+      <div class="skeleton skeleton-line"></div>
+      <div class="skeleton skeleton-line" style="width:60%"></div>
+    `;
+  });
 }
-loadReports();
+
+  function hideKpiSkeleton(data) {
+    // כאן ממלאים בנתונים אמיתיים מהשרת
+    document.getElementById("kpiShifts").textContent = data.shifts;
+    document.getElementById("kpiUsers").textContent = data.users;
+    document.getElementById("kpiMoney").textContent = data.money + "₪";
+    document.getElementById("kpiOrders").textContent = data.orders;
+  }
+
+  async function loadReports() {
+    // שלב 1: הפעל skeleton
+    showKpiSkeleton();
+
+    // שלב 2: מביאים נתונים
+    const shifts      = await fetch("/get-all-shifts").then(r=>r.json());
+    const users       = await fetch("/users-list").then(r=>r.json());
+    const dispersals  = await fetch("/dispersals").then(r=>r.json());
+    const suppliers   = await fetch("/suppliers-list").then(r=>r.json());
+
+    // שלב 3: מרכיבים אובייקט סיכום
+    const data = {
+      shifts: shifts.length,
+      users: users.users?.length || 0,
+      money: dispersals.reduce((sum, d) => sum + (d.price || 0), 0),
+      orders: suppliers.days?.length || 0
+    };
+
+    // שלב 4: מחליפים skeleton בנתונים
+    hideKpiSkeleton(data);
+  }
+
+  // הפעלה בהטענת העמוד
+  document.addEventListener("DOMContentLoaded", loadReports);
 </script>
+
   <script defer src="/js/admin.js"></script>
   <script defer src="/js/global.js"></script>
+  <script defer src="/js/ui.js"></script>
 </body>
 </html>

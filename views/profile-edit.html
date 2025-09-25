@@ -16,8 +16,6 @@
       <label for="username">שם משתמש</label>
       <input type="text" id="username" name="username" required>
 
-      <label for="password">סיסמה חדשה</label>
-      <input type="password" id="password" name="password">
 
 <label for="avatar">תמונת פרופיל</label>
 <input type="file" id="avatar" name="avatar" accept="image/*">
@@ -27,6 +25,7 @@
     </form>
   </div>
   <script src="/js/global.js"></script>
+  <script src="/js/ui.js"></script>
   <script>
     async function getCsrf() {
   const res = await fetch("/csrf-token", { credentials: "include" });
@@ -51,7 +50,6 @@ document.getElementById("editForm").addEventListener("submit", async (e) => {
 
   const formData = new FormData();
   formData.append("username", document.getElementById("username").value.trim());
-  formData.append("password", document.getElementById("password").value.trim());
   if (document.getElementById("avatar").files[0]) {
     formData.append("avatar", document.getElementById("avatar").files[0]);
   }

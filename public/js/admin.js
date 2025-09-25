@@ -379,9 +379,9 @@ async function loadUsers() {
         <td data-label="שם">${user.username}</td>
         <td>
           <select data-label="תפקיד" data-id="${user._id}" class="roleSelect">
-            <option value="employee" ${user.role === "employee" ? "selected" : ""}>עובד</option>
-            <option value="shiftManager" ${user.role === "shiftManager" ? "selected" : ""}>אחמ״ש</option>
-            <option value="admin" ${user.role === "admin" ? "selected" : ""}>מנהל</option>
+            <option value="user" ${user.role === "user" ? "selected" : ""}>משתמש</option>
+            <option value="admin" ${user.role === "admin" ? "selected" : ""}>אחמ"ש</option>
+            <option value="manager" ${user.role === "manager" ? "selected" : ""}>מנהל</option>
           </select>
         </td>
         <td>
@@ -447,3 +447,15 @@ async function attachRoleEvents() {
 
 // קריאה אחרי loadUsers
 loadUsers().then(attachRoleEvents);
+
+
+  document.getElementById("exportBtn").addEventListener("click", () => {
+  const monthInput = document.getElementById("exportMonth").value;
+  if (!monthInput) {
+    showToast("❌ חייב לבחור חודש!", { type: "error" });
+    return;
+  }
+
+  const [year, month] = monthInput.split("-");
+  window.location.href = `/invoices/export?year=${year}&month=${month}`;
+});

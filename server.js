@@ -10,7 +10,6 @@ const multer        = require('multer');
 const { v2: cloudinary } = require('cloudinary');
 const { connectMongoose } = require('./db');
 const bcrypt = require('bcrypt');
-
 // ===== Models =====
 const Dispersal  = require('./models/Dispersal');
 const Supplier   = require('./models/Supplier');
@@ -20,7 +19,8 @@ const Invoice    = require('./models/Invoice'); // ודא נתיב נכון אצ
 const Shift = require('./models/Shift');
 const helmet        = require('helmet');
 const rateLimit     = require('express-rate-limit');
-
+const twilio = require('twilio');
+const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 const hpp           = require('hpp');
 const cors          = require('cors');
 const { z }         = require('zod');
@@ -110,7 +110,13 @@ app.post('/upload-invoice', requireUser, upload.single('file'), async (req, res)
   }
 });
 
-
+const session = require("express-session");
+app.use(session({
+  secret: process.env.SESSION_SECRET || "secret-key",
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false } // אם תריץ ב-https תשנה ל-true
+}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public', {
@@ -134,12 +140,56 @@ app.use(helmet({
   contentSecurityPolicy: {
     useDefaults: true,
     directives: {
+      "default-src": ["'self'"],
       "img-src": ["'self'", "data:", "blob:", "*.cloudinary.com"],
-      "script-src": ["'self'", "'unsafe-inline'"],
-      "connect-src": ["'self'"]
+"script-src": [
+  "'self'",
+  "'unsafe-inline'",
+  "https://www.gstatic.com",
+  "https://www.googleapis.com",
+  "https://www.google.com",
+  "https://apis.google.com",
+  "https://www.recaptcha.net"
+],
+"connect-src": [
+  "'self'",
+  "https://www.gstatic.com",
+  "https://www.googleapis.com",
+  "https://identitytoolkit.googleapis.com",
+  "https://securetoken.googleapis.com",
+  "https://firebaseapp.com",
+  "https://*.firebaseapp.com",
+  "https://*.googleapis.com",
+  "https://www.recaptcha.net"
+],
+"frame-src": [
+  "'self'",
+  "https://www.google.com",
+  "https://www.gstatic.com",
+  "https://*.firebaseapp.com",
+  "https://www.recaptcha.net"
+]
     }
   }
 }));
+app.use((req, res, next) => {
+  res.setHeader(
+    "Content-Security-Policy",
+    "default-src 'self'; " +
+    "script-src 'self' https://cdn.jsdelivr.net https://www.gstatic.com https://www.googleapis.com https://www.google.com https://www.recaptcha.net https://apis.google.com 'unsafe-inline' 'unsafe-eval'; " +
+    "frame-src 'self' https://www.google.com https://www.recaptcha.net https://apis.google.com https://deliflow-24f13.firebaseapp.com; " +
+    "connect-src 'self' https://cdn.jsdelivr.net https://www.gstatic.com https://www.googleapis.com https://www.google.com https://www.recaptcha.net https://apis.google.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://deliflow-24f13.firebaseapp.com; " +
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; " +
+    "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
+    "img-src 'self' data:;"
+  );
+  next();
+});
+
+
+
+
+
 
 app.use(hpp());
 const authLimiter = rateLimit({
@@ -177,11 +227,8 @@ app.use((req, res, next) => {
   }
   next();
 });
-app.use((req, res, next) => {
-  res.setHeader("Content-Security-Policy", 
-    "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com;");
-  next();
-});
+
+
 // ===== MongoDB Connect =====
 // מומלץ לשים ב-.env: MONGO_URI=mongodb+srv://user:pass@cluster/dbName
 const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://aviel:aviel998898@cluster0.3po9ias.mongodb.net/';
@@ -198,17 +245,23 @@ app.use(async (req, res, next) => {
 
 
 
-
 function requireUser(req, res, next) {
   const cookie = req.cookies.user;
-  if (!cookie) return res.status(401).json({ ok:false, message:"חייב להתחבר" });
+  if (!cookie) {
+    console.log('❌ no cookie');
+    return res.redirect("/login");
+  }
   try {
     const parsed = JSON.parse(cookie);
-    if (!parsed.name) return res.status(400).json({ ok:false, message:"משתמש לא תקין" });
+    if (!parsed.id || !parsed.email) {
+      console.log('❌ bad cookie data', parsed);
+      return res.redirect("/login");
+    }
     req.user = parsed;
     next();
-  } catch {
-    return res.status(400).json({ ok:false, message:"קוקי לא תקין" });
+  } catch (err) {
+    console.log("❌ cookie parse error:", err);
+    return res.redirect("/login");
   }
 }
 
@@ -226,8 +279,33 @@ app.get("/csrf-token", (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
 });
 
+const nodemailer = require('nodemailer');
+const emailOtpStore = {}; // { "user@example.com": { code:"123456", name:"...", expires: 1234567890 } }
 
+// מיילר
 
+const mailer = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
+  },
+    tls: {
+    rejectUnauthorized: false   // ← מתעלם מבדיקת התעודה
+  },
+    debug: true,           // 🟢 הדפסות debug
+  logger: true           // 🟢 לוגים למסוף
+});
+
+// מחולל קוד
+function genCode() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// בדיקת אימייל בסיסית
+function isEmail(str) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(str||'').toLowerCase());
+}
 function normalizeTeam(team) {
   if (Array.isArray(team)) return team.map(n => String(n).trim()).filter(Boolean);
   if (typeof team === 'string') return team.split(',').map(n => n.trim()).filter(Boolean);
@@ -251,7 +329,6 @@ function upsertExecutions(targetExec, incomingExec) {
   });
 }
 
-
 function alignExecutionsByTasks(shift, executions) {
   const out = { daily: [], weekly: [], monthly: [] };
   ['daily', 'weekly', 'monthly'].forEach(cat => {
@@ -273,61 +350,21 @@ function weekdayIndexFromDateStr(yyyy_mm_dd) {
 }
 
 // ===== Views =====
-app.get('/create',requireAuth('manager'), (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'index.html'));
-});
+
 app.get('/', requireAuth(), (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'home.html'));
 });
-app.get('/manage',requireAuth(), (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'manage.html'));
-});
-app.get('/dispersals-page',requireAuth(), (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'dispersals.html'));
-});
-app.get('/orders-page',requireAuth(), (req, res) => {               // << דף ההזמנות
-  res.sendFile(path.join(__dirname, 'views', 'orders.html'));
-});
-app.get('/invoices-page',requireAuth(), (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'invoices.html'));
-});
-app.get('/test', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'test.html'));
-});
-
-
-app.get('/task', requireAuth('manager'),(req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'tasks.html'));
-});
-
-app.get('/manifest.json', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'manifest.json'));
-});
-// ===== Admin auth pages =====
-// app.get('/admin-login', (req, res) => {
-//   res.sendFile(path.join(__dirname, 'views', 'admin-login.html'));
-// });
-// app.post('/admin-login', (req, res) => {
-//   const { pin } = req.body || {};
-//   if (pin === ADMIN_PIN) {
-//     res.cookie('adminAuth', 'yes', {
-//       httpOnly: true, sameSite: 'lax', maxAge: 1000 * 60 * 60 * 8
-//     });
-//     return res.redirect('/admin');
-//   }
-//   return res.status(401).send(`
-//     <meta charset="utf-8">
-//     <div style="font-family:system-ui;direction:rtl;padding:20px">
-//       <h3>קוד שגוי</h3>
-//       <p>נסה שוב.</p>
-//       <a href="/admin">חזרה</a>
-//     </div>
-//   `);
-// });
 
 app.get('/admin', requireAuth('manager'), (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'admin.html'));
 });
+
+
+app.get('/manifest.json', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'manifest.json'));
+});
+
+
 
 // ===== Cloudinary helper =====
 function uploadToCloudinary(buffer, options) {
@@ -390,8 +427,10 @@ app.get("/profile", requireAuth(), (req, res) => {
 // ===== API: Profile Data =====
 app.get("/profile-data", requireAuth(), async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("-passwordHash");
-    if (!user) return res.status(404).json({ ok: false, message: "משתמש לא נמצא" });
+    const user = await User.findById(req.user._id).select("-passwordHash");
+    if (!user) {
+      return res.status(404).json({ ok: false, message: "משתמש לא נמצא" });
+    }
 
     res.json({ ok: true, user });
   } catch (err) {
@@ -399,6 +438,7 @@ app.get("/profile-data", requireAuth(), async (req, res) => {
     res.status(500).json({ ok: false, message: "שגיאה בשרת" });
   }
 });
+
 app.get("/profile-edit", requireAuth(), (req, res) => {
   res.sendFile(path.join(__dirname, "views", "profile-edit.html"));
 });
@@ -406,7 +446,7 @@ app.get("/profile-edit", requireAuth(), (req, res) => {
 // ===== API: Update Profile =====
 
 // API לעדכון פרופיל עם העלאת תמונה
-app.post("/profile-update", requireAuth(), upload.single("avatar"), async (req, res) => {
+app.post("/profile-update", requireUser, upload.single("avatar"), async (req, res) => {
   try {
     const { username, password } = req.body;
     const update = {};
@@ -581,6 +621,130 @@ app.get("/invoices/export", async (req, res) => {
     res.status(500).json({ ok: false, message: "שגיאה ביצוא" });
   }
 });
+app.get("/dispersals/export", async (req, res) => {
+  try {
+    const { year, month } = req.query;
+    if (!year || !month) {
+      return res.status(400).json({ ok: false, message: "חסר year או month" });
+    }
+
+    // התאמה על "YYYY-MM"
+    const regex = new RegExp(`^${year}-${month.padStart(2, "0")}`);
+
+    const items = await Dispersal.find({
+      shiftDate: { $regex: regex }
+    }).lean();
+
+    const rows = items.map(r => ({
+      "תאריך": r.shiftDate || "",
+      "מחיר": r.price || "",
+      "מונית": r.taxi || "",
+      "אנשים": Array.isArray(r.people) ? r.people.join(", ") : (r.people || ""),
+      "מי שילם": r.payer || "",
+      "הערות": r.notes || ""
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "פיזורים");
+
+    const buf = XLSX.write(wb, { type: "buffer", bookType: "xlsx" });
+    res.setHeader("Content-Disposition", `attachment; filename=dispersals_${year}_${month}.xlsx`);
+    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    res.send(buf);
+  } catch (err) {
+    console.error("שגיאה ביצוא פיזורים:", err);
+    res.status(500).json({ ok: false, message: "שגיאה ביצוא" });
+  }
+});
+
+// ===== OTP Store (בינתיים בזיכרון, אפשר להעביר ל-DB) =====
+// ===== OTP Store (בזיכרון) =====
+app.post('/auth/request-email-code', authLimiter, async (req,res)=>{
+  try {
+    const { name, email } = req.body;
+    const cleanName = String(name||'').trim();
+    const cleanEmail = String(email||'').trim().toLowerCase();
+
+    if (!cleanName || !isEmail(cleanEmail))
+      return res.status(400).json({ ok:false, message:"שם/אימייל לא תקינים" });
+
+    const code = genCode();
+    emailOtpStore[cleanEmail] = { code, name: cleanName, expires: Date.now()+5*60*1000 };
+
+    await mailer.sendMail({
+      from: `"New Deli" <${process.env.SMTP_USER}>`,
+      to: cleanEmail,
+      subject: "קוד התחברות",
+      text: `שלום ${cleanName}, הקוד שלך הוא: ${code} (תקף ל-5 דקות).`
+    });
+
+    res.json({ ok:true, message:"נשלח קוד לאימייל" });
+  } catch (err) {
+    console.error("request-email-code error:", err);
+    res.status(500).json({ ok:false, message:"שגיאה בשליחת הקוד" });
+  }
+});
+
+app.post('/auth/verify-email-code', async (req,res) => {
+  try {
+    const { email, code } = req.body;
+    const cleanEmail = String(email||'').trim().toLowerCase();
+    const rec = emailOtpStore[cleanEmail];
+
+    if (!isEmail(cleanEmail)) 
+      return res.status(400).json({ ok:false, message:"אימייל לא תקין" });
+    if (!rec) 
+      return res.status(400).json({ ok:false, message:"לא נשלח קוד" });
+    if (rec.expires < Date.now()) {
+      delete emailOtpStore[cleanEmail];
+      return res.status(400).json({ ok:false, message:"קוד פג תוקף" });
+    }
+    if (rec.code !== String(code)) 
+      return res.status(400).json({ ok:false, message:"קוד שגוי" });
+
+    // בדיקת משתמש קיים או יצירה
+    let user = await User.findOne({ email: cleanEmail });
+    if (!user) {
+      user = await User.create({ 
+        username: rec.name, 
+        email: cleanEmail, 
+        role: 'user' 
+      });
+    }
+
+    // צור טוקן עם id בלבד
+    const payload = { id: user._id.toString() };
+    const token = jwt.sign(payload, SECRET, { expiresIn: "7d" });
+
+    // שמור טוקן כ־cookie יחיד
+    res.cookie("token", token, {
+      sameSite: 'lax',
+      secure: false,   // אם תריץ ב-https תשנה ל-true
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 7
+    });
+
+    // מחק מהחנות OTP
+    delete emailOtpStore[cleanEmail];
+
+    // החזר מידע ל־frontend
+    res.json({
+      ok: true,
+      message: "מחובר!",
+      user: {
+        id: user._id,
+        username: user.username || rec.name || cleanEmail.split("@")[0],
+        email: user.email,
+        role: user.role
+      }
+    });
+  } catch (err) {
+    console.error("verify-email-code error:", err);
+    res.status(500).json({ ok:false, message:"שגיאה באימות" });
+  }
+});
+
 
 
 
@@ -717,9 +881,25 @@ app.post('/delete-runtime-note', async (req, res) => {
     return res.status(500).json({ ok: false, message: 'שגיאה בשרת' });
   }
 });
-app.get("/me", requireAuth(), (req, res) => {
-  res.json({ ok: true, user: req.user });
+app.get("/me", async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) return res.json({ ok: false });
+
+    const decoded = jwt.verify(token, SECRET);
+    const user = await User.findById(decoded.id).lean();
+
+    if (!user) return res.json({ ok: false });
+
+    res.json({ ok: true, user });
+  } catch (err) {
+    res.json({ ok: false });
+  }
 });
+
+
+
+
 
 app.post('/finalize-shift', requireUser, async (req, res) => {
   try {
@@ -813,12 +993,30 @@ app.get("/admin/users", async (req, res) => {
 app.post("/admin/update-role", async (req, res) => {
   const { userId, role } = req.body;
   try {
-    await User.findByIdAndUpdate(userId, { role });
-    res.json({ ok: true });
+    const user = await User.findByIdAndUpdate(userId, { role }, { new: true });
+
+    // הנפקת טוקן חדש
+    const payload = {
+      id: user._id.toString(),
+      username: user.username,
+      email: user.email,
+      role: user.role
+    };
+    const token = jwt.sign(payload, SECRET, { expiresIn: "7d" });
+
+    res.cookie("token", token, {
+      sameSite: 'lax',
+      secure: false,
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 7
+    });
+
+    res.json({ ok: true, user });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
   }
 });
+
 
 app.post('/orders', requireUser, async (req, res) => {
   try {
@@ -1284,73 +1482,46 @@ app.get("/logout", (req, res) => {
   res.clearCookie("user", { sameSite: "lax" });
   res.redirect("/login"); // אחרי לוגאאוט מחזיר לעמוד התחברות
 });
-const loginSchema = z.object({
-  username: z.string().min(3).max(30),
-  password: z.string().min(6).max(128)
-});
-const registerSchema = loginSchema.extend({
-  role: z.enum(['user','manager','admin']).optional()
-});
+
+// --- Register with username/password (אופציונלי)
 app.post('/register', async (req, res) => {
   try {
-    const parsed = registerSchema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ ok:false, message:"קלט לא תקין" });
+    const { username, email, name } = req.body;
 
-    let { username, password, role } = parsed.data;
-    username = username.trim().toLowerCase();
+    if (!username || !email || !name) {
+      return res.status(400).json({ ok: false, message: "חסר נתונים" });
+    }
 
-    const existing = await User.findOne({ username });
-    if (existing) return res.status(400).json({ ok:false, message:"שם משתמש כבר תפוס" });
+    const cleanUsername = username.trim().toLowerCase();
+    const cleanEmail = email.trim().toLowerCase();
 
-    const hash = await bcrypt.hash(password, 12);
-    const user = await User.create({ username, passwordHash: hash, role: role || 'user' });
+    // בדיקה אם כבר קיים משתמש עם אותו username או email
+    const existingUser = await User.findOne({
+      $or: [{ username: cleanUsername }, { email: cleanEmail }]
+    });
 
-    res.json({ ok:true, message:"נרשמת בהצלחה!", user:{ username:user.username, role:user.role } });
+    if (existingUser) {
+      return res.status(400).json({ ok: false, message: "שם משתמש או אימייל כבר בשימוש" });
+    }
+
+    const user = await User.create({
+      username: cleanUsername,
+      email: cleanEmail,
+      name: name.trim(),
+      role: "user"
+    });
+
+    res.json({
+      ok: true,
+      message: "נרשמת בהצלחה",
+      user: { id: user._id, username: user.username, email: user.email }
+    });
   } catch (err) {
     console.error("register error:", err);
-    res.status(500).json({ ok:false, message:"שגיאה בהרשמה" });
+    res.status(500).json({ ok: false, message: "שגיאה ברישום" });
   }
 });
 
-app.post('/login', async (req, res) => {
-  try {
-    const parsed = loginSchema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ ok:false, message:"קלט לא תקין" });
-
-    let { username, password } = parsed.data;
-    username = username.trim().toLowerCase();
-
-    const user = await User.findOne({ username });
-    if (!user) return res.status(400).json({ ok:false, message:"שם משתמש או סיסמה שגויים" });
-
-    const valid = await bcrypt.compare(password, user.passwordHash);
-    if (!valid) return res.status(400).json({ ok:false, message:"שם משתמש או סיסמה שגויים" });
-
-    const token = jwt.sign({ id:user._id, role:user.role }, SECRET, { expiresIn:"7d" });
-
-    res.cookie("token", token, {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: isProd,
-      maxAge: 1000 * 60 * 60 * 24 * 7
-    });
-
-    res.cookie("user", JSON.stringify({
-      id: user._id,
-      name: user.username,
-      role: user.role
-    }), {
-      sameSite: 'lax',
-      secure: isProd,
-      maxAge: 1000 * 60 * 60 * 24 * 7
-    });
-
-    res.json({ ok:true, message:"מחובר בהצלחה!", user:{ username:user.username, role:user.role } });
-  } catch (err) {
-    console.error("Login error:", err);
-    res.status(500).json({ ok:false, message:"שגיאת שרת בלוגין" });
-  }
-});
 
 
 

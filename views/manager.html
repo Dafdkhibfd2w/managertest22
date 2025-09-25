@@ -326,7 +326,7 @@
     <i class="fa-solid fa-truck"></i> הזמנות
   </a>
 
-  <button class="side_button" class="gohome" style="margin-top:auto; margin-bottom: 30px;">
+  <button class="side_button gohome" style="margin-top:auto; margin-bottom: 30px;">
     <i class="fa-solid fa-right-from-bracket"></i> חזרה לעמוד הראשי
   </button>
 </div>
@@ -505,27 +505,8 @@
           </div>
         </form>
       </div>
-<div class="card">
-  <h3>ייצוא חשבוניות</h3>
-  <div class="row">
-    <label>בחר חודש:</label>
-    <input type="month" id="exportMonth" />
-    <button type="button" id="exportBtn">📥 ייצא לאקסל</button>
-  </div>
-</div>
-<script>
-  document.getElementById("exportBtn").addEventListener("click", () => {
-  const monthInput = document.getElementById("exportMonth").value;
-  if (!monthInput) {
-    showToast("❌ חייב לבחור חודש!", { type: "error" });
-    return;
-  }
 
-  const [year, month] = monthInput.split("-");
-  window.location.href = `/invoices/export?year=${year}&month=${month}`;
-});
 
-</script>
       <!-- טבלה -->
       <div class="card">
         <div style="overflow:auto">
@@ -562,7 +543,6 @@
         <label>בחר תאריך משמרת:</label>
         <input type="date" name="date" required>
         <button type="submit" class="btn btn--primary">טען משמרת</button>
-        <button id="go-back" type="button" class="btn btn--primary">חזור אחורה</button>
         <div class="manage_btn" style="display: flex;justify-content: center;">
           <span id="leadChip" class="lead-chip" style="display:none;"></span>
           <span id="status" class="lead-chip" style="display:none;"></span>
@@ -642,5 +622,6 @@
 </nav>
 
   <script defer src="/js/global.js"></script>
+  <script defer src="/js/ui.js"></script>
 </body>
 </html>

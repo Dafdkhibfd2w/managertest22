@@ -1,28 +1,44 @@
 const jwt = require("jsonwebtoken");
-const SECRET = process.env.JWT_SECRET || "supersecret";
 const path = require("path");
+const User = require("../../models/user"); // תוודא שהנתיב נכון למודל שלך
+
+const SECRET = process.env.JWT_SECRET || "supersecret";
+
 function requireAuth(role) {
-  return (req, res, next) => {
+  return async (req, res, next) => {
     const token = req.cookies.token;
     if (!token) {
-      return res.redirect("/login"); // 🛑 אין טוקן → שולח ללוגין
+      return res.redirect("/login"); // 🛑 לא מחובר בכלל
     }
 
     try {
+      // פענוח הטוקן
       const decoded = jwt.verify(token, SECRET);
-      req.user = decoded;
 
-      // אם יש בדיקת role ספציפי
-      if (role && req.user.role !== role) {
-res.status(403).sendFile(path.join(__dirname, "..", "..", "views", "unauthorized.html"));
+      // שליפת המשתמש מה־DB לפי id
+      const user = await User.findById(decoded.id).lean();
+      if (!user) {
+        res.clearCookie("token");
+        return res.redirect("/login");
+      }
+
+      // שמור את המשתמש ב־req
+      req.user = user;
+
+      // אם דרוש role מסוים
+      if (role && user.role !== role) {
+        return res
+          .status(403)
+          .sendFile(path.join(__dirname, "..", "..", "views", "unauthorized.html"));
 
       }
 
+      // יש גישה ✅
       next();
-    } catch (e) {
-      console.error("❌ invalid token:", e.message);
+    } catch (err) {
+      console.error("❌ invalid token:", err.message);
       res.clearCookie("token");
-      res.redirect("/login");
+      return res.redirect("/login");
     }
   };
 }

@@ -60,7 +60,7 @@ document.getElementById("backBtn")?.addEventListener("click", () => {
 
     async function loadProfile() {
       try {
-        const res = await fetch("/profile-data");
+        const res = await fetch("/profile-data", { credentials: "include" });
         const data = await res.json();
         if (!data.ok) {
           window.location.href = "/login";
@@ -101,5 +101,6 @@ document.getElementById("editBtns")?.addEventListener("click", () => {
   </script>
 
   <script src="/js/global.js"></script>
+  <script src="/js/ui.js"></script>
 </body>
 </html>
