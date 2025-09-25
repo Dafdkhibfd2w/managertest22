@@ -500,3 +500,13 @@ function fixBottomNav() {
 window.addEventListener("resize", fixBottomNav);
 window.addEventListener("orientationchange", fixBottomNav);
 fixBottomNav();
+
+function setVh() {
+  // מחשבים 1vh אמיתי (בלי קשר למקלדת)
+  let vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
+}
+
+window.addEventListener('resize', setVh);
+window.addEventListener('orientationchange', setVh);
+setVh();

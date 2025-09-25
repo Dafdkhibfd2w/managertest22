@@ -1263,14 +1263,16 @@ body.light {
 /* =========================
    BOTTOM NAVBAR (Mobile)
    ========================= */
+   main, .pageContent, body {
+  padding-bottom: 80px; /* טיפה יותר מהגובה של ה-nav */
+}
 /* ==== BOTTOM NAVBAR (Mobile) ==== */
 .bottom-nav {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
-  height: calc(var(--vh, 1vh) * 7); /* תמיד 7% מהגובה הנוכחי */
-
+  height: 65px;
   background: var(--bg-alt);
   display: flex;
   justify-content: space-around;
@@ -1279,10 +1281,8 @@ body.light {
   border-top: 1px solid var(--card-border);
   z-index: 9500;
 
-  /* חשוב: */
-  position: fixed;
-  inset-inline: 0;
-  bottom: env(safe-area-inset-bottom, 0);
+  /* טריק שמאלץ אותו תמיד להישאר במסך האמיתי */
+  min-height: calc(var(--vh, 1vh) * 8);
 }
 #pageContent{
   padding-bottom: 55px;
