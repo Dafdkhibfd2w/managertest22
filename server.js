@@ -335,6 +335,34 @@ function weekdayIndexFromDateStr(yyyy_mm_dd) {
   return (wd === 0) ? 0 : wd; // כאן יוצא 0=ראשון, 1=שני, ...
 }
 
+// מושך את ההעדפות לכל העובדים לשבוע הבא
+// פונקציה שמחזירה את התאריך של יום ראשון הקרוב (שבוע הבא)
+function getNextSunday() {
+  const now = new Date();
+  const day = now.getDay(); // 0 = Sunday
+  const diff = 7 - day; // עוד כמה ימים עד יום ראשון הבא
+  const nextSunday = new Date(now);
+  nextSunday.setDate(now.getDate() + diff);
+  nextSunday.setHours(0,0,0,0);
+  return nextSunday;
+}
+
+// ===== API: שליפת העדפות =====
+app.get("/preferences/next-week", requireAuth(), async (req, res) => {
+  try {
+    const { weekStart, weekEnd } = getNextWeekRange();
+
+const submissions = await ShiftSubmission.find({
+  weekStartDate: { $gte: weekStart, $lte: weekEnd }
+}).populate("userId", "username role").lean();
+
+res.json({ ok: true, submissions, weekStart, weekEnd });
+  } catch (err) {
+    console.error("preferences error", err);
+    res.json({ ok: false, submissions: [] });
+  }
+});
+
 // ===== Views =====
 
 app.get('/', requireAuth(), (req, res) => {
@@ -343,6 +371,14 @@ app.get('/', requireAuth(), (req, res) => {
 
 app.get('/admin', requireAuth('manager'), (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'admin.html'));
+});
+
+app.get('/tem', requireAuth('manager'), (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'schedule-template.html'));
+});
+
+app.get('/submit', requireAuth(), (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'submit-shifts.html'));
 });
 
 
@@ -1234,6 +1270,278 @@ app.get("/tasks", async (req, res) => {
   }
 });
 
+const ShiftSubmission = require("./models/ShiftSubmission");
+function getNextWeekRange() {
+  const now = new Date();
+  // מוצא את יום ראשון הבא
+  const day = now.getDay();
+  const diff = 7 - day; // ימים עד ראשון הבא
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() + diff);
+  weekStart.setHours(0,0,0,0);
+
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 6);
+  weekEnd.setHours(23,59,59,999);
+
+  return { weekStart, weekEnd };
+}
+// יצירת/עדכון סידור
+// שליחת סידור
+app.post("/shift-submissions", requireAuth(), async (req, res) => {
+  try {
+    const { shifts, notes } = req.body;
+    const userId = req.user._id;
+    const username = req.user.username;
+
+    // מחשבים את תחילת השבוע הבא
+    const now = new Date();
+    const nextSunday = new Date(now);
+    nextSunday.setDate(now.getDate() + (7 - now.getDay())); // יום ראשון הבא
+    nextSunday.setHours(0,0,0,0);
+
+const { weekStart, weekEnd } = getNextWeekRange();
+
+const submission = await ShiftSubmission.findOneAndUpdate(
+  { userId: req.user._id, weekStartDate: weekStart }, // שים לב
+  { 
+    shifts, 
+    notes, 
+    username: req.user.username, 
+    weekStartDate: weekStart  // חייב להכניס למסמך
+  },
+  { upsert: true, new: true }
+);
+
+    res.json({ ok: true, submission });
+  } catch (err) {
+    console.error("submit shifts error", err);
+    res.status(500).json({ ok: false, message: "שגיאה בהגשת סידור" });
+  }
+});
+
+// קבלת ההגשה האישית לשבוע הבא
+app.get("/shift-submissions/my", requireAuth(), async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    // חישוב טווח השבוע הבא
+    const now = new Date();
+    const day = now.getDay(); // 0=ראשון
+    const weekStart = new Date(now);
+    weekStart.setDate(weekStart.getDate() - day + 7);
+    weekStart.setHours(0,0,0,0);
+
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 6);
+    weekEnd.setHours(23,59,59,999);
+
+    // חיפוש לפי userId + טווח
+    const submission = await ShiftSubmission.findOne({
+      userId,
+      weekStartDate: { $gte: weekStart, $lte: weekEnd }
+    }).lean();
+
+    res.json({ ok: true, submission });
+  } catch (err) {
+    console.error("get my shift-submission error", err);
+    res.status(500).json({ ok: false, message: "שגיאה בשרת" });
+  }
+});
+
+// שליפת סידור נוכחי למשתמש
+app.get("/shift-submissions/current", requireAuth(), async (req, res) => {
+  try {
+    const now = new Date();
+    const weekStart = new Date(now);
+    weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+    weekStart.setHours(0,0,0,0);
+
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 6);
+    weekEnd.setHours(23,59,59,999);
+
+    const sub = await ShiftSubmission.findOne({
+      userId: req.user._id,
+      weekStart: { $gte: weekStart },
+      weekEnd: { $lte: weekEnd }
+    }).lean();
+
+    res.json({ ok: true, submission: sub, weekStart, weekEnd });
+  } catch (e) {
+    res.status(500).json({ ok: false, message: "שגיאה בשליפה" });
+  }
+});
+
+app.get("/shift-submissions/next", requireAuth(), async (req, res) => {
+  try {
+    const { weekStart, weekEnd } = getNextWeekRange();
+
+    const sub = await ShiftSubmission.findOne({
+      userId: req.user._id,
+      username: req.user.username,
+      weekStart,
+      weekEnd
+    }).lean();
+
+    res.json({ ok: true, submission: sub, weekStart, weekEnd });
+  } catch (e) {
+    res.status(500).json({ ok: false, message: "שגיאה בשליפה" });
+  }
+});
+
+
+const Schedule = require("./models/Schedule");
+const {OpenAI} = require("openai");
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+app.post("/ai-schedule", async (req, res) => {
+  try {
+    const { weekStart, weekEnd } = getNextWeekRange();
+
+    // מושכים את כל ההעדפות לשבוע הבא
+    const submissions = await ShiftSubmission.find({
+      weekStartDate: { $gte: weekStart, $lte: weekEnd }
+    })
+      .populate("userId", "username role")
+      .lean();
+
+    if (!submissions.length) {
+      return res.json({ ok: false, message: "אין הגשות לשבוע הבא" });
+    }
+
+    const employees = submissions.map(s => ({
+      name: s.userId?.username || s.username || "אנונימי",
+      role: s.userId?.role || "user",
+      shifts: s.shifts,
+      notes: s.notes
+    }));
+
+const prompt = `
+אתה מחולל סידורי עבודה שבועיים.
+
+חוקים:
+1. בכל יום יש שתי משמרות: בוקר וערב.
+2. בכל משמרת אמורים להיות בדיוק 3 עובדים.
+3. לפחות אחד מהם חייב להיות עם role = "manager".
+4. מותר להשתמש **רק** בעובדים מהרשימה שניתנה לך.
+5. אם אין מספיק עובדים זמינים – תכניס "-" במקום שם. 
+6. אסור להמציא שמות חדשים.
+
+תחזיר אך ורק JSON במבנה:
+{
+  "sun": { "morning": ["...", "...", "..."], "evening": ["...", "...", "..."] },
+  "mon": { "morning": [...], "evening": [...] },
+  ...
+  "sat": { "morning": [...], "evening": [...] }
+}
+`;
+
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: "אתה מחולל סידורי עבודה. תחזיר אך ורק JSON תקין, בלי טקסט נוסף." },
+        { role: "user", content: prompt },
+        { role: "user", content: `נתוני העובדים: ${JSON.stringify(employees)}` }
+      ],
+      temperature: 0,
+      response_format: { type: "json_object" }
+    });
+
+    let text = completion.choices[0].message.content.trim();
+    if (text.startsWith("```")) {
+      text = text.replace(/```json/gi, "").replace(/```/g, "").trim();
+    }
+
+    let schedule;
+    try {
+      schedule = JSON.parse(text);
+    } catch (err) {
+      return res.json({ ok: false, message: "AI החזיר טקסט לא חוקי", raw: text });
+    }
+
+    // 🟢 שמירה למסד עם weekStart + weekEnd
+const saved = await Schedule.create({
+  weekStart,
+  weekEnd,
+  schedule
+});
+
+    res.json({ ok: true, schedule: saved.schedule, id: saved._id });
+  } catch (err) {
+    console.error("ai-schedule error:", err);
+    res.json({ ok: false, message: "שגיאה בשרת", error: String(err) });
+  }
+});
+
+
+
+app.post("/auto-schedule", async (req, res) => {
+  try {
+    const { weekStart, weekEnd } = getNextWeekRange();
+    // שליפת ההגשות
+    const submissions = await ShiftSubmission.find({
+      weekStartDate: { $gte: weekStart, $lte: weekEnd }
+    }).populate("userId", "username role").lean();
+
+    // חלוקה לפי תפקיד
+    const managers = submissions.filter(s => s.userId?.role === "manager" || s.userId?.role === "admin");
+    const employees = submissions.filter(s => s.userId?.role === "user");
+
+    const days = ["sun","mon","tue","wed","thu","fri","sat"];
+    const shifts = ["morning","evening"];
+
+    const schedule = {};
+
+    days.forEach(day => {
+      schedule[day] = {};
+      shifts.forEach(shift => {
+        // מוצאים את כל הזמינים
+        const availableManagers = managers.filter(s => s.shifts?.[day]?.includes(shift));
+        const availableEmployees = employees.filter(s => s.shifts?.[day]?.includes(shift));
+
+        // בוחרים אחד אקראי מהמנהלים + שני עובדים
+        const manager = availableManagers.length ? availableManagers[Math.floor(Math.random() * availableManagers.length)] : null;
+        const workers = availableEmployees.sort(() => 0.5 - Math.random()).slice(0, 2);
+
+        schedule[day][shift] = {
+          manager: manager ? manager.userId.username : "❌ אין אחמ״ש",
+          workers: workers.map(w => w.userId?.username || "—")
+        };
+      });
+    });
+
+    res.json({ ok: true, schedule });
+  } catch (err) {
+    console.error("auto schedule error", err);
+    res.status(500).json({ ok: false, message: "שגיאה בבניית סידור" });
+  }
+});
+async function getLastAISchedule() {
+  // מביא את הסידור האחרון שנשמר
+  const last = await Schedule.findOne().sort({ createdAt: -1 }).lean();
+  return last ? last.schedule : {};  // אם לא נמצא מחזיר אובייקט ריק
+}
+
+
+
+app.get("/schedule-preview", async (req, res) => {
+  try {
+    const schedule = await getLastAISchedule();
+    if (!schedule || !Object.keys(schedule).length) {
+      return res.json({ ok: false, message: "לא נמצא סידור" });
+    }
+    res.json({ ok: true, schedule });
+  } catch (err) {
+    console.error("schedule-preview error:", err);
+    res.status(500).json({ ok: false, message: "שגיאה בשרת" });
+  }
+});
+
+
+
 
 // יצירת משימה
 app.post("/tasks", async (req, res) => {
@@ -1456,7 +1764,9 @@ const jwt = require('jsonwebtoken');
 app.get("/login", (req, res) => {
   res.sendFile(path.join(__dirname, "views", "register.html"));
 });
-
+app.get("/ai", (req, res) => {
+  res.sendFile(path.join(__dirname, "views", "ai-schedule.html"));
+});
 app.get("/manager", (req, res) => {
   res.sendFile(path.join(__dirname, "views", "manager.html"));
 });
