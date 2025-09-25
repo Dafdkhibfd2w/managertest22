@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const InvoiceSchema = new mongoose.Schema({
-  shiftDate:   { type: String, required: true }, // YYYY-MM-DD
+  shiftDate:   { type: Date, required: true }, // YYYY-MM-DD
   supplier:    { type: String, required: true }, // שם ספק
   url:         { type: String, required: true }, // secure_url מ-Cloudinary
   publicId:    { type: String, required: true }, // למחיקה ב-Cloudinary

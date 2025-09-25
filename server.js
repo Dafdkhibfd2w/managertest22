@@ -11,6 +11,8 @@ const { v2: cloudinary } = require('cloudinary');
 const { connectMongoose } = require('./db');
 const bcrypt = require('bcrypt');
 // ===== Models =====
+const { requireAuth } = require("./public/middlewares/auth");
+
 const Dispersal  = require('./models/Dispersal');
 const Supplier   = require('./models/Supplier');
 const Task = require("./models/Task");
@@ -40,7 +42,7 @@ const PORT = process.env.PORT || 6000;
 app.use(cookieParser());
 
 // ===== Middlewares =====
-app.post('/upload-invoice', requireUser, upload.single('file'), async (req, res) => {
+app.post('/upload-invoice', requireAuth(), upload.single('file'), async (req, res) => {
   try {
     const date = (req.body?.date || '').trim();
     const supplier = (req.body?.supplier || '').trim();
@@ -187,7 +189,14 @@ app.use((req, res, next) => {
 
 
 
-
+function formatDate(dateStr) {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("he-IL", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  });
+}
 
 app.use(hpp());
 const authLimiter = rateLimit({
@@ -243,26 +252,6 @@ app.use(async (req, res, next) => {
 
 
 
-function requireUser(req, res, next) {
-  const cookie = req.cookies.user;
-  if (!cookie) {
-    console.log('❌ no cookie');
-    return res.redirect("/login");
-  }
-  try {
-    const parsed = JSON.parse(cookie);
-    if (!parsed.id || !parsed.email) {
-      console.log('❌ bad cookie data', parsed);
-      return res.redirect("/login");
-    }
-    req.user = parsed;
-    next();
-  } catch (err) {
-    console.log("❌ cookie parse error:", err);
-    return res.redirect("/login");
-  }
-}
-
 const csrfProtection = csrf({
   cookie: {
     httpOnly: true,
@@ -271,7 +260,6 @@ const csrfProtection = csrf({
   }
 });
 app.use(csrfProtection);
-const { requireAuth } = require("./public/middlewares/auth");
 // החזרת הטוקן ל-Frontend
 app.get("/csrf-token", (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
@@ -444,7 +432,7 @@ app.get("/profile-edit", requireAuth(), (req, res) => {
 // ===== API: Update Profile =====
 
 // API לעדכון פרופיל עם העלאת תמונה
-app.post("/profile-update", requireUser, upload.single("avatar"), async (req, res) => {
+app.post("/profile-update", requireAuth(), upload.single("avatar"), async (req, res) => {
   try {
     const { username, password } = req.body;
     const update = {};
@@ -502,7 +490,7 @@ app.get('/get-shift', async (req, res) => {
     res.status(500).json(null);
   }
 });
-app.post('/save-shift', requireUser, async (req, res) => {
+app.post('/save-shift', requireAuth(), async (req, res) => {
   try {
     const payload = { ...req.body };
     payload.team = normalizeTeam(payload.team);
@@ -596,10 +584,11 @@ app.get("/invoices/export", async (req, res) => {
 
     const items = await Invoice.find({
       shiftDate: { $regex: regex }
-    }).lean();
+    }).sort({ shiftDate: -1 })   // 🟢 ממיין מהתאריך הכי חדש לישן
+.lean();
 
     const rows = items.map(r => ({
-      "תאריך": r.shiftDate || "",
+      "תאריך": formatDate(r.shiftDate) || "",
       "ספק": r.supplier || "",
       "שם קובץ": r.originalName || "",
       "העלה": r.uploadedBy || "",
@@ -634,7 +623,7 @@ app.get("/dispersals/export", async (req, res) => {
     }).lean();
 
     const rows = items.map(r => ({
-      "תאריך": r.shiftDate || "",
+      "תאריך": formatDate(r.shiftDate) || "",
       "מחיר": r.price || "",
       "מונית": r.taxi || "",
       "אנשים": Array.isArray(r.people) ? r.people.join(", ") : (r.people || ""),
@@ -899,7 +888,7 @@ app.get("/me", async (req, res) => {
 
 
 
-app.post('/finalize-shift', requireUser, async (req, res) => {
+app.post('/finalize-shift', requireAuth(), async (req, res) => {
   try {
     const { date, manager, team, executions } = req.body || {};
     if (!date) return res.status(400).json({ ok: false, message: 'date חובה.' });
@@ -1016,7 +1005,7 @@ app.post("/admin/update-role", async (req, res) => {
 });
 
 
-app.post('/orders', requireUser, async (req, res) => {
+app.post('/orders', requireAuth(), async (req, res) => {
   try {
     const { date, blocks, notes } = req.body || {};
     if (!date || !Array.isArray(blocks)) {
@@ -1216,7 +1205,7 @@ app.post('/migrate-add-runtimeNotes', async (req, res) => {
     res.status(500).json({ ok:false });
   }
 });
-app.post('/suppliers', requireUser, async (req, res) => {
+app.post('/suppliers', requireAuth(), async (req, res) => {
 
   try {
     const { name, phone, days, items, active } = req.body || {};
@@ -1226,7 +1215,7 @@ app.post('/suppliers', requireUser, async (req, res) => {
       days: Array.isArray(days) ? days.map(Number) : [], // <<< חשוב
       items: Array.isArray(items) ? items.map(it => ({ name: it.name, unit: it.unit||'' })) : [],
       active: active !== undefined ? !!active : true,
-      createdBy: req.user?.name || "system"
+      createdBy: req.user?.username || "לא נמצא"
     });
 console.log("Current user:", req.user);
 
@@ -1544,7 +1533,7 @@ app.post('/dispersals', async (req, res) => {
     if (!date || !price) return res.status(400).json({ ok:false, message:'חובה תאריך ומחיר' });
 
     const doc = await Dispersal.create({
-      shiftDate: date,
+      shiftDate: new Date(date), // ← שמירה כ־Date אמיתי
       price,
       taxi: taxi || '',
       people: Array.isArray(people) ? people : String(people||'').split(',').map(x => x.trim()).filter(Boolean),
@@ -1563,9 +1552,19 @@ app.get('/dispersals', async (req, res) => {
   try {
     const { date } = req.query;
     const q = {};
-    if (date) q.shiftDate = date;
-    const items = await Dispersal.find(q).sort({ createdAt: -1 }).lean();
-    res.json(items);
+    if (date) q.shiftDate = new Date(date); // ← תמיכה בסינון לפי תאריך
+    const items = await Dispersal.find(q).sort({ shiftDate: -1 }).lean();
+
+    const formatted = items.map(i => ({
+      ...i,
+      shiftDate: new Date(i.shiftDate).toLocaleDateString("he-IL", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      })
+    }));
+
+    res.json(formatted);
   } catch (e) {
     console.error('list dispersals error', e);
     res.status(500).json([]);
@@ -1582,6 +1581,7 @@ app.delete('/dispersals/:id', async (req, res) => {
     res.status(500).json({ ok:false });
   }
 });
+
 app.use((err, req, res, next) => {
   console.error("🔥 Express Error:", err);
   res.status(500).json({ ok:false, message: "Server error", error: err.message });

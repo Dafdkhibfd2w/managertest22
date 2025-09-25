@@ -1,3 +1,11 @@
+function formatDate(dateStr) {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("he-IL", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  });
+}
 async function uploadInvoice() {
   const fileInput = document.getElementById("fileInput");
   if (!fileInput.files.length) {
@@ -10,7 +18,8 @@ async function uploadInvoice() {
 
   const res = await fetch("/upload-invoice", {
     method: "POST",
-    body: formData
+    body: formData,
+     credentials: "include"
   });
 
   const data = await res.json();
@@ -110,7 +119,7 @@ const res = await fetch('/upload-invoice', {
 
       tbodyInvoices.innerHTML = (data.items || []).map(r => `
         <tr>
-          <td data-label="תאריך">${escapeHtml(r.shiftDate || '')}</td>
+          <td data-label="תאריך">${escapeHtml(formatDate(r.shiftDate) || '')}</td>
           <td data-label="ספק">${escapeHtml(r.supplier || '')}</td>
           <td data-label="חשבונית">
             <a href="${r.url}" target="_blank" style="color: white;" title="${escapeHtml(r.originalName || '')}">צפייה בקובץ</a>

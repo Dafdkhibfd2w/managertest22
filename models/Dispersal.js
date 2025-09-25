@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const DispersalSchema = new mongoose.Schema({
-  shiftDate: { type: String, required: true },   // YYYY-MM-DD
+  shiftDate: { type: Date, required: true },   // YYYY-MM-DD
   price:     { type: Number, required: true },   // מחיר המונית
   taxi:      { type: String, default: '' },      // שם נהג/חברה
   people:    { type: [String], default: [] },    // מי נסעו
