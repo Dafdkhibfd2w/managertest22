@@ -26,9 +26,7 @@
       font-family: "Heebo", sans-serif;
       background: var(--bg);
       color: var(--ink);
-      display: flex;
       padding:0;
-      min-height: 100vh;
     }
     a{
       text-decoration: none;
@@ -310,6 +308,7 @@
 <a class="nav-btn active" href="#shifts" data-page="shifts"><i class="fa-solid fa-calendar"></i> משמרות</a>
 <a class="nav-btn" href="#notifications" data-page="notifications"><i class="fa-solid fa-bell"></i> התראות</a>
 <a class="nav-btn" href="#suppliers" data-page="suppliers"><i class="fa-solid fa-truck"></i> ספקים</a>
+<a class="nav-btn" href="#tasks" data-page="tasks"><i class="fa-solid fa-work"></i> ניהול משימות</a>
 <a class="nav-btn" href="#users" data-page="users"><i class="fa-solid fa-users"></i> משתמשים</a>
 <a class="nav-btn" href="#reports" data-page="reports"><i class="fa-solid fa-chart-column"></i> דוחות</a>
 
@@ -418,20 +417,25 @@
   border-bottom: 1px solid rgba(255,255,255,0.08);
   padding-bottom: 6px;
 }
-
-.tasks-table {
+/* עוטף טבלה - מונע חריגה */
+.table-wrapper {
   width: 100%;
-  max-width: 500px;   /* קובע מקסימום */
-  margin: 0 auto;     /* מרכז */
-  border-collapse: collapse;
+  overflow-x: auto;
 }
 
+/* עיצוב רגיל (דסקטופ) */
+.tasks-table {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  border-collapse: collapse;
+}
 
 .tasks-table th,
 .tasks-table td {
   padding: 10px 16px;
   text-align: center;
-  white-space: nowrap; /* לא לשבור שורה */
+  white-space: nowrap;
 }
 
 .tasks-table th {
@@ -448,6 +452,78 @@
   text-align: center;
   width: 80px;
 }
+
+/* 📱 גרסת מובייל */
+/* במובייל לא מציגים את ה-TH */
+@media (max-width: 768px) {
+  .tasks-table thead {
+    display: none;
+  }
+
+  .tasks-table {
+    display: block;
+    border: none;
+  }
+
+  .tasks-table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .tasks-table tr {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+
+  .tasks-table td {
+    border: none;
+    padding: 0;
+    background: none;
+  }
+
+  /* שם המשימה */
+  .tasks-table td:first-child {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    flex: 1;
+    text-align: right; /* יישור לימין */
+  }
+
+  /* כפתורים */
+  .tasks-table td.actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .tasks-table td.actions button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: var(--btn-primary, #00ff99);
+    color: #000;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+  }
+
+  .tasks-table td.actions button:hover {
+    transform: scale(1.1);
+    background: var(--btn-primary-hover, #00c2ff);
+  }
+}
+
+
 
 .delete-btn {
   background: linear-gradient(135deg, #3cb371, #2e8b57);
