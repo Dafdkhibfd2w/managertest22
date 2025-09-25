@@ -177,13 +177,7 @@
       transition: 0.3s;
     }
 
-    .bottom-nav .nav-item.active {
-      color: var(--accent);
-    }
 
-    .bottom-nav i {
-      font-size: 20px;
-    }
 #text{
   margin-right: 250px;
 }
@@ -299,17 +293,19 @@
   </style>
 </head>
 <body>
-<a href="/" class="floating-home"><i class="fa-solid fa-house"></i></a>
-<nav class="mobile-nav" id="mobileNav">
-  <ul>
-    <li><a href="/"><span class="icon">🏠</span> דף הבית</a></li>
-    <li><a href="/admin#create"><span class="icon">🗓️</span> יצירת משמרת</a></li>
-    <li><a href="/admin#tasks"><span class="icon">⚒</span> ניהול משימות</a></li>
 
-    <li><a href="/logout"><span class="icon">🚪</span> התנתקות</a></li>
+
+
+<div class="fab-container">
+  <button class="fab" id="fabBtn"><i class="fa-solid fa-plus"></i></button>
+  <ul class="fab-menu" id="fabMenu">
+    <li><a href="/"><i>🏠</i><span>דף הבית</span></a></li>
+    <li><a href="#"><i>🗓️</i><span>בהמשך</span></a></li>
+    <li><a href="/logout"><i>🚪</i><span>התנתקות</span></a></li>
   </ul>
-  <button id="closeNav" class="close-btn">✖</button> 
-</nav>
+</div>
+
+
 <div class="sidebar">
   <h2>📊 ניהול</h2>
 

@@ -1272,6 +1272,8 @@ body.light {
   padding-bottom: 80px; /* טיפה יותר מהגובה של ה-nav */
 }
 /* ==== BOTTOM NAVBAR (Mobile) ==== */
+
+    
 .bottom-nav {
   position: fixed;
   left: 0;
@@ -1281,13 +1283,84 @@ body.light {
   background: var(--bg-alt);
   display: flex;
   justify-content: space-around;
+      text-decoration: none;
+      gap: 4px;
+
   align-items: center;
   box-shadow: 0 -4px 16px rgba(0,0,0,.5);
   border-top: 1px solid var(--card-border);
   z-index: 9500;
+      transition: 0.3s;
 
   /* מכבד safe-area של אייפון */
   padding-bottom: env(safe-area-inset-bottom);
+}
+/* FAB */
+.fab-container {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  z-index: 9999;
+}
+
+.fab {
+  background: var(--accent, #00ff9d);
+  color: #111;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  font-size: 22px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.fab.open {
+  transform: rotate(45deg); /* + נהפך ל־X */
+}
+
+.fab-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  bottom: 70px;
+  right: 0;
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fab-menu.show {
+  display: flex;
+  animation: fadeInUp 0.3s ease;
+}
+
+.fab-menu li a {
+  background: rgba(40, 40, 40, 0.8);
+    backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+  color: var(--ink, #fff);
+  text-decoration: none;
+  padding: 10px 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.fab-menu li a:hover {
+  background: var(--accent, #00ff9d);
+  color: #111;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 #pageContent{
@@ -1584,11 +1657,13 @@ transition: 0.3s all;
 .bottom-nav {
 display: none;
 }
-.floating-home{
+#fabBtn{
   display: none;
 }
 }
-
+#fabBtn{
+  margin-bottom: 10px;
+}
 
     .admin-pages section.active {
       display: block;

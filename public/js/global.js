@@ -510,3 +510,11 @@ function setVh() {
 window.addEventListener('resize', setVh);
 window.addEventListener('orientationchange', setVh);
 setVh();
+
+const fabBtn = document.getElementById("fabBtn");
+const fabMenu = document.getElementById("fabMenu");
+
+fabBtn.addEventListener("click", () => {
+  fabBtn.classList.toggle("open");
+  fabMenu.classList.toggle("show");
+});
