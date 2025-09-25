@@ -1335,7 +1335,7 @@ body.light {
 .fab-menu.show {
   display: flex;
   animation: fadeInUp 0.3s ease;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 }
 
 .fab-menu li a {
