@@ -41,6 +41,8 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@capacitor/cli": "^7.4.3"
+    "@capacitor/cli": "^7.4.3",
+    "connect-livereload": "^0.6.1",
+    "livereload": "^0.10.3"
   }
 }

@@ -11,7 +11,6 @@ userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     wed: [String],
     thu: [String],
     fri: [String],
-    sat: [String],
   },
   notes: {
     sun: String,
@@ -20,7 +19,6 @@ userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     wed: String,
     thu: String,
     fri: String,
-    sat: String,
   },
 }, { timestamps: true });
 

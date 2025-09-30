@@ -2,255 +2,1072 @@
 <html lang="he" dir="rtl">
 
 <head>
-<meta charset="UTF-8" />
-
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="icon" href="/icons/icon-512.png" type="image/png">
-<link rel="apple-touch-icon" href="/icons/icon-192.png">
-
-<title>מערכת ניהול משמרות • דף הבית</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-<link rel="stylesheet" href="/css/style.css" />
-<link rel="manifest" href="/manifest.json">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="ניהול משמרות">
-<meta name="mobile-web-app-capable" content="yes">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <link rel="icon" href="/icons/icon-512.png" type="image/png">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <title>DeliFlow • דף הבית</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="/css/style.css">
 </head>
-<style>
-  /* 🎨 פלטת מונוכרום-ניאון */
-:root {
-  --bg: #0E0E0E;         /* רקע כללי */
-  --bg-alt: #1C1C1C;     /* רקע משני */
-  --ink: #FFFFFF;        /* טקסט ראשי */
-  --ink-muted: #B8B8B8;  /* טקסט משני */
-  --card: #1C1C1C;       /* רקע כרטיסים */
-  --card-border: #2A2A2A;
-  --btn-primary: #00FFA3;       /* כפתור ראשי - ירוק ניאון */
-  --btn-primary-hover: #00C2FF; /* מעבר לכחול */
-  --btn-secondary: #FFDD00;     /* כפתור משני - זהב */
-  --success: #00FFA3;
-  --error: #FF3B3B;
-  --warning: #FFD600;
-}
 
-body {
-  background: var(--bg);
-  color: var(--ink);
-  font-family: "Heebo", sans-serif;
-}
-
-/* ===== מיכל כללי ===== */
-.container {
-  max-width: 960px;
-  margin: auto;
-  padding: 24px;
-  animation: fadeIn 0.8s ease-in-out;
-}
-
-/* ===== כותרת ===== */
-h1.app-title {
-  font-size: 2.4rem;
-  color: var(--btn-primary);
-  text-align: center;
-  margin-bottom: 8px;
-  text-shadow: 0 0 12px rgba(0, 255, 163, 0.7);
-  animation: glowPulse 2s infinite alternate;
-}
-
-@keyframes glowPulse {
-  from { text-shadow: 0 0 6px rgba(0, 255, 163, 0.4); }
-  to   { text-shadow: 0 0 18px rgba(0, 255, 163, 0.9); }
-}
-
-.subtitle {
-  color: var(--ink-muted);
-  font-size: 1.2rem;
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-/* ===== גריד ===== */
-.nav-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
-}
-
-/* ===== קלפים ===== */
-.nav-card {
-  background: var(--card);
-  border: 2px solid var(--card-border);
-  border-left: 10px solid var(--btn-primary);
-  border-radius: 18px;
-  padding: 24px;
-  text-decoration: none;
-  color: var(--ink);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.6);
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border-left-color 0.3s, filter 0.3s;
-  opacity: 0;
-  animation: fadeUp 0.8s ease forwards;
-}
-
-/* stagger effect */
-.nav-card:nth-child(1) { animation-delay: 0.1s; }
-.nav-card:nth-child(2) { animation-delay: 0.2s; }
-.nav-card:nth-child(3) { animation-delay: 0.3s; }
-.nav-card:nth-child(4) { animation-delay: 0.4s; }
-.nav-card:nth-child(5) { animation-delay: 0.5s; }
-.nav-card:nth-child(6) { animation-delay: 0.6s; }
-.nav-card:nth-child(7) { animation-delay: 0.7s; }
-.nav-card:nth-child(8) { animation-delay: 0.8s; }
-
-@keyframes fadeUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to   { transform: translateY(0); opacity: 1; }
-}
-
-.nav-card:hover {
-  transform: translateY(-7px) scale(1.02);
-  box-shadow: 0 14px 28px rgba(0, 255, 163, 0.3);
-  border-left-color: var(--btn-primary-hover);
-  filter: brightness(1.05);
-}
-
-/* ===== אייקונים ===== */
-.nav-icon {
-  font-size: 30px;
-  margin-left: 10px;
-  display: inline-block;
-  transition: transform 0.3s ease;
-}
-.nav-card:hover .nav-icon {
-  transform: rotate(-8deg) scale(1.2);
-}
-
-.nav-title {
-  font-weight: 800;
-  font-size: 1.2rem;
-  margin: 6px 0 10px;
-  display: flex;
-  align-items: center;
-}
-
-.nav-desc {
-  font-size: 0.95rem;
-  color: var(--ink-muted);
-  line-height: 1.6;
-}
-#pageContent {
-  margin-top: 60px; /* אותו גובה של ה-brandbar */
-}
-/* ===== פוטר ===== */
-.footer-tip {
-  margin-top: 40px;
-  text-align: center;
-  font-size: 0.9rem;
-  color: var(--btn-secondary);
-}
-
-/* ===== Loader ===== */
-#globalLoader {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  flex-direction: column;
-  background: var(--bg);
-  color: var(--ink);
-}
-
-/* ===== אנימציות כלליות ===== */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-
-</style>
-<body class="theme-dark-premium">
-
-
-<header class="brandbar">
-  <div class="brand-left">
-    <img src="/icons/icon-512.png" alt="לוגו" class="brand-logo">
-    <span class="brand-title">DeliFlow</span>
+<body>
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-logo">🚀</div>
+    <div class="loading-text">DeliFlow</div>
+    <div class="loading-bar">
+      <div class="loading-progress"></div>
+    </div>
   </div>
 
-  <div class="brand-right">
-<a style="font-size: 24px;" id="notifToggle" class="notifToggle mlo"><i class="fa-solid fa-bell notifIcon"></i></a>
-<div class="user-menu">
-  <img src="/icons/avatar.png" alt="User" class="avatar mlo" id="userAvatar">
-  <div class="dropdown" id="userDropdown">
-    <a href="/profile"><i class="fa-solid fa-user"></i> עריכת פרופיל</a>
-    <a href="/logout" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> יציאה</a>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-container">
+      <div class="logo-section">
+        <div class="logo">DF</div>
+        <div class="brand-name">DeliFlow</div>
+      </div>
+      <div class="header-actions">
+        <div class="notification-menu">
+          <button class="notification-btn" id="notificationBtn">
+            <i class="fas fa-bell"></i>
+            <div class="notification-badge">3</div>
+          </button>
+          <div class="notifications-dropdown" id="notificationsDropdown">
+            <div class="notifications-header">
+              <i class="fas fa-bell"></i>
+              התראות
+            </div>
+            <div class="notifications-empty">
+              <div class="notifications-empty-icon">🔔</div>
+              <div class="notifications-empty-text">אין התראות חדשות</div>
+            </div>
+          </div>
+        </div>
+        <div class="user-menu">
+          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44'%3E%3Ccircle cx='22' cy='22' r='22' fill='%236366f1'/%3E%3Ctext x='22' y='28' text-anchor='middle' fill='white' font-size='16' font-weight='bold'%3E👤%3C/text%3E%3C/svg%3E" alt="User Avatar" class="user-avatar" id="userAvatar">
+          <div class="dropdown-menu" id="dropdownMenu">
+            <a href="/profile" class="dropdown-item">
+              <i class="fas fa-user"></i>
+              <span>עריכת פרופיל</span>
+            </a>
+            <a href="/settings" class="dropdown-item">
+              <i class="fas fa-cog"></i>
+              <span>הגדרות</span>
+            </a>
+            <a href="/logout" class="dropdown-item">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>יציאה</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+<main class="main">
+  <section id="home" class="page-section active" data-section="home">
+  <section class="hero-section">
+    <h1 class="hero-title">Welcome To DeliFlow</h1> 
+    <p class="hero-subtitle">פלטפורמת ניהול מתקדמת לעסקים - כל הכלים שאתם צריכים במקום אחד</p> 
+     </section> <div class="container">
+      <div class="cards-grid"> <a href="/admin" class="feature-card"> 
+        <div class="card-header"> <div class="card-icon"> 
+          <i class="fas fa-chart-line"></i> 
+        </div> 
+        <div> 
+          <div class="card-title">ארכיון / דשבורד מנהל</div> 
+        </div> 
+      </div> 
+      <div class="card-description">
+         דשבורד מנהלים מרכזי – צפו ונהלו את כל המידע: דוחות מפורטים, ניהול משתמשים, מעקב ביצועים וכלי ניהול מתקדמים. כל הנתונים החשובים במקום אחד. 
+        </div> 
+    </a> <a href="/manager" class="feature-card"> 
+      <div class="card-header"> <div class="card-icon"> 
+        <i class="fas fa-tasks"></i> 
+      </div> 
+      <div> 
+        <div class="card-title">ניהול משימות יומי</div> 
+      </div> 
+    </div> 
+    <div class="card-description">
+      כל הכלים לאחמ״ש במקום אחד – חשבוניות, פיזורים, ניהול משמרות והזמנות יומיות. ממשק פשוט ונוח לניהול השוטף והיעיל של הסניף. 
+    </div>
+   </a> 
+  </div> 
+</div>
+</section>
+
+  <!-- הגשת סידור -->
+  <section id="sendshift" class="page-section" data-section="sendshift">
+  <h2>הגשת זמינות לשבוע הבא 🗓️</h2>
+  <p id="weekRange"></p>
+<form id="submitShiftsForm">
+
+  <!-- ראשון -->
+  <div class="day-card">
+    <h3>ראשון</h3>
+    <div class="shift-options">
+      <div class="option">
+        <label class="option-label">🌅 בוקר</label>
+        <label class="switch">
+          <input type="checkbox" name="sun[]" value="morning">
+          <span class="slider"></span>
+        </label>
+      </div>
+          <div class="option">
+      <label class="option-label">🌤️ אמצע</label>
+      <label class="switch">
+        <input type="checkbox" name="sun[]" value="mid">
+        <span class="slider"></span>
+      </label>
+    </div>
+      <div class="option">
+        <label class="option-label">🌙 ערב</label>
+        <label class="switch">
+          <input type="checkbox" name="sun[]" value="evening">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+    <textarea name="note_sun" placeholder="הערות ליום ראשון..."></textarea>
   </div>
+
+  <!-- שני -->
+  <div class="day-card">
+    <h3>שני</h3>
+    <div class="shift-options">
+      <div class="option">
+        <label class="option-label">🌅 בוקר</label>
+        <label class="switch">
+          <input type="checkbox" name="mon[]" value="morning">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="option">
+        <label class="option-label">🌙 ערב</label>
+        <label class="switch">
+          <input type="checkbox" name="mon[]" value="evening">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+    <textarea name="note_mon" placeholder="הערות ליום שני..."></textarea>
+  </div>
+
+  <!-- שלישי -->
+  <div class="day-card">
+    <h3>שלישי</h3>
+    <div class="shift-options">
+      <div class="option">
+        <label class="option-label">🌅 בוקר</label>
+        <label class="switch">
+          <input type="checkbox" name="tue[]" value="morning">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="option">
+        <label class="option-label">🌙 ערב</label>
+        <label class="switch">
+          <input type="checkbox" name="tue[]" value="evening">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+    <textarea name="note_tue" placeholder="הערות ליום שלישי..."></textarea>
+  </div>
+
+  <!-- רביעי -->
+  <div class="day-card">
+    <h3>רביעי</h3>
+    <div class="shift-options">
+      <div class="option">
+        <label class="option-label">🌅 בוקר</label>
+        <label class="switch">
+          <input type="checkbox" name="wed[]" value="morning">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="option">
+        <label class="option-label">🌙 ערב</label>
+        <label class="switch">
+          <input type="checkbox" name="wed[]" value="evening">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+    <textarea name="note_wed" placeholder="הערות ליום רביעי..."></textarea>
+  </div>
+
+  <!-- חמישי -->
+  <div class="day-card">
+    <h3>חמישי</h3>
+    <div class="shift-options">
+      <div class="option">
+        <label class="option-label">🌅 בוקר</label>
+        <label class="switch">
+          <input type="checkbox" name="thu[]" value="morning">
+          <span class="slider"></span>
+        </label>
+      </div>
+          <div class="option">
+      <label class="option-label">🌤️ אמצע</label>
+      <label class="switch">
+        <input type="checkbox" name="thu[]" value="mid">
+        <span class="slider"></span>
+      </label>
+    </div>
+      <div class="option">
+        <label class="option-label">🌙 ערב</label>
+        <label class="switch">
+          <input type="checkbox" name="thu[]" value="evening">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+    <textarea name="note_thu" placeholder="הערות ליום חמישי..."></textarea>
+  </div>
+  <div class="day-card">
+    <h3>שישי</h3>
+    <div class="shift-options">
+      <div class="option">
+        <label class="option-label">🌅 בוקר</label>
+        <label class="switch">
+          <input type="checkbox" name="fri[]" value="morning">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="option">
+        <label class="option-label">🌙 ערב</label>
+        <label class="switch">
+          <input type="checkbox" name="fri[]" value="evening">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+    <textarea name="note_fri" placeholder="הערות ליום שישי..."></textarea>
+  </div>
+  <button type="submit" class="submit-btn">📤 שלח סידור</button>
+</form>
+  </section>
+
+  <!-- תצוגת סידור -->
+  <section id="schedule" class="page-section" data-section="schedule">
+  <h2>📅 סידור שבועי</h2>
+  <div class="table-wrapper">
+  <table class="table-schedule" id="scheduleTable">
+    <thead>
+      <tr>
+        <th>יום</th>
+        <th>בוקר</th>
+        <th>אמצע</th>
+        <th>ערב</th>
+      </tr>
+    </thead>
+    <tbody id="scheduleBody">
+      <tr><td colspan="4">טוען...</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+<div class="ai-explanation">
+  <h3>הסבר על החלוקה</h3>
+  <p id="aiExplanation"></p>
 </div>
 
+  </section>
+
+  <!-- משמרות -->
+  <section id="manage" class="page-section" data-section="manage">
+    <div class="page-container">
+    <div class="container">
+      <h1>ניהול משימות המשמרת</h1>
+
+      <form id="loadManageForm">
+        <label>בחר תאריך משמרת:</label>
+        <input type="date" name="date" required>
+        <button type="submit" class="btn btn--primary">טען משמרת</button>
+        <div class="manage_btn" style="display: flex;justify-content: center;">
+          <span id="leadChip" class="lead-chip" style="display:none;"></span>
+          <span id="status" class="lead-chip" style="display:none;"></span>
+          <span id="createdByChip" class="lead-chip" style="display:none;"></span>
+        </div>
+      </form>
+      <div id="shiftSection" style="display:none;">
+        <h2>משימות</h2>
+        <form id="updateForm">
+          <div id="categories"></div>
+        </form>
+
+        <section id="runtimeNotesSection">
+          <h3>הערות בזמן המשמרת</h3>
+          <ul id="runtimeNotesList"></ul>
+          <br>
+          <div class="controls-row">
+            <input type="text" id="runtimeNoteText" placeholder="לדוגמה: נגמר החומר של הפלטה">
+            <button type="button" id="addRuntimeNoteBtn">➕</button>
+          </div>
+
+          <section id="managerNoteSection" class="manager-note-box">
+            <h3>הערות למשמרת</h3>
+            <p id="managerNote"></p>
+          </section>
+        </section>
+
+        <div class="controls-row">
+<button id="saveUpdates" class="action-btn">שמור ביצועים</button>
+<button id="finalizeBtn" class="action-btn">סיום משמרת</button>
+        </div>
+
+        <p id="saveStatus" class="subtitle"></p>
+      </div>
+    </div>
+    </div>
+
+
+    <div id="finalizeModal" class="modal" style="display:none">
+      <div class="modal-content">
+        <h2>סיכום משמרת לאישור אחמ״ש</h2>
+        <div id="finalizeSummary" class="section"></div>
+        <li>
+          <span>הערות למשמרת:</span>
+          <span id="managerNotes"></span>
+        </li>
+        <div class="modal-actions">
+          <button type="button" class="btn btn--primary" id="confirmFinalize">אישור וסגירת יום</button>
+          <button type="button" class="btn btn--ghost" id="cancelFinalize">סגור</button>
+        </div>
+        <p id="finalizeStatus" class="subtitle"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- חשבוניות -->
+  <section id="invoices" class="page-section" data-section="invoices">
+    <div class="page-container">
+      <h1>חשבוניות</h1>
+
+      <!-- העלאה -->
+      <div class="card">
+        <form id="uploadInvoicesForm" enctype="multipart/form-data">
+          <div class="row">
+            <div>
+              <label>תאריך משמרת</label>
+              <input type="date" name="date" required />
+            </div>
+            <div>
+              <label>שם ספק</label>
+              <input type="text" name="supplier" placeholder="לדוגמה: סופר-דרינק בע״מ" required />
+            </div>
+            <label>קובץ חשבונית (תמונה / PDF)</label>
+            <div class="file-upload">
+<input type="file" id="fileInput" name="file" accept="image/*,application/pdf" style="display:none">
+<button type="button" id="fileBtn">בחר קובץ</button>
+
+              <span id="fileName">לא נבחר קובץ</span>
+            </div>
+            <div style="margin-top: 20px;">
+              <button type="submit">העלה חשבונית</button>
+            </div>
+          </div>
+          <p class="muted" id="uploadMsg"></p>
+        </form>
+      </div>
+
+      <!-- חיפוש/סינון -->
+      <div class="card">
+        <form id="filterInvoicesForm">
+          <div class="row">
+            <div>
+              <label>חפש לפי תאריך</label>
+              <input type="date" name="date" />
+            </div>
+            <div>
+              <label>חפש לפי ספק</label>
+              <input type="text" name="supplier" placeholder="שם ספק" />
+            </div>
+          </div>
+          <div class="row buttons">
+            <button type="submit" class="secondary">סנן</button>
+            <button type="button" id="clearInvoicesFilters" class="secondary">נקה</button>
+          </div>
+        </form>
+      </div>
+
+
+      <!-- טבלה -->
+      <div class="card">
+        <div style="overflow:auto">
+          <table id="tbl">
+            <thead>
+              <tr>
+                <th>תאריך</th>
+                <th>ספק</th>
+                <th>חשבונית</th>
+                <th>העלה</th>
+                <th style="width:160px">פעולות</th>
+              </tr>
+            </thead>
+            <tbody class="tbodyInvoices"></tbody>
+          </table>
+        </div>
+        
+
+        <div class="pager">
+          <button id="prevBtnInv" class="secondary">‹ הקודם</button>
+          <span class="muted" id="pageInfoInv"></span>
+          <button id="nextBtnInv" class="secondary">הבא ›</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- פיזורים -->
+<section id="dispersals" class="page-section" data-section="dispersals">
+  <div class="page-container">
+    <h1>פיזורים 🚕</h1>
+
+    <div class="card summary">
+      <span class="chip">סה״כ מוצג: <b id="sumShown">0</b> ₪</span>
+      <span class="chip">כמות רשומות: <b id="countShown">0</b></span>
+      <span class="muted">טיפ: אפשר לסנן לפי תאריך, נהג או שם של מישהו שנסע.</span>
+    </div>
+
+    <div class="card">
+      <form id="addForm">
+        <div class="row">
+          <div>
+            <label>תאריך משמרת</label>
+            <input type="date" name="date" required />
+          </div>
+          <div>
+            <label>מחיר מונית (₪)</label>
+            <input type="number" name="price" min="0" step="1" placeholder="לדוגמה: 55" required />
+          </div>
+          <div>
+            <label>נהג / חברה</label>
+            <input type="text" name="taxi" placeholder="לדוגמה: אבי / Gett" />
+          </div>
+        </div>
+        <div class="row" style="grid-template-columns: 1fr 1fr;">
+          <div>
+            <label>מי שילם</label>
+            <input type="text" name="payer" placeholder="לדוגמה: הקופה / עומר" />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="primary">שמור פיזור</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- כרטיס סינון -->
+    <div class="card">
+      <form id="filterForm">
+        <div class="row">
+          <div>
+            <label>סינון לפי תאריך</label>
+            <input type="date" name="date" />
+          </div>
+          <div>
+            <label>חיפוש לפי נהג</label>
+            <input type="text" name="q" placeholder="הקלד שם נהג" />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="secondary">סנן</button>
+          <button type="button" id="clearFilters" class="secondary">נקה</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- כרטיס טבלה -->
+    <div class="card">
+      <div>
+        <table id="tblD">
+          <thead>
+            <tr>
+              <th class="nowrap">תאריך</th>
+              <th class="nowrap">מחיר</th>
+              <th>נהג / חברה</th>
+              <th>שילם</th>
+              <th class="nowrap">פעולות</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="pager">
+        <button id="prevBtn" class="secondary">‹ הקודם</button>
+        <span class="muted" id="pageInfo"></span>
+        <button id="nextBtn" class="secondary">הבא ›</button>
+      </div>
+    </div>
   </div>
-    <nav class="brand-nav">
-    <a id="notifToggle" class="notifToggle" style="cursor: pointer;"> התראות<i class="fa-solid fa-bell notifIcon"></i></a>
-    <a href="/profile"> פרופיל<i class="fa-solid fa-user"></i></a>
-  </nav>
-</header>
+</section>
 
 
 
-<!-- התוכן שלך -->
-<nav class="mobile-nav" id="mobileNav">
-  <ul>
-    <li><a href="/"><span class="icon">🏠</span> דף הבית</a></li>
-    <li><a href="/create"><span class="icon">🗓️</span> יצירת משמרת</a></li>
-    <li><a href="/manage"><span class="icon">✅</span> ניהול משמרת</a></li>
-    <li><a href="/admin"><span class="icon">📚</span> ארכיון / דשבורד מנהל</a></li>
-    <li><a href="/invoices-page"><span class="icon">🧾</span> חשבוניות</a></li>
-    <li><a href="/suppliers-page"><span class="icon">🏷️</span> ספקים</a></li>
-    <li><a href="/orders-page"><span class="icon">📦</span> הזמנות</a></li>
-    <li><a href="/dispersals-page"><span class="icon">🚕</span> פיזורים</a></li>
-    <li><a href="/logout"><span class="icon">🚪</span> התנתקות</a></li>
-  </ul>
-  <button id="closeNav" class="close-btn">✖</button> 
+  <!-- הזמנות -->
+  <section id="orders" class="page-section" data-section="orders">
+    <div class="page-container">
+      <h1>הזמנות יומיות</h1>
+      <div class="card">
+        <form id="loadOrdersform" class="row">
+          <div>
+            <label>תאריך</label>
+            <input type="date" name="date" id="dateInput" required>
+            <small id="weekdayHint" class="muted" style="margin-inline-start:8px"></small>
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <button type="submit">טען / צור טופס</button>
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <button type="button" id="saveBtn">שמור</button>
+          </div>
+        </form>
+        <p class="muted" id="msg"></p>
+      </div>
+      <div id="suppliersWrap"></div>
+    </div>
+  </section>
+
+  <!-- בניית סידור -->
+  <section id="build-shift" class="page-section" data-section="build-shift">
+    <h1>📅 בניית סידור</h1>
+    <p>בניית סידור עבודה חדש.</p>
+  </section>
+
+  <!-- ניהול משתמשים -->
+  <section id="users" class="page-section" data-section="users">
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>תמונה</th>
+                <th>שם</th>
+                <th>תפקיד</th>
+                <th>פעולות</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <!-- Will be populated by JS -->
+            </tbody>
+          </table>
+        </div>
+  </section>
+
+  <!-- ספקים -->
+  <section id="suppliers" class="page-section" data-section="suppliers">
+    <div class="page-container">
+      <h1>ניהול ספקים</h1>
+
+      <!-- טופס הוספה/עריכה -->
+      <div class="section">
+        <h3 id="formTitle" style="color: var(--muted);">הוסף ספק</h3>
+        <form id="supplierForm">
+          <div class="modal-grid">
+            <div style="display: grid;">
+              <label for="name">שם ספק</label>
+              <input type="text" id="name" name="name" required />
+            </div>
+            <div style="display: grid;">
+
+              <label for="phone">טלפון (לא חובה)</label>
+              <input type="text" id="phone" name="phone" placeholder="050-0000000" />
+            </div>
+          </div>
+
+          <div class="section">
+            <label>ימי פעילות</label>
+            <div class="task-tabs">
+              <label class="check-label">
+                <input type="checkbox" class="day styled-checkbox" value="0">
+                <span class="day-text">א'</span>
+              </label>
+              <label class="check-label">
+                <input type="checkbox" class="day styled-checkbox" value="1">
+                <span class="day-text">ב'</span>
+              </label>
+              <label class="check-label">
+                <input type="checkbox" class="day styled-checkbox" value="2">
+                <span class="day-text">ג'</span>
+              </label>
+              <label class="check-label">
+                <input type="checkbox" class="day styled-checkbox" value="3">
+                <span class="day-text">ד'</span>
+              </label>
+              <label class="check-label">
+                <input type="checkbox" class="day styled-checkbox" value="4">
+                <span class="day-text">ה'</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="section">
+            <label>מוצרים</label>
+            <div class="items-grid" id="itemsGrid" style="display: grid; gap: 12px;"></div>
+            <button type="button" id="addItem" class="secondary">הוסף מוצר</button>
+          </div>
+
+          <div class="modal-actions">
+            <button type="submit" class="btn save">שמור</button>
+            <button type="button" id="resetForm" class="btn cancel">נקה טופס</button>
+          </div>
+          <p class="muted" id="msg"></p>
+        </form>
+      </div>
+
+      <!-- טבלת ספקים -->
+      <div class="card">
+        <h3 style="margin:0">ספקים</h3>
+        <div>
+          <table id="tblSu">
+            <thead>
+              <tr>
+                <th>שם</th>
+                <th>טלפון</th>
+                <th>ימים</th>
+                <th>מוצרים</th>
+                <th>הועלה</th>
+                <th>פעולות</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <p class="muted">שינויי ספקים ישפיעו על יצירת טופס הזמנות חדש ליום רלוונטי.</p>
+    </div>
+  </section>
+
+  <!-- שליחת התראות -->
+  <section id="notifications" class="page-section" data-section="notifications">
+    <h1>🔔 שליחת התראות</h1>
+    <p>כאן המנהל שולח התראות.</p>
+  </section>
+
+  <!-- הגדרות -->
+  <section id="settings" class="page-section" data-section="settings">
+    <h1>⚙️ הגדרות</h1>
+    <p>ניהול הגדרות מערכת.</p>
+  </section>
+</main>
+
+    <!-- <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-content">
+        <div class="footer-section company-info">
+          <div class="company-logo">DF</div>
+          <h3 class="company-name">DeliFlow</h3>
+          <p class="company-description">
+            פלטפורמת ניהול מתקדמת לעסקים - כל הכלים שאתם צריכים למקום אחד לניהול יעיל ומקצועי
+          </p>
+          <div class="social-links">
+            <a href="#" class="social-link">
+              <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="#" class="social-link">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="#" class="social-link">
+              <i class="fab fa-instagram"></i>
+            </a>
+            <a href="#" class="social-link">
+              <i class="fab fa-linkedin-in"></i>
+            </a>
+            <a href="#" class="social-link">
+              <i class="fab fa-whatsapp"></i>
+            </a>
+          </div>
+        </div>
+        <div class="footer-section">
+          <h4 class="footer-title">קישורים מהירים</h4>
+          <ul class="footer-list">
+            <li><a href="#" class="footer-link"><i class="fas fa-home"></i>דף הבית</a></li>
+            <li><a href="#" class="footer-link"><i class="fas fa-info-circle"></i>אודות</a></li>
+            <li><a href="#" class="footer-link"><i class="fas fa-cog"></i>שירותים</a></li>
+            <li><a href="#" class="footer-link"><i class="fas fa-phone"></i>צור קשר</a></li>
+            <li><a href="#" class="footer-link"><i class="fas fa-blog"></i>בלוג</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4 class="footer-title">תמיכה ועזרה</h4>
+          <ul class="footer-list">
+            <li><a href="#" class="footer-link"><i class="fas fa-question-circle"></i>שאלות נפוצות</a></li>
+            <li><a href="#" class="footer-link"><i class="fas fa-headset"></i>תמיכה טכנית</a></li>
+            <li><a href="#" class="footer-link"><i class="fas fa-book"></i>מדריכים</a></li>
+            <li><a href="#" class="footer-link"><i class="fas fa-video"></i>הדרכות וידאו</a></li>
+            <li><a href="#" class="footer-link"><i class="fas fa-envelope"></i>פנו אלינו</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4 class="footer-title">מידע משפטי</h4>
+          <ul class="footer-list">
+            <li><a href="#" class="footer-link"><i class="fas fa-file-contract"></i>תנאי שימוש</a></li>
+            <li><a href="#" class="footer-link"><i class="fas fa-shield-alt"></i>מדיניות פרטיות</a></li>
+            <li><a href="#" class="footer-link"><i class="fas fa-cookie-bite"></i>מדיניות עוגיות</a></li>
+            <li><a href="#" class="footer-link"><i class="fas fa-balance-scale"></i>הודעה משפטית</a></li>
+            <li><a href="#" class="footer-link"><i class="fas fa-certificate"></i>תעודות ורישיונות</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div class="copyright">
+          © 2025 DeliFlow. כל הזכויות שמורות.
+        </div>
+        <div class="credits">
+          <div class="credit-item">
+            <i class="fas fa-code"></i>
+            <span>פותח על ידי Claude & OpenAI</span>
+          </div>
+          <div class="credit-item">
+            <i class="fas fa-paint-brush"></i>
+            <span>עוצב עם אהבה</span>
+          </div>
+          <div class="credit-item">
+            <i class="fas fa-rocket"></i>
+            <span>בנוי בישראל</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer> -->
+<nav class="bottom-nav">
+  <div class="bottom-nav-container">
+    <!-- בית -->
+    <a href="#home" class="bottom-nav-item active">
+      <i class="fas fa-home bottom-nav-icon"></i>
+      <span class="bottom-nav-label">בית</span>
+    </a>
+
+    <!-- הגשת סידור -->
+    <a href="#sendshift" class="bottom-nav-item">
+      <i class="fas fa-calendar-plus bottom-nav-icon"></i>
+      <span class="bottom-nav-label">הגשת סידור</span>
+    </a>
+
+    <!-- תצוגת סידור -->
+    <a href="#schedule" class="bottom-nav-item">
+      <i class="fas fa-calendar-alt bottom-nav-icon"></i>
+      <span class="bottom-nav-label">תצוגת סידור</span>
+    </a>
+
+    <!-- תפריט – יוצג רק לאחמ״ש/מנהל -->
+    <div class="bottom-nav-item bottom-nav-more" id="menuBtn" style="display:none;">
+      <i class="fas fa-bars bottom-nav-icon"></i>
+      <span class="bottom-nav-label">תפריט</span>
+      <div class="more-menu" id="menuDropdown"></div>
+    </div>
+
+    <!-- הגדרות -->
+    <a href="#settings" class="bottom-nav-item">
+      <i class="fas fa-cog bottom-nav-icon"></i>
+      <span class="bottom-nav-label">הגדרות</span>
+    </a>
+  </div>
 </nav>
-<div class="container" style="margin-top: 75px;">
-  <h1 class="app-title" id="user">ברוכים הבאים</h1>
-  <p class="subtitle">בחרו פעולה כדי להתחיל 👇</p>
- <div class="nav-grid">
-<a href="/admin" class="nav-card">
-  <div class="nav-title"><span class="nav-icon">📚</span> ארכיון / דשבורד מנהל</div>
-  <div class="nav-desc">
-    דשבורד מנהלים מרכזי – צפו ונהלו את כל המידע: דוחות, משתמשים, מעקב ביצועים, 
-    וכלי ניהול מתקדמים עבור ההנהלה.
-  </div>
-</a>
-<a href="/manager" class="nav-card">
-  <div class="nav-title"><span class="nav-icon">⚒</span> ניהול משימות</div>
-  <div class="nav-desc">
-    כל הכלים לאחמ״ש במקום אחד – חשבוניות, פיזורים, ניהול משמרות והזמנות יומיות. 
-    פשוט ונוח לניהול השוטף של הסניף.
-  </div>
-</a>
-  </div>
-  <p class="footer-tip">💡 שמרו את האתר במסך הבית כדי להשתמש בו כאפליקציה!</p>
-</div>
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-  const avatar = document.getElementById("userAvatar");
-  const menu = document.querySelector(".user-menu");
 
-  avatar.addEventListener("click", (e) => {
+  <script>
+
+  // אפשר: "employee", "admin", "manager"
+
+let userRole = null;
+  async function loadUserRole() {
+  try {
+const res = await fetch("/me", { credentials: "include" });
+    if (!res.ok) {
+if (res.status === 403) {
+  window.location.href = "/unauthorized";
+}
+      throw new Error("Server error");
+    }
+
+    const data = await res.json();
+    if (data.ok) {
+      console.log("מחובר כ:", data.user._id, "תפקיד:", data.user.role);
+      userRole = data.user.role;
+      initMenu(userRole);
+    } else {
+        window.location.href = "/login";
+       userRole = 'employee';
+      initMenu(userRole);
+    }
+  } catch (err) {
+    console.error("שגיאה בבקשת /me:", err);
+}
+
+  }
+
+function initMenu(role) {
+  const menuBtn = document.getElementById("menuBtn");
+  const menuDropdown = document.getElementById("menuDropdown");
+
+  const roleMenus = {
+    admin: [
+      { href: "#manage", icon: "fas fa-calendar-day", label: "משמרות" },
+      { href: "#invoices", icon: "fas fa-file-invoice", label: "חשבוניות" },
+      { href: "#dispersals", icon: "fas fa-taxi", label: "פיזורים" },
+      { href: "#orders", icon: "fas fa-truck", label: "הזמנות" },
+    ],
+    manager: [
+      { href: "#manage", icon: "fas fa-calendar-day", label: "משמרות" },
+      { href: "#invoices", icon: "fas fa-file-invoice", label: "חשבוניות" },
+      { href: "#dispersals", icon: "fas fa-taxi", label: "פיזורים" },
+      { href: "#orders", icon: "fas fa-truck", label: "הזמנות" },
+      { href: "#build-shift", icon: "fas fa-calendar-check", label: "בניית סידור" },
+      { href: "#users", icon: "fas fa-users", label: "ניהול משתמשים" },
+      { href: "#suppliers", icon: "fas fa-industry", label: "ספקים" },
+      { href: "#notifications", icon: "fas fa-bell", label: "שליחת התראות" },
+    ],
+    employee: [] // עובדים לא צריכים תפריט נוסף
+  };
+
+  if (roleMenus[role]) {
+    menuBtn.style.display = "flex";
+    menuDropdown.innerHTML = roleMenus[role]
+      .map(item => `
+        <a href="${item.href}" class="more-menu-item">
+          <i class="${item.icon}"></i>
+          <span>${item.label}</span>
+        </a>
+      `)
+      .join("");
+  }
+}
+
+// להריץ אחרי טעינת הדף
+document.addEventListener("DOMContentLoaded", loadUserRole);
+  // פתיחה/סגירה
+  menuBtn.addEventListener("click", (e) => {
     e.stopPropagation();
-    menu.classList.toggle("open");
+    menuDropdown.classList.toggle("active");
   });
 
-  // סגירה בלחיצה מחוץ
-  window.addEventListener("click", () => {
-    menu.classList.remove("open");
+  document.addEventListener("click", (e) => {
+    if (!menuBtn.contains(e.target)) {
+      menuDropdown.classList.remove("active");
+    }
   });
-});
 
+    // Remove loading screen after animation
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        if (loadingOverlay) {
+          loadingOverlay.remove();
+        }
+      }, 3000);
+    });
+
+    // Dropdown menu functionality
+ document.addEventListener('DOMContentLoaded', () => {
+      const userAvatar = document.getElementById('userAvatar');
+      const dropdownMenu = document.getElementById('dropdownMenu');
+      const notificationBtn = document.getElementById('notificationBtn');
+      const notificationsDropdown = document.getElementById('notificationsDropdown');
+      const moreBtn = document.getElementById('moreBtn');
+      const moreMenu = document.getElementById('moreMenu');
+      
+      // User menu toggle
+      userAvatar.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdownMenu.classList.toggle('active');
+        // Close notifications if open
+        notificationsDropdown.classList.remove('active');
+        // Close more menu if open
+        if (moreMenu) moreMenu.classList.remove('active');
+      });
+
+      // Notifications menu toggle
+      notificationBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        notificationsDropdown.classList.toggle('active');
+        // Close user menu if open
+        dropdownMenu.classList.remove('active');
+        // Close more menu if open
+        if (moreMenu) moreMenu.classList.remove('active');
+      });
+
+      // More menu toggle (bottom nav)
+      if (moreBtn && moreMenu) {
+        moreBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          moreMenu.classList.toggle('active');
+          // Close other dropdowns
+          dropdownMenu.classList.remove('active');
+          notificationsDropdown.classList.remove('active');
+        });
+      }
+
+      // Close dropdowns when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!dropdownMenu.contains(e.target) && !userAvatar.contains(e.target)) {
+          dropdownMenu.classList.remove('active');
+        }
+        if (!notificationsDropdown.contains(e.target) && !notificationBtn.contains(e.target)) {
+          notificationsDropdown.classList.remove('active');
+        }
+        if (moreMenu && !moreMenu.contains(e.target) && !moreBtn.contains(e.target)) {
+          moreMenu.classList.remove('active');
+        }
+      });
+
+      const featureCards = document.querySelectorAll('.feature-card');
+      featureCards.forEach(card => {
+        card.addEventListener('click', (e) => {
+          e.preventDefault();
+          card.style.transform = 'translateY(-8px) scale(0.98)';
+          setTimeout(() => {
+            card.style.transform = '';
+            // Navigate to the href after animation
+            window.location.href = card.href;
+          }, 200);
+        });
+      });
+
+      });
+
+    // Add parallax effect on scroll
+    window.addEventListener('scroll', () => {
+      const scrolled = window.pageYOffset;
+      const parallax = document.querySelector('.hero-section');
+      const speed = scrolled * 0.5;
+      parallax.style.transform = `translateY(${speed}px)`;
+    });
+
+    // Add intersection observer for animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, observerOptions);
+
+    // Observe elements for scroll animations
+//     document.addEventListener('DOMContentLoaded', () => {
+//       const animatedElements = document.querySelectorAll('.feature-card, .footer-tip');
+//       animatedElements.forEach(el => {
+//         observer.observe(el);
+//       });
+//     });
+// const sections = document.querySelectorAll('.page-section');
+// const navItems = document.querySelectorAll('.bottom-nav-item, .more-menu-item');
+// function showSection(id) {
+//   sections.forEach(sec => sec.classList.remove('active'));
+//   const active = document.getElementById(id);
+//   if (active) active.classList.add('active');
+// }
+// navItems.forEach(item => {
+//   item.addEventListener('click', (e) => {
+//     e.preventDefault();
+//     navItems.forEach(nav => nav.classList.remove('active'));
+//     item.classList.add('active');
+//     const href = item.getAttribute('href').replace('#','');
+//     if (href) {
+//       showSection(href);
+//     }
+//   });
+// });
+  </script>
+<script>
+  // --- Router: Section Navigation (bottom-nav + more-menu) ---
+  (function(){
+    const sections = [...document.querySelectorAll('.page-section')];
+
+    function setActiveTab(id){
+      // הדגשת כפתורי תפריט תחתון
+      document.querySelectorAll('.bottom-nav-item').forEach(a=>{
+        const target = (a.getAttribute('href')||'').replace('#','');
+        a.classList.toggle('active', target === id);
+      });
+      // הדגשת פריטי ה-More (אם קיימים)
+      document.querySelectorAll('.more-menu-item').forEach(a=>{
+        const target = (a.getAttribute('href')||'').replace('#','');
+        a.classList.toggle('active', target === id);
+      });
+    }
+
+    function showSection(id){
+      sections.forEach(s=>s.classList.remove('active'));
+      const el = document.getElementById(id);
+      if (el){
+        el.classList.add('active');
+        window.scrollTo({top: 0, behavior: 'smooth'});
+        setActiveTab(id);
+      }
+    }
+
+    // ניווט לפי hash
+    function routeFromHash(){
+      const id = location.hash.replace('#','') || 'home';
+      showSection(id);
+    }
+    window.addEventListener('hashchange', routeFromHash);
+
+    // חיבור קליקים דינמי (גם למה שנוצר מאוחר יותר)
+    document.addEventListener('click', (e)=>{
+      const a = e.target.closest('a[href^="#"]');
+      if (!a) return;
+      const id = a.getAttribute('href').replace('#','');
+      if (!id) return;
+      e.preventDefault();
+      history.replaceState(null,'','#'+id);
+      showSection(id);
+
+      // סגור more-menu אם פתוח
+      const menuDropdown = document.getElementById('menuDropdown');
+      menuDropdown?.classList.remove('active');
+    });
+
+    // טעינה ראשונית
+    document.addEventListener('DOMContentLoaded', routeFromHash);
+  })();
 </script>
-<script src="/js/global.js"></script>
-<script src="/js/ui.js"></script>
+<script>
+  // Parallax (safe)
+  (function(){
+    const parallax = document.querySelector('.hero-section');
+    if (!parallax) return;
+    window.addEventListener('scroll', ()=>{
+      const speed = window.pageYOffset * 0.5;
+      parallax.style.transform = `translateY(${speed}px)`;
+    }, {passive:true});
+  })();
+</script>
+<script>
+  (function(){
+    const nav = document.querySelector('.bottom-nav');
+    if (!nav || !window.visualViewport) return;
+
+    function adjust(){
+      // כשמקלדת פתוחה, נוסיף padding לתחתית התוכן
+      const vh = window.visualViewport.height;
+      const h  = window.innerHeight;
+      const keyboardOpen = vh < h - 80; // סף פשוט
+      document.body.classList.toggle('kb-open', keyboardOpen);
+    }
+    visualViewport.addEventListener('resize', adjust);
+    visualViewport.addEventListener('scroll', adjust);
+    adjust();
+  })();
+</script>
+
+  <script src="/js/all.js"></script>
 </body>
 </html>

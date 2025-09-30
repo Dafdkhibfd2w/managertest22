@@ -266,7 +266,7 @@ app.get("/csrf-token", (req, res) => {
 });
 
 const nodemailer = require('nodemailer');
-const emailOtpStore = {}; // { "user@example.com": { code:"123456", name:"...", expires: 1234567890 } }
+const emailOtpStore = {};
 
 // מיילר
 
@@ -373,13 +373,6 @@ app.get('/admin', requireAuth('manager'), (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'admin.html'));
 });
 
-app.get('/tem', requireAuth('manager'), (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'schedule-template.html'));
-});
-
-app.get('/submit', requireAuth(), (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'submit-shifts.html'));
-});
 
 
 app.get('/manifest.json', (req, res) => {
@@ -1396,6 +1389,42 @@ const {OpenAI} = require("openai");
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+function cleanSchedule(schedule, employees) {
+  const validNames = new Set(employees.map(e => e.name));
+  const days = Object.keys(schedule);
+
+  days.forEach(day => {
+    const shifts = schedule[day];
+    const usedToday = new Set();
+
+    ["morning", "mid", "evening"].forEach(shift => {
+      if (!Array.isArray(shifts[shift])) return;
+
+      const seen = new Set();
+      shifts[shift] = shifts[shift].map(name => {
+        if (!name || name === "-") return "-";
+
+        // 🟢 אם השם לא קיים ברשימת העובדים – מחליפים ל "-"
+        if (!validNames.has(name)) return "-";
+
+        // כפילויות במשמרת / ביום
+        if (seen.has(name) || usedToday.has(name)) return "-";
+
+        seen.add(name);
+        usedToday.add(name);
+        return name;
+      });
+
+      // בדיוק 3 ערכים
+      while (shifts[shift].length < 3) shifts[shift].push("-");
+      if (shifts[shift].length > 3) shifts[shift] = shifts[shift].slice(0, 3);
+    });
+  });
+
+  return schedule;
+}
+
+
 app.post("/ai-schedule", async (req, res) => {
   try {
     const { weekStart, weekEnd } = getNextWeekRange();
@@ -1422,21 +1451,32 @@ const prompt = `
 אתה מחולל סידורי עבודה שבועיים.
 
 חוקים:
-1. בכל יום יש שתי משמרות: בוקר וערב.
-2. בכל משמרת אמורים להיות בדיוק 3 עובדים.
-3. לפחות אחד מהם חייב להיות עם role = "manager".
-4. מותר להשתמש **רק** בעובדים מהרשימה שניתנה לך.
-5. אם אין מספיק עובדים זמינים – תכניס "-" במקום שם. 
-6. אסור להמציא שמות חדשים.
-
-תחזיר אך ורק JSON במבנה:
+1. בכל יום יש שלוש משמרות: בוקר, אמצע, וערב.
+2. בכל משמרת צריכים להיות בדיוק 3 ערכים במערך.
+3. לפחות אחד בכל משמרת חייב להיות עובד עם role = "admin".
+4. אסור לחזור על אותו עובד פעמיים באותה משמרת. 
+5. אסור לחזור על אותו עובד פעמיים באותו יום (אם עובד כבר שובץ ביום מסוים – אל תכניס אותו למשמרת נוספת באותו יום).
+6. נסה לחלק את העובדים באופן שוויוני לאורך השבוע – שלא יהיו אותם עובדים בכל יום ובכל משמרת.
+7. אם אין מספיק עובדים → אל תמציא שמות חדשים (כמו admin1, admin2 וכו').
+   תחתוך עם "-" עד שיש שלושה ערכים. 
+   דוגמה חוקית: ["אבי", "-", "-"].
+   דוגמה לא חוקית: ["admin1","admin2","admin3"] אם הם לא קיימים ברשימה.
+8. מותר להשתמש **רק** בעובדים מהרשימה שאספק לך. 
+9. "אמצע" קיימת רק בימים ראשון וחמישי. בשאר הימים תחזיר מערך ריק [].
+החזרה תהיה אך ורק JSON תקין, במבנה:
 {
-  "sun": { "morning": ["...", "...", "..."], "evening": ["...", "...", "..."] },
-  "mon": { "morning": [...], "evening": [...] },
-  ...
-  "sat": { "morning": [...], "evening": [...] }
+  "sun": { "morning": ["...", "...", "..."], "mid": ["...", "...", "..."], "evening": ["...", "...", "..."] },
+  "mon": { "morning": ["...", "...", "..."], "mid": [], "evening": ["...", "...", "..."] },
 }
+
+רשימת העובדים הזמינים:
+${JSON.stringify(employees, null, 2)}
+
+שבוע שמתחיל בתאריך: ${weekStart}
 `;
+
+
+
 
 
     const completion = await openai.chat.completions.create({
@@ -1455,13 +1495,13 @@ const prompt = `
       text = text.replace(/```json/gi, "").replace(/```/g, "").trim();
     }
 
-    let schedule;
-    try {
-      schedule = JSON.parse(text);
-    } catch (err) {
-      return res.json({ ok: false, message: "AI החזיר טקסט לא חוקי", raw: text });
-    }
-
+let schedule;
+try {
+  schedule = JSON.parse(text);
+} catch (err) {
+  return res.json({ ok: false, message: "AI החזיר טקסט לא חוקי", raw: text });
+}
+schedule = cleanSchedule(schedule, employees);
     // 🟢 שמירה למסד עם weekStart + weekEnd
 const saved = await Schedule.create({
   weekStart,
@@ -1469,7 +1509,7 @@ const saved = await Schedule.create({
   schedule
 });
 
-    res.json({ ok: true, schedule: saved.schedule, id: saved._id });
+res.json({ ok: true, schedule: saved.schedule, id: saved._id });
   } catch (err) {
     console.error("ai-schedule error:", err);
     res.json({ ok: false, message: "שגיאה בשרת", error: String(err) });
@@ -1490,7 +1530,7 @@ app.post("/auto-schedule", async (req, res) => {
     const managers = submissions.filter(s => s.userId?.role === "manager" || s.userId?.role === "admin");
     const employees = submissions.filter(s => s.userId?.role === "user");
 
-    const days = ["sun","mon","tue","wed","thu","fri","sat"];
+    const days = ["sun","mon","tue","wed","thu","fri"];
     const shifts = ["morning","evening"];
 
     const schedule = {};
