@@ -183,8 +183,6 @@ app.use(helmet({
         "*.cloudinary.com",
         "https:",
       ],
-
-      // CSS/פונטים
       styleSrc: [
         "'self'",
         "'unsafe-inline'",
