@@ -149,7 +149,9 @@ app.use(helmet({
   "https://www.googleapis.com",
   "https://www.google.com",
   "https://apis.google.com",
-  "https://www.recaptcha.net"
+  "https://www.recaptcha.net",
+  "https://vercel.live", 
+  "https://*.vercel.live"
 ],
 "connect-src": [
   "'self'",
@@ -160,15 +162,41 @@ app.use(helmet({
   "https://firebaseapp.com",
   "https://*.firebaseapp.com",
   "https://*.googleapis.com",
-  "https://www.recaptcha.net"
+  "https://www.recaptcha.net",
+    "https://vercel.live",
+    "https://*.vercel.live",
+    "wss://vercel.live",
+    "wss://*.vercel.live",
 ],
 "frame-src": [
   "'self'",
   "https://www.google.com",
   "https://www.gstatic.com",
   "https://*.firebaseapp.com",
-  "https://www.recaptcha.net"
-]
+  "https://www.recaptcha.net",
+  "https://vercel.live", "https://*.vercel.live"
+],
+      imgSrc: [
+        "'self'",
+        "data:",
+        "blob:",
+        "*.cloudinary.com",
+        "https:",
+      ],
+
+      // CSS/פונטים
+      styleSrc: [
+        "'self'",
+        "'unsafe-inline'",
+        "https://fonts.googleapis.com",
+        "https://cdnjs.cloudflare.com",
+      ],
+      fontSrc: [
+        "'self'",
+        "https://fonts.gstatic.com",
+        "https://cdnjs.cloudflare.com",
+        "data:",
+      ],
     }
   }
 }));
