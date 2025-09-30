@@ -150,8 +150,7 @@ app.use(helmet({
   "https://www.google.com",
   "https://apis.google.com",
   "https://www.recaptcha.net",
-  "https://vercel.live", 
-  "https://*.vercel.live"
+  "https://vercel.live", "https://*.vercel.live"
 ],
 "connect-src": [
   "'self'",
@@ -163,10 +162,10 @@ app.use(helmet({
   "https://*.firebaseapp.com",
   "https://*.googleapis.com",
   "https://www.recaptcha.net",
-    "https://vercel.live",
-    "https://*.vercel.live",
-    "wss://vercel.live",
-    "wss://*.vercel.live",
+  "https://vercel.live",
+  "https://*.vercel.live",
+  "wss://vercel.live",
+  "wss://*.vercel.live",
 ],
 "frame-src": [
   "'self'",
@@ -175,26 +174,7 @@ app.use(helmet({
   "https://*.firebaseapp.com",
   "https://www.recaptcha.net",
   "https://vercel.live", "https://*.vercel.live"
-],
-      imgSrc: [
-        "'self'",
-        "data:",
-        "blob:",
-        "*.cloudinary.com",
-        "https:",
-      ],
-      styleSrc: [
-        "'self'",
-        "'unsafe-inline'",
-        "https://fonts.googleapis.com",
-        "https://cdnjs.cloudflare.com",
-      ],
-      fontSrc: [
-        "'self'",
-        "https://fonts.gstatic.com",
-        "https://cdnjs.cloudflare.com",
-        "data:",
-      ],
+]
     }
   }
 }));
@@ -202,18 +182,15 @@ app.use((req, res, next) => {
   res.setHeader(
     "Content-Security-Policy",
     "default-src 'self'; " +
-    "script-src 'self' https://cdn.jsdelivr.net https://www.gstatic.com https://www.googleapis.com https://www.google.com https://www.recaptcha.net https://apis.google.com 'unsafe-inline' 'unsafe-eval'; " +
-    "frame-src 'self' https://www.google.com https://www.recaptcha.net https://apis.google.com https://deliflow-24f13.firebaseapp.com; " +
-    "connect-src 'self' https://cdn.jsdelivr.net https://www.gstatic.com https://www.googleapis.com https://www.google.com https://www.recaptcha.net https://apis.google.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://deliflow-24f13.firebaseapp.com; " +
+    "script-src 'self' https://cdn.jsdelivr.net https://vercel.live https://*.vercel.live https://www.gstatic.com https://www.googleapis.com https://www.google.com https://www.recaptcha.net https://apis.google.com 'unsafe-inline' 'unsafe-eval'; " +
+    "frame-src 'self' https://www.google.com https://www.recaptcha.net https://apis.google.com https://deliflow-24f13.firebaseapp.com https://vercel.live, https://*.vercel.live;" +
+    "connect-src 'self' https://cdn.jsdelivr.net https://www.gstatic.com https://vercel.live https://*.vercel.live wss://*.vercel.live wss://vercel.live https://www.googleapis.com https://www.google.com https://www.recaptcha.net https://apis.google.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://deliflow-24f13.firebaseapp.com; " +
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; " +
     "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
     "img-src 'self' data:;"
   );
   next();
 });
-
-
-
 
 function formatDate(dateStr) {
   const d = new Date(dateStr);
