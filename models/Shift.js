@@ -1,6 +1,9 @@
+const tenantPlugin = require('./plugins/tenantPlugin');
 const mongoose = require("mongoose");
 
 const ExecutionSchema = new mongoose.Schema({
+
+  tenant: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: true, index: true },
   task:   { type: String, required: true },
   worker: { type: String, default: "" },
   time:   { type: String, default: "" },
@@ -45,4 +48,5 @@ createdBy: { type: String, default: "" },
   closedBy:  { type: String, default: "" }, // 🟢 מי סגר
 }, { timestamps: true });
 
+ExecutionSchema.plugin(tenantPlugin);
 module.exports = mongoose.model("Shift", ShiftSchema);

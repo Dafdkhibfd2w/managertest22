@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const path = require("path");
-const User = require("../../models/user"); // תוודא שהנתיב נכון למודל שלך
+const User = require("../../models/user");
+const { setTenantContext } = require("./tenantContext"); // תוודא שהנתיב נכון למודל שלך
 const SECRET = process.env.JWT_SECRET || "supersecret";
 function requireAuth(role) {
   return async (req, res, next) => {
@@ -16,6 +17,7 @@ function requireAuth(role) {
         return res.redirect("/login");
       }
       req.user = user;
+      if (user && user.activeTenant) setTenantContext(user.activeTenant);
       if (role && user.role !== role) {
         return res
           .status(403)

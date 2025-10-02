@@ -1,6 +1,8 @@
+const tenantPlugin = require('./plugins/tenantPlugin');
 const mongoose = require('mongoose');
 
 const InvoiceSchema = new mongoose.Schema({
+  tenant: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: true, index: true },
   shiftDate:   { type: Date, required: true }, // YYYY-MM-DD
   supplier:    { type: String, required: true }, // שם ספק
   url:         { type: String, required: true }, // secure_url מ-Cloudinary
@@ -16,4 +18,5 @@ const InvoiceSchema = new mongoose.Schema({
 
 InvoiceSchema.index({ shiftDate: 1, supplier: 1, createdAt: -1 });
 
+InvoiceSchema.plugin(tenantPlugin);
 module.exports = mongoose.model('Invoice', InvoiceSchema);

@@ -1,6 +1,8 @@
+const tenantPlugin = require('./plugins/tenantPlugin');
 const mongoose = require('mongoose');
 
 const ItemLineSchema = new mongoose.Schema({
+  tenant: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: true, index: true },
   name:        { type: String, required: true }, // שם המוצר (לדוגמה "טבעות בצל")
   unit:        { type: String, default: '' },    // קרטון / ארגז...
   currentQty:  { type: Number, default: 0 },     // כמה יש כרגע
@@ -22,4 +24,5 @@ const DailyOrderSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
+ItemLineSchema.plugin(tenantPlugin);
 module.exports = mongoose.model('DailyOrder', DailyOrderSchema);

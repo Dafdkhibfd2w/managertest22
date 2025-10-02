@@ -1,6 +1,9 @@
+const tenantPlugin = require('./plugins/tenantPlugin');
 const mongoose = require('mongoose');
 
 const SupplierSchema = new mongoose.Schema({
+
+  tenant: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: true, index: true },
   name:  { type: String, required: true, unique: true },
   phone: { type: String, default: '' },
 
@@ -15,4 +18,5 @@ const SupplierSchema = new mongoose.Schema({
   active: { type: Boolean, default: true }
 }, { timestamps: true });
 
+SupplierSchema.plugin(tenantPlugin);
 module.exports = mongoose.model('Supplier', SupplierSchema);
