@@ -111,6 +111,7 @@ const res = await fetch("/shift-submissions", {
 });
 const data = await res.json();
   showToast(data.message || (data.ok ? "✅ הסידור נשלח!" : "❌ שגיאה בשליחה"));
+  
 });
 async function loadMySubmission() {
   try {
@@ -1518,8 +1519,8 @@ loadUsers().then(attachRoleEvents);
           <td data-label="מוצרים">${(s.items||[]).map(it => escapeHtml(it.name)).join(', ')}</td>
           <td data-label="הועלה">${escapeHtml(s.createdBy || 'לא ידוע')}</td>
           <td class="actions">
-            <button style="width:100px;" class="secondary editBtn" data-id="${s._id}">ערוך</button>
-            <button style="width:100px;" class="danger delBtn" data-id="${s._id}">מחק</button>
+            <button class="secondary editBtn" data-id="${s._id}">ערוך</button>
+            <button class="danger delBtn" data-id="${s._id}">מחק</button>
           </td>
         </tr>
       `).join('');
@@ -1560,3 +1561,273 @@ loadUsers().then(attachRoleEvents);
 
     // init
     resetForm(); loadSuppliers();
+
+
+      const notifForm = document.getElementById("notifForm");
+  notifForm?.addEventListener("submit", async e => {
+    e.preventDefault();
+    const notifMessage = document.getElementById("notifMessage").value;
+    const notifStatus = document.getElementById("notifStatus");
+    showToast('⏳ שולח...');
+
+    const res = await fetch("/send-notification", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json", "CSRF-Token": await getCsrf() },
+      body: JSON.stringify({ message: notifMessage })
+    });
+    const data = await res.json();
+    showToast(
+(data.ok ? "נשלח בהצלחה!" : "שגיאה"),
+  data.ok ? "success" : "error"
+);
+  });
+
+
+  
+// ===== Push Notifications =====
+function urlBase64ToUint8Array(base64String) {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const rawData = atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
+let currentSubscription = null;
+
+async function initPush() {
+  try {
+    if (!("serviceWorker" in navigator)) {
+      showToast('❌ הדפדפן לא תומך ב-Service Worker', { type:'error' });
+      return;
+    }
+    const reg = await navigator.serviceWorker.register("/service-worker.js");
+
+    showToast('📩 מבקש הרשאה...',);
+    const permission = await Notification.requestPermission();
+    if (permission !== "granted") return;
+    currentSubscription = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(
+        "BGEYruudNkeNhSyxPmrvHjnvUFnFe3Ca2KmA6IZU6UJU7_fJvVldk4qd90nNil_i_HRR6dY02I_j8oD6hS-4U0E"
+      )
+    });
+console.log(currentSubscription)
+    await fetch("/save-subscription", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "CSRF-Token": await getCsrf() },
+      body: JSON.stringify(currentSubscription)
+    });
+
+    showToast('✅ התראות הופעלו בהצלחה!', 'success');
+    updateBell(true);
+
+  } catch (err) {
+    console.error("שגיאה בהרשמה ל-Push:", err);
+    showToast("❌ שגיאה: " + err.message, { type:'error' });
+  }
+}
+
+async function unsubscribePush() {
+  try {
+    const reg = await navigator.serviceWorker.getRegistration();
+    if (!reg) return;
+    const sub = await reg.pushManager.getSubscription();
+    if (sub) {
+      await sub.unsubscribe();
+      currentSubscription = null;
+      showToast("🔕 התראות כובו", 'worn');
+      updateBell(false);
+    }
+  } catch (err) {
+    console.error("שגיאה בכיבוי:", err);
+    showToast("❌ שגיאה בכיבוי התראות", 'error');
+  }
+}
+
+function updateBell(enabled) {
+  const notifIcons = document.querySelectorAll('.notifIcon');
+  notifIcons.forEach(icon => {
+    icon.classList.remove("fa-bell", "fa-bell-slash");
+    icon.classList.add(enabled ? "fa-bell" : "fa-bell-slash");
+
+    // אפקט קטן
+    icon.classList.add("active");
+    setTimeout(() => icon.classList.remove("active"), 300);
+  });
+}
+
+
+// ===== Init =====
+document.addEventListener("DOMContentLoaded", () => {
+  const notifToggle = document.querySelectorAll(".notifToggle");
+notifToggle.forEach(btn => {
+btn.addEventListener("click", async () => {
+  if (Notification.permission === "default") {
+    // רק בפעם הראשונה זה יבקש הרשאה
+    await initPush();
+  } else if (Notification.permission === "granted") {
+    if (currentSubscription) {
+      // קיים מנוי → נכבה
+      await unsubscribePush();
+    } else {
+      // אין מנוי אבל יש הרשאה → נרשום מחדש
+      await initPush(); 
+    }
+  } else if (Notification.permission === "denied") {
+    showToast("❌ חסמת התראות. כדי לאפשר שוב, עדכן בהגדרות הדפדפן.", 'error');
+  }
+});
+})
+});
+
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const reg = await navigator.serviceWorker.getRegistration();
+    const sub = await reg?.pushManager.getSubscription();
+    currentSubscription = sub;
+    updateBell(!!sub); // true אם יש מנוי, אחרת false
+  } catch (err) {
+    console.error("שגיאה בבדיקת subscription:", err);
+    updateBell(false);
+  }
+});
+
+
+
+  const daysOrder = ['sun','mon','tue','wed','thu','fri'];
+  const daysHeb = {sun:'ראשון',mon:'שני',tue:'שלישי',wed:'רביעי',thu:'חמישי',fri:'שישי'};
+
+  function setWeekText(startISO,endISO){
+    const s = new Date(startISO).toLocaleDateString('he-IL');
+    const e = new Date(endISO).toLocaleDateString('he-IL');
+    document.getElementById('weekText').textContent = `שבוע הבא: ${s} – ${e}`;
+  }
+
+  function skPrefs(){
+    const body = document.getElementById('prefsBody');
+    body.innerHTML = '';
+    for(let i=0;i<6;i++){
+      body.innerHTML += `<tr>
+        <td><div class="skeleton sk-line" style="width:120px"></div></td>
+        <td><div class="skeleton sk-line" style="width:220px"></div></td>
+        <td><div class="skeleton sk-line" style="width:160px"></div></td>
+      </tr>`;
+    }
+  }
+
+function renderPrefs(list){
+  const body = document.getElementById('prefsBody');
+  if(!list.length){ 
+    body.innerHTML = `<div class="muted">אין הגשות עדיין</div>`; 
+    return; 
+  }
+
+  body.innerHTML = list.map(row=>{
+const avail = daysOrder.map(d=>{
+  const a = (row.shifts?.[d]||[]).map(x=> {
+    if (x === 'morning') return 'בוקר';
+    if (x === 'mid') return 'אמצע';
+    if (x === 'evening') return 'ערב';
+    return x;
+  }).join(' · ');
+  return a ? `${daysHeb[d]}: ${a}` : '';
+}).filter(Boolean).join(' / ');
+
+
+    const notes = Object.entries(row.notes||{})
+      .filter(([,v])=>v)
+      .map(([d,v])=>`<li>${daysHeb[d]} – ${v}</li>`)
+      .join('');
+
+return `
+  <div class="pref-card">
+    <div class="username">👤 ${row.userId?.username || "—"}</div>
+    <div class="field">
+      <ul>${avail || '<li>—</li>'}</ul>
+    </div>
+    <div class="field">
+      <strong>📝 הערות:</strong>
+      <ul>${notes || '<li>—</li>'}</ul>
+    </div>
+  </div>
+`;
+
+  }).join('');
+}
+
+
+  function renderSchedule(sch){
+    const box = document.getElementById('scheduleBox');
+    box.innerHTML = '';
+    daysOrder.forEach(d=>{
+      const day = sch?.[daysHeb[d]] || sch?.[d] || {}; // תומך גם במפתחי עברית וגם באנגלית
+      const morning = day?.בוקר || day?.morning || [];
+      const evening = day?.ערב || day?.evening || [];
+      box.innerHTML += `<div class="day">
+        <h3>${daysHeb[d]}</h3>
+        <div class="row"><div class="slot">בוקר</div><div class="names">${(morning||[]).map(n=>`<span class="pill">${n}</span>`).join('')||'<span class="muted">—</span>'}</div></div>
+        <div class="row"><div class="slot">ערב</div><div class="names">${(evening||[]).map(n=>`<span class="pill">${n}</span>`).join('')||'<span class="muted">—</span>'}</div></div>
+      </div>`
+    });
+  }
+
+  async function loadPrefs(){
+    try{
+      document.getElementById('hint').textContent = 'טוען העדפות…';
+      skPrefs();
+      const r = await fetch('/preferences/next-week',{credentials:'include'});
+      const j = await r.json();
+      if(!j.ok) throw new Error(j.message||'שגיאה');
+      setWeekText(j.weekStart,j.weekEnd);
+      renderPrefs(j.submissions||[]);
+      document.getElementById('hint').textContent = '';
+      return j;
+    }catch(e){
+      document.getElementById('hint').textContent = '❌ שגיאה בטעינה';
+      console.error(e);
+      return {ok:false, submissions:[]};
+    }
+  }
+
+  async function buildAI(){
+    try{
+      document.getElementById('btnBuild').disabled = true;
+      document.getElementById('hint').textContent = 'מריץ AI…';
+      const csrf = await getCsrf();
+      const r = await fetch('/ai-schedule',{
+        method:'POST', credentials:'include', headers:{'Content-Type':'application/json','CSRF-Token':csrf}, body: JSON.stringify({})
+      });
+      const j = await r.json();
+      if(!j.ok){ throw new Error(j.message||'שגיאה בבניית הסידור'); }
+
+      // יכול להגיע מחרוזת JSON או אובייקט
+      let sch = j.schedule;
+      if(typeof sch === 'string'){
+        try{ sch = JSON.parse(sch); }catch{ /* נשאיר raw */ }
+      }
+      if(typeof sch === 'object'){
+        renderSchedule(sch);
+        document.getElementById('rawOut').textContent = JSON.stringify(sch,null,2);
+      }else{
+        document.getElementById('rawOut').textContent = String(j.schedule||'');
+      }
+      document.getElementById('hint').textContent = '✅ סידור נבנה';
+    }catch(e){
+      console.error(e);
+      document.getElementById('hint').textContent = '❌ שגיאה בהפקה';
+    }finally{
+      document.getElementById('btnBuild').disabled = false;
+    }
+  }
+
+  // events
+  document.getElementById('btnRefresh').addEventListener('click', loadPrefs);
+  document.getElementById('btnBuild').addEventListener('click', buildAI);
+
+  // init
+  loadPrefs();

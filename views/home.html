@@ -32,20 +32,9 @@
       </div>
       <div class="header-actions">
         <div class="notification-menu">
-          <button class="notification-btn" id="notificationBtn">
-            <i class="fas fa-bell"></i>
-            <div class="notification-badge">3</div>
-          </button>
-          <div class="notifications-dropdown" id="notificationsDropdown">
-            <div class="notifications-header">
-              <i class="fas fa-bell"></i>
-              התראות
-            </div>
-            <div class="notifications-empty">
-              <div class="notifications-empty-icon">🔔</div>
-              <div class="notifications-empty-text">אין התראות חדשות</div>
-            </div>
-          </div>
+<button id="notifToggle" class="notifToggle notification-btn" type="button" aria-label="התראות">
+  <i style="font-size: 1.3rem;" class="fa-solid fa-bell notifIcon"></i>
+</button>
         </div>
         <div class="user-menu">
           <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44'%3E%3Ccircle cx='22' cy='22' r='22' fill='%236366f1'/%3E%3Ctext x='22' y='28' text-anchor='middle' fill='white' font-size='16' font-weight='bold'%3E👤%3C/text%3E%3C/svg%3E" alt="User Avatar" class="user-avatar" id="userAvatar">
@@ -650,8 +639,12 @@
 
   <!-- שליחת התראות -->
   <section id="notifications" class="page-section" data-section="notifications">
-    <h1>🔔 שליחת התראות</h1>
-    <p>כאן המנהל שולח התראות.</p>
+        <h2>שליחת התראה</h2>
+        <form id="notifForm">
+          <input type="text" id="notifMessage" placeholder="כתוב הודעה..." required />
+          <button type="submit">📢 שלח</button>
+        </form>
+        <p id="notifStatus"></p>
   </section>
 
   <!-- הגדרות -->
@@ -872,8 +865,6 @@ document.addEventListener("DOMContentLoaded", loadUserRole);
  document.addEventListener('DOMContentLoaded', () => {
       const userAvatar = document.getElementById('userAvatar');
       const dropdownMenu = document.getElementById('dropdownMenu');
-      const notificationBtn = document.getElementById('notificationBtn');
-      const notificationsDropdown = document.getElementById('notificationsDropdown');
       const moreBtn = document.getElementById('moreBtn');
       const moreMenu = document.getElementById('moreMenu');
       
@@ -881,30 +872,16 @@ document.addEventListener("DOMContentLoaded", loadUserRole);
       userAvatar.addEventListener('click', (e) => {
         e.stopPropagation();
         dropdownMenu.classList.toggle('active');
-        // Close notifications if open
-        notificationsDropdown.classList.remove('active');
-        // Close more menu if open
         if (moreMenu) moreMenu.classList.remove('active');
       });
 
-      // Notifications menu toggle
-      notificationBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        notificationsDropdown.classList.toggle('active');
-        // Close user menu if open
-        dropdownMenu.classList.remove('active');
-        // Close more menu if open
-        if (moreMenu) moreMenu.classList.remove('active');
-      });
 
       // More menu toggle (bottom nav)
       if (moreBtn && moreMenu) {
         moreBtn.addEventListener('click', (e) => {
           e.stopPropagation();
           moreMenu.classList.toggle('active');
-          // Close other dropdowns
           dropdownMenu.classList.remove('active');
-          notificationsDropdown.classList.remove('active');
         });
       }
 
@@ -912,9 +889,6 @@ document.addEventListener("DOMContentLoaded", loadUserRole);
       document.addEventListener('click', (e) => {
         if (!dropdownMenu.contains(e.target) && !userAvatar.contains(e.target)) {
           dropdownMenu.classList.remove('active');
-        }
-        if (!notificationsDropdown.contains(e.target) && !notificationBtn.contains(e.target)) {
-          notificationsDropdown.classList.remove('active');
         }
         if (moreMenu && !moreMenu.contains(e.target) && !moreBtn.contains(e.target)) {
           moreMenu.classList.remove('active');

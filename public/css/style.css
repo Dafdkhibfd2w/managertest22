@@ -97,10 +97,16 @@
       --text-primary: #f1f5f9;
       --text-secondary: #cbd5e1;
       --text-muted: #94a3b8;
-      
+        --edit-bg:        #17b897;  /* טורקיז-אזמרגד נעים */
+  --edit-bg-hover:  #13a585;
+  --edit-bg-active: #0f8e73;
+  --edit-ring:      rgba(23,184,151,.35);
       --border: #334155;
       --border-light: #475569;
-      
+        --delete-bg:        #e74c3c;   /* אדום חזק אך אלגנטי */
+  --delete-bg-hover:  #d84332;
+  --delete-bg-active: #c0392b;
+  --delete-ring:      rgba(231,76,60,.35);
       --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
       --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
       --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
@@ -198,15 +204,15 @@
       width: 44px;
       height: 44px;
       border: none;
-      background: var(--bg-tertiary);
-      border-radius: var(--radius-md);
+      background: var(--primary);
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       transition: var(--transition);
       color: var(--text-secondary);
-      border: 1px solid var(--border);
+    border: 2px solid var(--primary);
     }
 
     .notification-btn:hover {
@@ -1559,7 +1565,7 @@ body.kb-open .bottom-nav{
   #orders table tr,
   #invoices table tr {
     margin-bottom: 16px;
-    background: var(--bg-tertiary);
+    background: var(--surface);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-sm);
     overflow: hidden;
@@ -2752,23 +2758,148 @@ body.kb-open .bottom-nav{
 }
 
 #tblSu .editBtn {
-  background: white;
-  color: #000;
-  font-weight: 600;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 8px;
+  appearance: none;
+  width: 100%;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 10px;
+  color: #eaf7f4;                 /* טקסט רך, לא לבן מסנוור */
+  background: linear-gradient(180deg, var(--edit-bg), var(--edit-bg-active));
+  box-shadow: 0 6px 14px rgba(23,184,151,.18);
   cursor: pointer;
+  transition: transform .08s ease, box-shadow .15s ease, filter .15s ease;
+}
+/* ===== Notifications Section ===== */
+#notifications {
+  max-width: 550px;
+  margin: 0 auto;
+  padding: 22px;
+  background: var(--card-bg, #1e2533);
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  animation: fadeInUp .5s ease;
+}
+
+#notifications h2 {
+  text-align: center;
+  font-size: 1.6rem;
+  margin-bottom: 20px;
+  color: var(--ink, #fff);
+}
+
+/* Form Layout */
+#notifForm {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#notifForm input {
+  flex: 1;
+  padding: 12px 14px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  background: #2a3142;
+  color: var(--ink, #fff);
+  font-size: 1rem;
+  transition: border .2s, box-shadow .2s;
+}
+
+#notifForm input::placeholder {
+  color: #999;
+}
+
+#notifForm input:focus {
+  outline: none;
+  border-color: var(--accent, #4fc3f7);
+  box-shadow: 0 0 0 3px rgba(79,195,247,0.25);
+}
+
+/* Button */
+#notifForm button {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #4fc3f7, #1976d2);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(25,118,210,0.35);
+  transition: transform .1s ease, filter .2s ease;
+}
+
+#notifForm button:hover {
+  filter: brightness(1.1);
+}
+
+#notifForm button:active {
+  transform: translateY(1px);
+}
+
+/* Status text */
+#notifStatus {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--muted, #aaa);
+  min-height: 20px;
+}
+@keyframes bellShake{
+  0%,100%{transform:rotate(0)}
+  20%{transform:rotate(-15deg)}
+  40%{transform:rotate(15deg)}
+  60%{transform:rotate(-10deg)}
+  80%{transform:rotate(10deg)}
+}
+
+/* חשוב כדי שהטרנספורם יחול על האייקון עצמו */
+.notifIcon{
+  display:inline-block;
+  transform-origin:50% 10%;
+  will-change:transform;
+}
+
+/* טריגר אנימציה בלחיצה רגעית */
+.notifToggle:active .notifIcon{
+  animation:bellShake .6s ease;
+}
+
+/* טריגר אנימציה כשמוסיפים class דרך JS */
+.notifIcon.active{
+  animation:bellShake .6s ease;
+}
+/* Animation */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(15px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  #notifForm {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #notifForm button {
+    width: 100%;
+  }
 }
 
 #tblSu .delBtn {
-  background: #ef5350;
-  color: #fff;
-  font-weight: 600;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 8px;
+  appearance: none;
+  width: 100%;
+  padding: 10px 14px;
+  margin-top: 5px;
+  border: 0;
+  border-radius: 10px;
+  color: #fff3f3;   /* טקסט רך על אדום */
+  background: linear-gradient(180deg, var(--delete-bg), var(--delete-bg-active));
+  box-shadow: 0 6px 14px rgba(231,76,60,.18);
   cursor: pointer;
+  transition: transform .08s ease, box-shadow .15s ease, filter .15s ease;
 }
 
 #tblSu .editBtn:hover { 
